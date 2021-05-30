@@ -1,0 +1,52 @@
+c = 525 * a + 2 * b;
+
+Atual: 2     === 5  == * 
+Anterior: 5  === 52 == 525
+
+
+split(*) = 525, a+2*b => 525, a+2, b		== Posicao 1 (+)
+split(+) = 525, a, 2, b
+z1 = 525 * a
+z2 = 2 * b
+z3 = z1 + z2
+
+c = 525 * a + 282 * 2 * b;
+
+split(*) = 525, a+282*2*b => 525, a+282, 2*b => 525, a+282, 2, b	== Posicao 1 (+)
+split(+) = 525, a, 282, 2, b
+z1 = 525 * a
+z2 = 2 * b
+z3 = z1 + z2
+
+operation = 525, a, 282, 2, b => 525a, 282, 2, b => 525a, 282*2, b => 525a, 282*2*b = 525a + 282*2*b =>RETORNA
+
+pilha de operadores: *[0], *[1], *[2], +[1] 
+		     *[0], *[2], *[3], +[1] => *[1], *[2], +[0] => *[1], +[0] => +[0] => NULL
+
+Estrategia da pilha:
+1+2*3+4
+1 | 2*3+4
+2*3 | 4
+6 | 
+10
+1 | 10
+11
+
+Lê 1 caractere, verifica se é número
+
+Anterior:
+Atual:
+
+pilha de números e pilha de simbolos:
+
+
+
+
+
+
+
+		     
+
+
+
+
