@@ -1,0 +1,15 @@
+a  
+
+= 
+
+
+123;
+
+
+/* Isso é um comentário
+
+*/
+
+b = 456; // comentário de linha
+c = a + b + 789 * 0;
+c;

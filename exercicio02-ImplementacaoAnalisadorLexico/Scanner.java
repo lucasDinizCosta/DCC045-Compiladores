@@ -47,7 +47,7 @@ public class Scanner {
     private final int ST_SKIP = 12;
     private final int ST_ERROR = 13;
 
-    private final int ST_BAD = -1;
+    private final int ST_BAD = -2;
     
     // Tipos de Tokens
     private final int CAT_EOF = 0;
