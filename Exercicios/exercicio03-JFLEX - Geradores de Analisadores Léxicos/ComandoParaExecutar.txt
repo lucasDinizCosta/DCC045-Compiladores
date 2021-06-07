@@ -1,0 +1,15 @@
+Gerar o lexer com o JFLEX: 
+
+java -jar jflex-full-1.8.2.jar Exemplo.jflex
+
+OU dependendo pode ser se acessar pela raiz do repositório
+
+java -jar JFLEX\ -\ Gerador\ de\ Analisadores\ Léxico/jflex-full-1.8.2.jar Exercicios/Exercicio03\ -\ JFLEX\ -\ Geradores\ de\ Analisadores\ Léxicos/Exemplo.jflex
+
+Em seguida ele irá gerar um NFA com o número de estados, converte NFA pra DFA
+e retorna o número de estados da minimização e os estados depois da minimização 
+do autômato.
+
+rodar o programa de exemplo:
+javac -cp . Teste.java  // Compila
+java Teste sample1.txt  // Roda com o arquivo sample1.txt passado como parametro
