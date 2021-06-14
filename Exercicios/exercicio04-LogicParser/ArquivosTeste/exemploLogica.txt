@@ -1,3 +1,4 @@
-/* Teste*/
-/*a = 2;*/
-true false ∨ falsetruetrue¬true
+/* ~ ou ¬ são o comando de negacao */
+/* ∨ ou a letra 'v' são o comando OU(OR)*/
+true v false v true;
+false v false v true v ¬false;
