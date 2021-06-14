@@ -1,7 +1,7 @@
 /* ~ ou ¬ são o comando de negacao */
 /* ∨ ou a letra 'v' são o comando OU(OR)*/
-//¬~~false;
-//~true;
+¬~~false;
+~true;
 //true v true v false;
 // true v false v true;
 false v false v ~~true v ¬false;

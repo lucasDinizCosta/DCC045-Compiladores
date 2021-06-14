@@ -70,10 +70,11 @@ public class LogicParser extends TopDownRecursiveParser {
         int x = getCurrLine(); // Linha e coluna do token
         int y = getCurrCol();
         // Atribuição
-        // ID = ... // a = 5
         // stmt -> Exp1 Exp
         if (exp1()) {
             if (exp()) {
+                Print p = new Print(x,y,(Expr)ast.pop());
+                ast.push(p);
                 return true;
             }
         }
