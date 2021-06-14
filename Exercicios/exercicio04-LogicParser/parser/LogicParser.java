@@ -120,6 +120,7 @@ public class LogicParser extends TopDownRecursiveParser {
                 Expr rgt = (Expr) ast.pop();
                 System.out.println("putting Not " + rgt);
                 ast.push(new Not(x, y, rgt));
+                return true;
             }
         }
 

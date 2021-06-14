@@ -4,8 +4,8 @@ package parser;
 public enum TOKEN_TYPE {
     TRUE,
     FALSE,
-    OR,
-    NOT,
-    SEMI,
+    OR,     // ∨ ou a letra 'v'
+    NOT,    // '~' ou '¬'
+    SEMI,   // ';'
     EOF,
 }

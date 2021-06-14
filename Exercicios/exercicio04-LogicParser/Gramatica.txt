@@ -31,12 +31,13 @@ v, ¬ e as constantes true e false
 Prog -> StmtList
 StmtList -> Stmt ; StmtList 
 		  | Stmt ;
-Stmt -> W Exp
-Exp -> ∨ W Exp | ​Ɛ
-W -> ¬W | true | false
+Stmt -> Exp1 Exp
+Exp -> ∨ Exp1 Exp | ​Ɛ
+Exp1  -> ¬Exp1 | true | false
 
-ou
-
+Prog -> StmtList
+StmtList -> Stmt ; StmtList 
+		  | Stmt ;
 Stmt -> Exp1 Exp
 Exp -> ∨ Exp1 Exp | ​Ɛ
 Exp1  -> ¬Exp1 | true | false
