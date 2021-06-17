@@ -1,0 +1,25 @@
+{-
+/******************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1) *
+*                                                     *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C *
+******************************************************/
+-}
+
+main ( ) {
+    print fat (10.556) ; -- Comentario em linha
+}
+
+fat (num :: Int ) : Int {
+    if (num < 1 )
+        return 1;
+    else
+        return num fat (num-1);
+}
+
+divmod (num :: Int , div :: Int ) : Int , Int {
+    q = num / div;
+    r = num % div;
+    a = '\n';
+    return q , r;
+}

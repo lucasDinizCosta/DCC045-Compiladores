@@ -1,39 +1,10 @@
-LangParser 4
-/**
-Modificações: 
-- A linguagem vai aceitar identificadores com mais de um caractere
-- ? e : representam o IF
-- F: Fator é um número ou identificador
-*/
-
-Prog -> StmtList
-
-StmtList -> Stmt ; StmtList
-         | stmt ;
-      
-Stmt -> ID = Exp   
-     | F ? Stmt : Stmt
-     | F ? Exp 
-     | Exp         
-                  
-Exp -> F + Exp    
-     | F * Exp    
-     | F
-     
-F -> INT | ID
-
-LogicParser
+[ --- LogicParser --- ]
 
 v, ¬ e as constantes true e false
 ∨ ==> OR
 ¬ ==> Negação
 
-Prog -> StmtList
-StmtList -> Stmt ; StmtList 
-		  | Stmt ;
-Stmt -> Exp1 Exp
-Exp -> ∨ Exp1 Exp | ​Ɛ
-Exp1  -> ¬Exp1 | true | false
+Gramática
 
 Prog -> StmtList
 StmtList -> Stmt ; StmtList 
