@@ -48,7 +48,8 @@ numberInteger  = [:digit:]+                   // Identifica os inteiros:(Com pel
 numberFloat    = ([:digit:]* "." ([:digit:] [:digit:]*))  // Identifica os reais(Float): 123.23, 1.0, .12345
 
 letter = [:letter:]               // Letras maiusculas ou minúsculas
-characterLitteral     = "'"("\\n" | "\\b" | "\\t" | "\\r" | "\\" | "\\\\")"'" 
+characterLitteral = ("\\'" | "\\n" | "\\t" | "\\b" |"\\r" |"\\\\" | [^\n\r])  // Identifica os caracteres
+
 id = [:lowercase:] ({letter} | "_" | [:digit:])*  // Reconhece os identificadores. Ex: Nome de variaveis
 
 // Apesar de o nome de tipo ser um identificador, ele tem suas particularidades
@@ -86,8 +87,8 @@ nameType = [:uppercase:] ({letter} | "_" | [:digit:])*
     {id}                { return symbol(TOKEN_TYPE.ID);   }
     {numberInteger}     { return symbol(TOKEN_TYPE.VALUE_INT, Integer.parseInt(yytext()) );    }
     {numberFloat}       { return symbol(TOKEN_TYPE.VALUE_FLOAT, Float.parseFloat(yytext()) );  }
-    {characterLitteral} { return symbol(TOKEN_TYPE.VALUE_CHAR);}
     {nameType}          { return symbol(TOKEN_TYPE.NAME_TYPE); }
+    \'{characterLitteral}\' { return symbol(TOKEN_TYPE.VALUE_CHAR);}
     
     
     // SIMBOLOS RESERVADOS

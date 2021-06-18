@@ -21,5 +21,7 @@ divmod (num :: Int , div :: Int ) : Int , Int {
     q = num / div;
     r = num % div;
     a = '\n';
+    k = '\\';
+    x = '\'';
     return q , r;
 }
