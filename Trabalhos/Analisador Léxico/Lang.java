@@ -16,6 +16,7 @@ public class Lang {
         // Instancia um token
         Token t = lx.nextToken();
 
+        System.out.println("\n---- Inicia a impressao dos tokens: ----");
         /// Itera sobre os tokens da entrada até chegar ao final do arquivo
         while (t != null) {
             System.out.println(t.toString());
