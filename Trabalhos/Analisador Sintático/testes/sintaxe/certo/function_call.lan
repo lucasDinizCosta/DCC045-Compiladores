@@ -1,0 +1,10 @@
+
+f(x :: Int){
+   y = 2*x  + 1;
+   print y;
+}
+
+main(v :: Int[], f :: Float){
+  z = 10;
+  f(z);
+}
