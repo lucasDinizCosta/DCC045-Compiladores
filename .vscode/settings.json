@@ -1,0 +1,10 @@
+{
+    "java.project.referencedLibraries": [
+        "library/**/*.jar",
+        "ANTLR/antlr-4.9.2-complete.jar"
+    ],
+    "java.project.sourcePaths": [
+        "Exercicios/exercicio05-ANTLR-Teste-01-simples",
+        "Exercicios/exercicio06-ANTLR-Teste-02-Mais-Complexo"
+    ],
+}
