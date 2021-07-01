@@ -17,7 +17,7 @@ public class LangCompiler{
           System.out.println(" -bsm : Executa uma bateria de testes no interpretador");          
         
           System.out.println(" -pp: Pretty print program.");        
-          System.out.println(" -tp: Verficar tipos e imprimir o ambiente de tipos");
+          System.out.println(" -tp: Verificar tipos e imprimir o ambiente de tipos");
           System.out.println(" -i : Apenas interpretar");
           
           System.out.println(" -ti: Verificar tipos e depois interpretar");
