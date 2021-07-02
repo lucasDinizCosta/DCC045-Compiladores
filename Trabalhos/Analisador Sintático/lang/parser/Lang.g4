@@ -1,3 +1,8 @@
+grammar Lang;
+
+// No cabeçalho de todas as classes geradas irá aparecer que estiver dentro do header
+@header
+{
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
 *                                                       *
@@ -6,14 +11,6 @@
 *                                                       *
 *********************************************************/
 
-grammar Lang;
-
-@parser::header
-{ 
-package lang.parser;    
-}
-@lexer::header
-{ 
 package lang.parser;    
 }
 
@@ -90,8 +87,8 @@ exps: exp (COMMA exp)*
 /* Tokens da linguagem -- Parte Léxica */
 // Tudo que começa com letra maiúscula a ferramenta entende que é do analisador léxico
 
-EOL: '\r' ? '\n' -> skip;                 // Identifica o Final de Linha
-WS : [ \t]+ -> skip;             // WhiteSpace => espaço em branco
+EOL: '\r' ? '\n' -> skip;                               // Identifica o Final de Linha
+WS : [ \t]+ -> skip;                                    // WhiteSpace => espaço em branco
 SINGLE_LINE_COMMENT: '--' .*? EOL -> skip;              // Identifica o comentário de uma linha
 MULTI_LINE_COMMENT: '{-' .*? '-}' -> skip;
 
@@ -166,6 +163,6 @@ CHAR: ('\'' '\\n' '\'')
     | ('\'' '\\r' '\'') 
     | ('\'' '\\\\' '\'') 
     | ('\'' '\\' '\'') 
-    | ('\'' [\u0000-\uFFFE] '\'')       // Limite de caracteres, captura todos os caracteres possíveis
+    | ('\'' [\u0000-\uFFFE] '\'')       // Limite de caracteres, captura todos os caracteres possíveis com base no unicode
     ;
     

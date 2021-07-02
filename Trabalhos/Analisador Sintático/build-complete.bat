@@ -1,5 +1,6 @@
 @ECHO OFF
 cls
+echo "----  LIMPA, CONSTROI E COMPILA TODO O PROJETO(PROCESSO COMPLETO)----"
 cd lang
 cd parser
 echo "----  Limpa a pasta de parser"
@@ -25,7 +26,6 @@ javac -cp ../lib/ANTLR.jar;.. *.java
 cd ..
 echo "----  Compila as classes do PARSER"
 javac -cp ../lib/ANTLR.jar;.. ./parser/*.java
-cd ..
 del *.class
 echo "----  Compila a classe LangCompiler"
 javac -cp ../lib/ANTLR.jar;.. LangCompiler.java

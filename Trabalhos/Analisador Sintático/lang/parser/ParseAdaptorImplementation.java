@@ -1,3 +1,11 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*                                                       *
+* Projeto do Analisador Sintático para a Linguagem Lang *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
+
 package lang.parser;
 
 import lang.ast.SuperNode;
