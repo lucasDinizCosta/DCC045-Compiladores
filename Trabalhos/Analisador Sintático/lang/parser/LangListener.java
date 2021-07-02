@@ -150,15 +150,15 @@ public interface LangListener extends ParseTreeListener {
 	 */
 	void exitPexp(LangParser.PexpContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#one_value}.
+	 * Enter a parse tree produced by {@link LangParser#lvalue}.
 	 * @param ctx the parse tree
 	 */
-	void enterOne_value(LangParser.One_valueContext ctx);
+	void enterLvalue(LangParser.LvalueContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#one_value}.
+	 * Exit a parse tree produced by {@link LangParser#lvalue}.
 	 * @param ctx the parse tree
 	 */
-	void exitOne_value(LangParser.One_valueContext ctx);
+	void exitLvalue(LangParser.LvalueContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LangParser#exps}.
 	 * @param ctx the parse tree

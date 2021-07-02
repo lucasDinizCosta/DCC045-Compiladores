@@ -186,13 +186,13 @@ public class LangBaseListener implements LangListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOne_value(LangParser.One_valueContext ctx) { }
+	@Override public void enterLvalue(LangParser.LvalueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOne_value(LangParser.One_valueContext ctx) { }
+	@Override public void exitLvalue(LangParser.LvalueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
