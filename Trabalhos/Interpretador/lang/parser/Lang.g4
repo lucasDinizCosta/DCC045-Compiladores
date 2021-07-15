@@ -160,6 +160,6 @@ CHAR: ('\'' '\\n' '\'')
     | ('\'' '\\r' '\'') 
     | ('\'' '\\\\' '\'') 
     | ('\'' '\\' '\'') 
-    | ('\'' [\u20-\u7F] '\'')       // Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
+    | ('\''[\u0000-\u007F]'\'')       // Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
     ;
     
