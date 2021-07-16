@@ -45,25 +45,25 @@ cmd: OPEN_BRACES cmd* CLOSE_BRACES
     | lvalue EQUALS exp SEMI
     | ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA lvalue)* GREATER_THAN)? SEMI
     ;
-exp: exp AND exp
+exp:<assoc=left> exp AND exp
     | rexp
     ;
 rexp: aexp LESS_THAN aexp
-    | rexp EQUALITY aexp
-    | rexp DIFFERENCE aexp
+    |<assoc=left> rexp EQUALITY aexp
+    |<assoc=left> rexp DIFFERENCE aexp
     | aexp
     ;
 aexp: aexp PLUS mexp
     | aexp MINUS mexp
     | mexp
     ;
-mexp: mexp TIMES sexp
-    | mexp SLASH sexp
-    | mexp PERCENT sexp
+mexp:<assoc=left> mexp TIMES sexp
+    |<assoc=left> mexp SLASH sexp
+    |<assoc=left> mexp PERCENT sexp
     | sexp
     ;
-sexp: EXCLAMATION sexp
-    | MINUS sexp
+sexp:<assoc=right> EXCLAMATION sexp
+    |<assoc=right> MINUS sexp
     | TRUE
     | FALSE
     | NULL
@@ -73,13 +73,13 @@ sexp: EXCLAMATION sexp
     | pexp
     ;
 pexp: lvalue
-    | OPEN_PARENT exp CLOSE_PARENT
+    |<assoc=left> OPEN_PARENT exp CLOSE_PARENT
     | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?
     | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET
     ;
 lvalue: ID
-    | lvalue OPEN_BRACKET exp CLOSE_BRACKET
-    | lvalue DOT ID
+    |<assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET
+    |<assoc=left> lvalue DOT ID
     ;
 exps: exp (COMMA exp)*
     ;

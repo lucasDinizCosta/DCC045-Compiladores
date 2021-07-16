@@ -20,16 +20,17 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
 
     // Retorna null se encontrar erros de sintaxe no arquivo de entrada
     @Override
-    public SuperNode parseFile(String path) throws IOException{
-        // Cria uma variavel que irá armazenar um charStream de ANTLR 
+    public SuperNode parseFile(String path){
+        try{
+            // Cria uma variavel que irá armazenar um charStream de ANTLR 
         // a partir de um arquivo
         CharStream stream = CharStreams.fromFileName(path);
 
         // Cria um analisador léxico que é carregado com os dados do arquivo
-        LangLexer lex = new LangLexer(stream);
+        LangLexer lexer = new LangLexer(stream);
 
         // Cria um buffer de tokens com base no analisador léxico
-        CommonTokenStream tokens = new CommonTokenStream(lex);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         // Utiliza o analisador sintático criado e será alimentado com os buffers 
         // dos tokens
@@ -45,5 +46,11 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
         // Retorna um nó caso não encontre erros no arquivo passado
         // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do compilador
         return new Node();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do compilador
+            return new Node();
+        }
     }
 }
