@@ -18,163 +18,627 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface LangListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link LangParser#prog}.
+	 * Enter a parse tree produced by the {@code Program}
+	 * labeled alternative in {@link LangParser#prog}.
 	 * @param ctx the parse tree
 	 */
-	void enterProg(LangParser.ProgContext ctx);
+	void enterProgram(LangParser.ProgramContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#prog}.
+	 * Exit a parse tree produced by the {@code Program}
+	 * labeled alternative in {@link LangParser#prog}.
 	 * @param ctx the parse tree
 	 */
-	void exitProg(LangParser.ProgContext ctx);
+	void exitProgram(LangParser.ProgramContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#data}.
+	 * Enter a parse tree produced by the {@code DataDeclaration}
+	 * labeled alternative in {@link LangParser#data}.
 	 * @param ctx the parse tree
 	 */
-	void enterData(LangParser.DataContext ctx);
+	void enterDataDeclaration(LangParser.DataDeclarationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#data}.
+	 * Exit a parse tree produced by the {@code DataDeclaration}
+	 * labeled alternative in {@link LangParser#data}.
 	 * @param ctx the parse tree
 	 */
-	void exitData(LangParser.DataContext ctx);
+	void exitDataDeclaration(LangParser.DataDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#decl}.
+	 * Enter a parse tree produced by the {@code VarDeclaration}
+	 * labeled alternative in {@link LangParser#decl}.
 	 * @param ctx the parse tree
 	 */
-	void enterDecl(LangParser.DeclContext ctx);
+	void enterVarDeclaration(LangParser.VarDeclarationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#decl}.
+	 * Exit a parse tree produced by the {@code VarDeclaration}
+	 * labeled alternative in {@link LangParser#decl}.
 	 * @param ctx the parse tree
 	 */
-	void exitDecl(LangParser.DeclContext ctx);
+	void exitVarDeclaration(LangParser.VarDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#func}.
+	 * Enter a parse tree produced by the {@code Function}
+	 * labeled alternative in {@link LangParser#func}.
 	 * @param ctx the parse tree
 	 */
-	void enterFunc(LangParser.FuncContext ctx);
+	void enterFunction(LangParser.FunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#func}.
+	 * Exit a parse tree produced by the {@code Function}
+	 * labeled alternative in {@link LangParser#func}.
 	 * @param ctx the parse tree
 	 */
-	void exitFunc(LangParser.FuncContext ctx);
+	void exitFunction(LangParser.FunctionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#params}.
+	 * Enter a parse tree produced by the {@code ParametersFunction}
+	 * labeled alternative in {@link LangParser#params}.
 	 * @param ctx the parse tree
 	 */
-	void enterParams(LangParser.ParamsContext ctx);
+	void enterParametersFunction(LangParser.ParametersFunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#params}.
+	 * Exit a parse tree produced by the {@code ParametersFunction}
+	 * labeled alternative in {@link LangParser#params}.
 	 * @param ctx the parse tree
 	 */
-	void exitParams(LangParser.ParamsContext ctx);
+	void exitParametersFunction(LangParser.ParametersFunctionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#type}.
+	 * Enter a parse tree produced by the {@code BTypeCall}
+	 * labeled alternative in {@link LangParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void enterType(LangParser.TypeContext ctx);
+	void enterBTypeCall(LangParser.BTypeCallContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#type}.
+	 * Exit a parse tree produced by the {@code BTypeCall}
+	 * labeled alternative in {@link LangParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void exitType(LangParser.TypeContext ctx);
+	void exitBTypeCall(LangParser.BTypeCallContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#btype}.
+	 * Enter a parse tree produced by the {@code TypeDeclaration}
+	 * labeled alternative in {@link LangParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void enterBtype(LangParser.BtypeContext ctx);
+	void enterTypeDeclaration(LangParser.TypeDeclarationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#btype}.
+	 * Exit a parse tree produced by the {@code TypeDeclaration}
+	 * labeled alternative in {@link LangParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void exitBtype(LangParser.BtypeContext ctx);
+	void exitTypeDeclaration(LangParser.TypeDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#cmd}.
+	 * Enter a parse tree produced by the {@code BTypeInt}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterCmd(LangParser.CmdContext ctx);
+	void enterBTypeInt(LangParser.BTypeIntContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#cmd}.
+	 * Exit a parse tree produced by the {@code BTypeInt}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitCmd(LangParser.CmdContext ctx);
+	void exitBTypeInt(LangParser.BTypeIntContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#exp}.
+	 * Enter a parse tree produced by the {@code BTypeChar}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp(LangParser.ExpContext ctx);
+	void enterBTypeChar(LangParser.BTypeCharContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#exp}.
+	 * Exit a parse tree produced by the {@code BTypeChar}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp(LangParser.ExpContext ctx);
+	void exitBTypeChar(LangParser.BTypeCharContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#rexp}.
+	 * Enter a parse tree produced by the {@code BTypeBool}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterRexp(LangParser.RexpContext ctx);
+	void enterBTypeBool(LangParser.BTypeBoolContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#rexp}.
+	 * Exit a parse tree produced by the {@code BTypeBool}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitRexp(LangParser.RexpContext ctx);
+	void exitBTypeBool(LangParser.BTypeBoolContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#aexp}.
+	 * Enter a parse tree produced by the {@code BTypeFloat}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterAexp(LangParser.AexpContext ctx);
+	void enterBTypeFloat(LangParser.BTypeFloatContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#aexp}.
+	 * Exit a parse tree produced by the {@code BTypeFloat}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitAexp(LangParser.AexpContext ctx);
+	void exitBTypeFloat(LangParser.BTypeFloatContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#mexp}.
+	 * Enter a parse tree produced by the {@code BTypeNameType}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterMexp(LangParser.MexpContext ctx);
+	void enterBTypeNameType(LangParser.BTypeNameTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#mexp}.
+	 * Exit a parse tree produced by the {@code BTypeNameType}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitMexp(LangParser.MexpContext ctx);
+	void exitBTypeNameType(LangParser.BTypeNameTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#sexp}.
+	 * Enter a parse tree produced by the {@code BTypeID}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void enterSexp(LangParser.SexpContext ctx);
+	void enterBTypeID(LangParser.BTypeIDContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#sexp}.
+	 * Exit a parse tree produced by the {@code BTypeID}
+	 * labeled alternative in {@link LangParser#btype}.
 	 * @param ctx the parse tree
 	 */
-	void exitSexp(LangParser.SexpContext ctx);
+	void exitBTypeID(LangParser.BTypeIDContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#pexp}.
+	 * Enter a parse tree produced by the {@code CommandsList}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void enterPexp(LangParser.PexpContext ctx);
+	void enterCommandsList(LangParser.CommandsListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#pexp}.
+	 * Exit a parse tree produced by the {@code CommandsList}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void exitPexp(LangParser.PexpContext ctx);
+	void exitCommandsList(LangParser.CommandsListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#lvalue}.
+	 * Enter a parse tree produced by the {@code If}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void enterLvalue(LangParser.LvalueContext ctx);
+	void enterIf(LangParser.IfContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#lvalue}.
+	 * Exit a parse tree produced by the {@code If}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void exitLvalue(LangParser.LvalueContext ctx);
+	void exitIf(LangParser.IfContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LangParser#exps}.
+	 * Enter a parse tree produced by the {@code IfElse}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void enterExps(LangParser.ExpsContext ctx);
+	void enterIfElse(LangParser.IfElseContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LangParser#exps}.
+	 * Exit a parse tree produced by the {@code IfElse}
+	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
 	 */
-	void exitExps(LangParser.ExpsContext ctx);
+	void exitIfElse(LangParser.IfElseContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Iterate}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterIterate(LangParser.IterateContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Iterate}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitIterate(LangParser.IterateContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Read}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterRead(LangParser.ReadContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Read}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitRead(LangParser.ReadContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Print}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrint(LangParser.PrintContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Print}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrint(LangParser.PrintContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Return}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturn(LangParser.ReturnContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Return}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturn(LangParser.ReturnContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Attribution}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttribution(LangParser.AttributionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Attribution}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttribution(LangParser.AttributionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FunctionCall}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionCall(LangParser.FunctionCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FunctionCall}
+	 * labeled alternative in {@link LangParser#cmd}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionCall(LangParser.FunctionCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code RExpCall}
+	 * labeled alternative in {@link LangParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterRExpCall(LangParser.RExpCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code RExpCall}
+	 * labeled alternative in {@link LangParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitRExpCall(LangParser.RExpCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code AndOperation}
+	 * labeled alternative in {@link LangParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterAndOperation(LangParser.AndOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code AndOperation}
+	 * labeled alternative in {@link LangParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitAndOperation(LangParser.AndOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code AExpCall}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterAExpCall(LangParser.AExpCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code AExpCall}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitAExpCall(LangParser.AExpCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code LessThan}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLessThan(LangParser.LessThanContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code LessThan}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLessThan(LangParser.LessThanContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Equality}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterEquality(LangParser.EqualityContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Equality}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitEquality(LangParser.EqualityContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Difference}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterDifference(LangParser.DifferenceContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Difference}
+	 * labeled alternative in {@link LangParser#rexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitDifference(LangParser.DifferenceContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code AdditionOperation}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterAdditionOperation(LangParser.AdditionOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code AdditionOperation}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitAdditionOperation(LangParser.AdditionOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code SubtractionOperation}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterSubtractionOperation(LangParser.SubtractionOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SubtractionOperation}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitSubtractionOperation(LangParser.SubtractionOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code MExpCall}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMExpCall(LangParser.MExpCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code MExpCall}
+	 * labeled alternative in {@link LangParser#aexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMExpCall(LangParser.MExpCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DivisionOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterDivisionOperation(LangParser.DivisionOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DivisionOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitDivisionOperation(LangParser.DivisionOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code SExpCall}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterSExpCall(LangParser.SExpCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SExpCall}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitSExpCall(LangParser.SExpCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code MultiplicationOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiplicationOperation(LangParser.MultiplicationOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code MultiplicationOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiplicationOperation(LangParser.MultiplicationOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ModularOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterModularOperation(LangParser.ModularOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ModularOperation}
+	 * labeled alternative in {@link LangParser#mexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitModularOperation(LangParser.ModularOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Not}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterNot(LangParser.NotContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Not}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitNot(LangParser.NotContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Minus}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMinus(LangParser.MinusContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Minus}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMinus(LangParser.MinusContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code True}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterTrue(LangParser.TrueContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code True}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitTrue(LangParser.TrueContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code False}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterFalse(LangParser.FalseContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code False}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitFalse(LangParser.FalseContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Null}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterNull(LangParser.NullContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Null}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitNull(LangParser.NullContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Integer}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterInteger(LangParser.IntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Integer}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitInteger(LangParser.IntegerContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Float}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterFloat(LangParser.FloatContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Float}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitFloat(LangParser.FloatContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Character}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterCharacter(LangParser.CharacterContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Character}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitCharacter(LangParser.CharacterContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code PExpCall}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterPExpCall(LangParser.PExpCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code PExpCall}
+	 * labeled alternative in {@link LangParser#sexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitPExpCall(LangParser.PExpCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code LitteralValueCall}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLitteralValueCall(LangParser.LitteralValueCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code LitteralValueCall}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLitteralValueCall(LangParser.LitteralValueCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ExpParenthesis}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpParenthesis(LangParser.ExpParenthesisContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ExpParenthesis}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpParenthesis(LangParser.ExpParenthesisContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code TypeInstanciate}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeInstanciate(LangParser.TypeInstanciateContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code TypeInstanciate}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeInstanciate(LangParser.TypeInstanciateContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FunctionReturn}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionReturn(LangParser.FunctionReturnContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FunctionReturn}
+	 * labeled alternative in {@link LangParser#pexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionReturn(LangParser.FunctionReturnContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ArrayAccess}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayAccess(LangParser.ArrayAccessContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ArrayAccess}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayAccess(LangParser.ArrayAccessContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Identifier}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdentifier(LangParser.IdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Identifier}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdentifier(LangParser.IdentifierContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DataAccess}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void enterDataAccess(LangParser.DataAccessContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DataAccess}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void exitDataAccess(LangParser.DataAccessContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FCallParams}
+	 * labeled alternative in {@link LangParser#exps}.
+	 * @param ctx the parse tree
+	 */
+	void enterFCallParams(LangParser.FCallParamsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FCallParams}
+	 * labeled alternative in {@link LangParser#exps}.
+	 * @param ctx the parse tree
+	 */
+	void exitFCallParams(LangParser.FCallParamsContext ctx);
 }

@@ -13,75 +13,79 @@ grammar Lang;
 
 package lang.parser;    
 }
+/**
+ Foi adicionado um ("#")apelido para cada expressão para facilitar a identificação
+ no interpretador e na semântica posteriormente
+*/
 
 /* Regras da gramática */
-prog: data* func*
+prog: data* func*   # Program
     ;
-data: DATA_TYPE NAME_TYPE OPEN_BRACES decl* CLOSE_BRACES
+data: DATA_TYPE NAME_TYPE OPEN_BRACES decl* CLOSE_BRACES    # DataDeclaration
     ;
-decl: ID DOUBLE_COLON type SEMI
+decl: ID DOUBLE_COLON type SEMI                             # VarDeclaration
     ;
-func: ID OPEN_PARENT params? CLOSE_PARENT (COLON type (COMMA type)*)? OPEN_BRACES cmd* CLOSE_BRACES
+func: ID OPEN_PARENT params? CLOSE_PARENT (COLON type (COMMA type)*)? OPEN_BRACES cmd* CLOSE_BRACES    # Function
     ;
-params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*
+params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*  # ParametersFunction
       ;
-type: type OPEN_BRACKET CLOSE_BRACKET
-    | btype
+type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
+    | btype     # BTypeCall
     ;
-btype: INT_TYPE
-    | CHAR_TYPE
-    | BOOL_TYPE
-    | FLOAT_TYPE
-    | NAME_TYPE
-    | ID
+btype: INT_TYPE     # BTypeInt
+    | CHAR_TYPE     # BTypeChar
+    | BOOL_TYPE     # BTypeBool
+    | FLOAT_TYPE    # BTypeFloat
+    | NAME_TYPE     # BTypeNameType
+    | ID            # BTypeID
     ;
-cmd: OPEN_BRACES cmd* CLOSE_BRACES
-    | IF OPEN_PARENT exp CLOSE_PARENT cmd
-    | IF OPEN_PARENT exp CLOSE_PARENT cmd ELSE cmd
-    | ITERATE OPEN_PARENT exp CLOSE_PARENT cmd
-    | READ lvalue SEMI
-    | PRINT exp SEMI
-    | RETURN exp (COMMA exp)* SEMI
-    | lvalue EQUALS exp SEMI
-    | ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA lvalue)* GREATER_THAN)? SEMI
+cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
+    | IF OPEN_PARENT exp CLOSE_PARENT cmd   # If
+    | IF OPEN_PARENT exp CLOSE_PARENT cmd ELSE cmd  # IfElse
+    | ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
+    | READ lvalue SEMI  # Read
+    | PRINT exp SEMI    # Print
+    | RETURN exp (COMMA exp)* SEMI  # Return
+    | lvalue EQUALS exp SEMI    # Attribution
+    | ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA lvalue)* GREATER_THAN)? SEMI   # FunctionCall
     ;
-exp:<assoc=left> exp AND exp
-    | rexp
+exp:<assoc=left> exp AND exp    # AndOperation
+    | rexp      # RExpCall
     ;
-rexp: aexp LESS_THAN aexp
-    |<assoc=left> rexp EQUALITY aexp
-    |<assoc=left> rexp DIFFERENCE aexp
-    | aexp
+rexp: aexp LESS_THAN aexp   # LessThan
+    |<assoc=left> rexp EQUALITY aexp    # Equality
+    |<assoc=left> rexp DIFFERENCE aexp  # Difference
+    | aexp      # AExpCall
     ;
-aexp: aexp PLUS mexp
-    | aexp MINUS mexp
-    | mexp
+aexp: aexp PLUS mexp    # AdditionOperation
+    | aexp MINUS mexp   # SubtractionOperation
+    | mexp      # MExpCall
     ;
-mexp:<assoc=left> mexp TIMES sexp
-    |<assoc=left> mexp SLASH sexp
-    |<assoc=left> mexp PERCENT sexp
-    | sexp
+mexp:<assoc=left> mexp TIMES sexp   # MultiplicationOperation
+    |<assoc=left> mexp SLASH sexp   # DivisionOperation
+    |<assoc=left> mexp PERCENT sexp # ModularOperation
+    | sexp      # SExpCall
     ;
-sexp:<assoc=right> EXCLAMATION sexp
-    |<assoc=right> MINUS sexp
-    | TRUE
-    | FALSE
-    | NULL
-    | INT
-    | FLOAT
-    | CHAR
-    | pexp
+sexp:<assoc=right> EXCLAMATION sexp # Not
+    |<assoc=right> MINUS sexp   # Minus
+    | TRUE  # True
+    | FALSE # False
+    | NULL  # Null
+    | INT   # Integer
+    | FLOAT # Float
+    | CHAR  # Character
+    | pexp  # PExpCall
     ;
-pexp: lvalue
-    |<assoc=left> OPEN_PARENT exp CLOSE_PARENT
-    | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?
-    | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET
+pexp: lvalue    # LitteralValueCall
+    |<assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
+    | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
+    | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
     ;
-lvalue: ID
-    |<assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET
-    |<assoc=left> lvalue DOT ID
+lvalue: ID      # Identifier
+    |<assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
+    |<assoc=left> lvalue DOT ID     # DataAccess
     ;
-exps: exp (COMMA exp)*
+exps: exp (COMMA exp)*      # FCallParams
     ;
 
 /* Tokens da linguagem -- Parte Léxica */
