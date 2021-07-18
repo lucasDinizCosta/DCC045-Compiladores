@@ -16,18 +16,8 @@ del LangLexer.*
 del LangParser.*
 del LangBaseListener.*
 del LangListener.*
-echo "----  Gera as classes java do analisador sintatico"
-java -jar ../../lib/ANTLR.jar -visitor Lang.g4
 cd ..
 cd ast
 del *.class
-echo "----  Compila as classes do AST"
-javac -cp ../lib/ANTLR.jar;.. *.java
-cd ..
-echo "----  Compila as classes do PARSER"
-javac -cp ../lib/ANTLR.jar;.. ./parser/*.java
-del *.class
-echo "----  Compila a classe LangCompiler"
-javac -cp ../lib/ANTLR.jar;.. LangCompiler.java
-echo "----  PROCESSO DE BUILD CONCLUIDO"
+echo "----  PROCESSO DE LIMPEZA CONCLUIDA COM SUCCESSO
 pause

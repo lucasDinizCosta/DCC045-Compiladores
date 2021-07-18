@@ -14,7 +14,7 @@ grammar Lang;
 package lang.parser;    
 }
 /**
- Foi adicionado um ("#")apelido para cada expressão para facilitar a identificação
+ Foi adicionado um ("#")label para cada expressão para facilitar a identificação
  no interpretador e na semântica posteriormente
 */
 
