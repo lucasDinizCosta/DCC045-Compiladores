@@ -6,6 +6,7 @@ import java.util.List;
 import lang.ast.Type;
 import lang.ast.Node;
 
+import lang.interpreter.Visitor;
 public class Parameters extends Node {
     /**
      * ---- Regra

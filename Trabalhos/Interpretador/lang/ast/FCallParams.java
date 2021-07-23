@@ -1,8 +1,9 @@
 package lang.ast;
 
 import lang.ast.Expression;
-import java.util.ArrayList;
 import java.util.List;
+
+import lang.interpreter.Visitor;
 
 public class FCallParams extends Expression{
     /**
@@ -41,7 +42,7 @@ public class FCallParams extends Expression{
             text = text + expression + ", ";
         }
         if(text.length() > 0){
-            return text.substring(0, bld.length() - 2);      // Remove a virgula e o ultimo espaço
+            return text.substring(0, text.length() - 2);      // Remove a virgula e o ultimo espaço
         }
         return text;
     }

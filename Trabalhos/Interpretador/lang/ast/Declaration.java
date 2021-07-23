@@ -1,6 +1,5 @@
 package lang.ast;
 
-import lang.interpreter;
 import lang.ast.Node;
 import lang.ast.Type;
 import lang.interpreter.Visitor;

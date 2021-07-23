@@ -62,7 +62,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
 
         // Percorre o número de declarações
         for (int i = 0; i < ctx.decl().size(); i++) {
-            Declaration declarationAccept = ctx.decl().get(i).accept(this);
+            Declaration declarationAccept = (Declaration)ctx.decl().get(i).accept(this);
             decls.add(declarationAccept); // Listagem de declarações do data
         }
 
@@ -254,7 +254,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitRead(ReadContext ctx) {
         // ----- Regra
         // cmd: READ lvalue SEMI  # Read
-        Lvalue lValue = (Lvalue) ctx.getChild(1).accept(this);
+        LValue lValue = (LValue) ctx.getChild(1).accept(this);
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
         return new Read(line, column, lValue);
@@ -265,7 +265,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // cmd: PRINT exp SEMI    # Print
         Expression expression = (Expression) ctx.exp().accept(this);
-        return new Imprimir(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), expression);
+        return new Print(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), expression);
     }
 
     @Override
@@ -287,7 +287,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // cmd: lvalue EQUALS exp SEMI    # Attribution
         return new Attribution(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-                (Lvalue) ctx.lvalue().accept(this), (Expression) ctx.exp().accept(this));
+                (LValue) ctx.lvalue().accept(this), (Expression) ctx.exp().accept(this));
     }
 
     @Override
@@ -306,7 +306,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
 
         for (int i = 0; i < ctx.lvalue().size() && this.shouldVisitNextChild(ctx, this.defaultResult()); i++) {
             ParseTree childTree = ctx.lvalue(i);
-            fcall.addLvalues((Lvalue) this.aggregateResult(this.defaultResult(), childTree.accept(this)));
+            fcall.addLValue((LValue) this.aggregateResult(this.defaultResult(), childTree.accept(this)));
         }
 
         return fcall;
@@ -453,7 +453,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // sexp: TRUE  # True
         return new BooleanValue(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-        BooleanValue.parseBoolean(ctx.getChild(0).getText()));
+        Boolean.parseBoolean(ctx.getChild(0).getText()));
     }
 
     @Override
@@ -461,7 +461,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // sexp: FALSE  # False
         return new BooleanValue(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-        BooleanValue.parseBoolean(ctx.getChild(0).getText()));
+        Boolean.parseBoolean(ctx.getChild(0).getText()));
     }
 
     @Override
@@ -472,21 +472,21 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitIntegerNumber(IntegerContext ctx) {
+    public Node visitIntegerNumber(IntegerNumberContext ctx) {
         // ----- Regra
         // sexp: INT   # IntegerNumber
         return new IntegerNumber(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), Integer.parseInt(ctx.getChild(0).getText()));
     }
 
     @Override
-    public Node visitFloatNumber(FloatContext ctx) {
+    public Node visitFloatNumber(FloatNumberContext ctx) {
         // ----- Regra
         // sexp: FLOAT   # FloatNumber
         return new FloatNumber(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), Float.parseFloat(ctx.FLOAT().getText()));
     }
 
     @Override
-    public Node visitCharLitteral(CharacterContext ctx) {
+    public Node visitCharLitteral(CharLitteralContext ctx) {
         // ----- Regra
         // sexp: CHAR   # CharLitteral
         // Se atentar e lembrar que tem '\\n', '\\t'...
@@ -525,7 +525,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         Expression exp = (Expression) ctx.exp().accept(this);
         Type type = (Type) ctx.type().accept(this);
 
-        return new TypeInstantiate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
+        return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
     }
 
     @Override
@@ -542,7 +542,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitArrayAccess(ArrayAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
-        Lvalue lVal = (Lvalue) ctx.getChild(0).accept(this);
+        LValue lVal = (LValue) ctx.getChild(0).accept(this);
         Expression exp = (Expression) ctx.getChild(2).accept(this);
 
         return new ArrayAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, exp);
@@ -560,7 +560,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitDataAccess(DataAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue DOT ID     # DataAccess
-        Lvalue lVal = (Lvalue) ctx.lvalue().accept(this);
+        LValue lVal = (LValue) ctx.lvalue().accept(this);
         String id = ctx.getChild(2).getText();
         return new DataAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, id);
     }

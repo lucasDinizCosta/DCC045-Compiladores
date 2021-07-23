@@ -1,10 +1,9 @@
 package lang.ast;
 
-import lang.ast.Lvalue;
-
+import lang.ast.LValue;
 import lang.interpreter.Visitor;
 
-public class PexpIdentifier extends Lvalue {
+public class PexpIdentifier extends LValue {
     /**
      * ---- Regra
      * pexp: lvalue    # PexpIdentifier       // Chama lValue e o ID

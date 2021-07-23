@@ -15,12 +15,12 @@ public class CommandsList extends Command{
     private List<Command> commands;
 
     public CommandsList(int line, int column, List<Command> commands){
-        super(line, value);
+        super(line, column);
         this.commands = commands;
     }
 
     public CommandsList(int line, int column){
-        super(line, value);
+        super(line, column);
         this.commands = new ArrayList<Command>();
     }
 

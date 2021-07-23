@@ -7,7 +7,7 @@ import lang.ast.LValue;
 
 import lang.interpreter.Visitor;
 
-public class Identifier extends Lvalue {
+public class Identifier extends LValue {
     /**
      * ---- Regra
      * lvalue: ID      # Identifier

@@ -1,6 +1,7 @@
 package lang.ast;
 
 import lang.ast.BinOP;
+import lang.ast.Expression;
 import lang.interpreter.Visitor;
 
 public class And extends BinOP{
@@ -10,13 +11,11 @@ public class And extends BinOP{
     */
 
     public And(int line, int column, Expression left, Expression right){
-        super(line, column);
-        this.left = left;
-        this.right = right;
+        super(line, column, left, right);
     }
 
     @Override
-    public void toString(){
+    public String toString(){
         return (left.toString() + " && " + right.toString());
     }
 

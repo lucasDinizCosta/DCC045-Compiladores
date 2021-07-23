@@ -21,10 +21,18 @@ public class Function extends Node{
     private List<Type> returnTypes;     // Tipos de retorno da função
     private List<Command> commands;     // Corpo da função
 
-    public Function(int line, int column, ID id, Parameters parameters){
+    public Function(int line, int column, String id, Parameters parameters){
         super(line, column);
         this.id = id;
         this.parameters = parameters;
+        this.returnTypes = new ArrayList<Type>();
+        this.commands = new ArrayList<Command>();
+    }
+
+    public Function(int line, int column, String id){
+        super(line, column);
+        this.id = id;
+        this.parameters = null;
         this.returnTypes = new ArrayList<Type>();
         this.commands = new ArrayList<Command>();
     }
@@ -61,7 +69,7 @@ public class Function extends Node{
         this.commands = commands;
     }
 
-    public void setId(ID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

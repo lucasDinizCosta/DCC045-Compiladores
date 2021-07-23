@@ -53,6 +53,10 @@ public class Data extends Node{
         return this.nameType;
     }
 
+    public String getId() {
+        return nameType;
+    }
+
     // @Override
     // public String toString(){
     //     return "Size";

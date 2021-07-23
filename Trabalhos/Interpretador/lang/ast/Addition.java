@@ -1,6 +1,8 @@
 package lang.ast;
 
 import lang.ast.BinOP;
+import lang.ast.Expression;
+
 import lang.interpreter.Visitor;
 
 public class Addition extends BinOP{
@@ -10,14 +12,12 @@ public class Addition extends BinOP{
     */
 
     public Addition(int line, int column, Expression left, Expression right){
-        super(line, column);
-        this.left = left;
-        this.right = right;
+        super(line, column, left, right);
     }
 
     @Override
-    public void toString(){
-        return (left.toString() + " + " + right.toString());
+    public String toString(){
+        return (this.left.toString() + " + " + this.right.toString());
     }
 
     @Override

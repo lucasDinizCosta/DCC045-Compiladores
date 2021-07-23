@@ -4,7 +4,7 @@ import lang.ast.Type;
 import lang.ast.Expression;
 import lang.interpreter.Visitor;
 
-public class TypeInstantiate extends Expression {
+public class TypeInstanciate extends Expression {
     /**
      * ---- Regra
      * pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate 
@@ -12,7 +12,7 @@ public class TypeInstantiate extends Expression {
     private Expression exp;
     private Type type;
 
-    public TypeInstantiate (int line, int column, Expression exp, Type type){
+    public TypeInstanciate (int line, int column, Expression exp, Type type){
         super(line, column);
         this.exp = exp;
         this.type = type;

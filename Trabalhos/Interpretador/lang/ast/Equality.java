@@ -3,7 +3,6 @@ package lang.ast;
 import lang.ast.BinOP;
 import lang.ast.Expression;
 import lang.interpreter.Visitor;
-
 public class Equality extends BinOP{
     /**
      * ---- Regra
@@ -11,13 +10,11 @@ public class Equality extends BinOP{
     */
 
     public Equality(int line, int column, Expression left, Expression right){
-        super(line, column);
-        this.left = left;
-        this.right = right;
+        super(line, column, left, right);
     }
 
     @Override
-    public void toString(){
+    public String toString(){
         return (left.toString() + " == " + right.toString());
     }
 

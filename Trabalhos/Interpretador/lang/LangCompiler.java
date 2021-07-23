@@ -10,6 +10,7 @@ package lang;
 import java.io.*;
 import lang.parser.*;
 import lang.ast.*;
+import lang.interpreter.*;
 
 public class LangCompiler {
     // Recupera o nome base (sem extensão) de um arquivo.
@@ -35,10 +36,11 @@ public class LangCompiler {
         }
         try {
             ParseAdaptor langParser = new ParseAdaptorImplementation();
+            Interpreter interp = new Interpreter();
 
             if (args[0].equals("-interp")) {
                 System.out.println("\nInterpretando a linguagem...\n");
-                interpret();
+                interp.interpret();
                 System.out.println("\nFim da execução.\n");
                 return;
             }

@@ -1,6 +1,6 @@
 package lang.ast;
 
-import lang.ast.Tyope;
+import lang.ast.Type;
 
 import lang.interpreter.Visitor;
 public class TypeArray extends Type{

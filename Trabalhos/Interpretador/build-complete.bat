@@ -18,15 +18,15 @@ del LangBaseListener.*
 del LangListener.*
 echo "----  Gera as classes java do analisador sintatico"
 java -jar ../../lib/ANTLR.jar -visitor Lang.g4
+echo "----  COMPILACAO ------------"
 cd ..
-cd ast
-del *.class
+cd ..
 echo "----  Compila as classes do AST"
-javac -cp ../lib/ANTLR.jar;.. *.java
-cd ..
+javac -cp ./lib/ANTLR.jar;.. ./lang/ast/*.java
 echo "----  Compila as classes do PARSER"
-javac -cp ../lib/ANTLR.jar;.. ./parser/*.java
-del *.class
+javac -cp ../lib/ANTLR.jar;.. ./lang/parser/*.java
+echo "----  Compila as classes do INTERPRETER"
+javac -cp ../lib/ANTLR.jar;.. ./lang/interpreter/*.java
 echo "----  Compila a classe LangCompiler"
 javac -cp ../lib/ANTLR.jar;.. LangCompiler.java
 echo "----  PROCESSO DE BUILD CONCLUIDO"

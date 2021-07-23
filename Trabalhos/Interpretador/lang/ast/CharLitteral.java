@@ -21,7 +21,7 @@ public class CharLitteral extends LValue{
     }
 
     public String getValue(){
-        return value;
+        return value + "";
     }
 
     @Override
@@ -32,5 +32,11 @@ public class CharLitteral extends LValue{
     @Override
     public void accept(Visitor v) {
         v.visit(this);
+    }
+
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

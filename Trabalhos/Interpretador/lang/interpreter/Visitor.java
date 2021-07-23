@@ -71,7 +71,7 @@ public abstract class Visitor {
     // Partem do pexp
     public abstract void visit(PexpIdentifier i);
     public abstract void visit(ExpParenthesis e);
-    public abstract void visit(TypeInstantiate t);
+    public abstract void visit(TypeInstanciate t);
     public abstract void visit(FunctionReturn f);
 
     // Partem do lvalue

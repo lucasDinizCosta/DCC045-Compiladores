@@ -15,8 +15,8 @@ public class Attribution extends Command{
     private Expression exp;
 
     public Attribution(int line, int column, LValue lvalue, Expression exp){
-        super(line, value);
-        this.lavlue = lvalue;
+        super(line, column);
+        this.lvalue = lvalue;
         this.exp = exp;
     }
 

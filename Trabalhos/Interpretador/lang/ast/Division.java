@@ -11,13 +11,11 @@ public class Division extends BinOP{
     */
 
     public Division(int line, int column, Expression left, Expression right){
-        super(line, column);
-        this.left = left;
-        this.right = right;
+        super(line, column, left, right);
     }
 
     @Override
-    public void toString(){
+    public String toString(){
         return (left.toString() + " / " + right.toString());
     }
 

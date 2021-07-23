@@ -3,8 +3,9 @@ package lang.ast;
 import lang.ast.Expression;
 
 public class BinOP extends Expression{
-    private Expression left;
-    private Expression right;
+    // Protected para os filhos poderem acessar
+    protected Expression left;      
+    protected Expression right;
 
     public BinOP(int line, int column, Expression left, Expression right) {
         super(line, column);

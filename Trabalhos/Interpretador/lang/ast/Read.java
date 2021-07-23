@@ -1,7 +1,7 @@
 package lang.ast;
 
 import lang.ast.Command;
-import lang.ast.Expression;
+import lang.ast.LValue;
 
 import lang.interpreter.Visitor;
 
@@ -11,9 +11,9 @@ public class Read extends Command {
      * cmd: READ lvalue SEMI  # Read
     */
     
-    private Lvalue lvalue;
+    private LValue lvalue;
 
-    public Read (int line, int column, Lvalue lvalue){
+    public Read (int line, int column, LValue lvalue){
         super(line, column);
         this.lvalue = lvalue;
     }
@@ -28,7 +28,7 @@ public class Read extends Command {
         v.visit(this);
     }
 
-    public Lvalue getLvalue() {
+    public LValue getLValue() {
         return lvalue;
     }
 }

@@ -23,4 +23,3 @@ public class Difference extends BinOP{
         v.visit(this);
     }
 }
-}

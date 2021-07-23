@@ -18,7 +18,7 @@ public class ArrayAccess extends LValue{
         this.exp = exp;
     }
 
-    public Lvalue getLvalue() {
+    public LValue getLValue() {
         return lvalue;
     }
 

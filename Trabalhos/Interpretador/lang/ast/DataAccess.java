@@ -35,7 +35,7 @@ public class DataAccess extends LValue{
 
     @Override
     public String toString(){
-        return lvalue.toString + '.' + id.toString();
+        return lvalue.toString() + '.' + id.toString();
     }
 
     @Override

@@ -1,3 +1,7 @@
+package lang.ast;
+
+import lang.ast.Expression;
+import lang.interpreter.Visitor;
 public class Null extends Expression {
     /**
      * ---- Regra

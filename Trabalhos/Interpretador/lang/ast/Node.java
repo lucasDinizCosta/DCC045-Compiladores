@@ -43,6 +43,9 @@ public class Node extends SuperNode implements Visitable {
 	}
 
 	// Metodo base do Visitor para caminhar nos nós da AST e verificar se é aceito ou não
-	public void accept(Visitor v) {/* Vazio => A função é implementada nos outros nós */}
+	@Override
+	public void accept(Visitor v) {
+		/* Vazio => A função é implementada nos outros nós */
+	}
 
 }

@@ -32,4 +32,10 @@ public class FloatNumber extends LValue{
     public void accept(Visitor v) {
         v.visit(this);
     }
+
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
