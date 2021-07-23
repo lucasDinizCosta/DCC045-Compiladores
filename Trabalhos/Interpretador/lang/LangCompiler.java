@@ -1,7 +1,7 @@
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
 *                                                       *
-* Projeto do Analisador Sintático para a Linguagem Lang *
+* Projeto do Interpretador para a Linguagem Lang        *
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
 *                                                       *
 *********************************************************/
@@ -20,6 +20,7 @@ public class LangCompiler {
             System.out.println("Use java -cp . Lang ação <Caminho para código Fonte> ");
             System.out.println("Ação (uma das seguintes possibilidades): ");
 
+            System.out.println(" -interp : Executa uma bateria de testes e interpreta o código");
             System.out.println(" -bs : Executa uma bateria de testes sintáticos");
             System.out.println(" -bty : Executa uma bateria de testes no sistemas de tipos");
             System.out.println(" -bsm : Executa uma bateria de testes no interpretador");
@@ -41,7 +42,7 @@ public class LangCompiler {
             if (args[0].equals("-interp")) {
                 System.out.println("\nInterpretando a linguagem...\n");
                 interp.interpret();
-                System.out.println("\nFim da execução.\n");
+                System.out.println("\nFim da execucao.\n");
                 return;
             }
             if (args[0].equals("-bs")) {

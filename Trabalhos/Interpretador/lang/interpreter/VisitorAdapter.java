@@ -1,3 +1,10 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*                                                       *
+* Projeto do Interpretador para a Linguagem Lang        *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.interpreter;
 
 import java.util.ArrayList;
@@ -10,8 +17,8 @@ import lang.parser.LangParser.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
- * Classe auxiliar que pega o visitor base do ANTLR e implementa os métodos com
- * base nos nós criados da AST
+ * Classe auxiliar que pega a parseTree do ANTLR e implementa os métodos com
+ * base nos nós criados da AST no padrão NODE
  * Classe auxiliar que adapta a parseTree criada pelo ANTLR para receber o Node da AST criado
  * e implementa os métodos do Visitor padrão do ANTLR
  */

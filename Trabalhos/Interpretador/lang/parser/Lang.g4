@@ -6,7 +6,7 @@ grammar Lang;
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
 *                                                       *
-* Projeto do Analisador Sintático para a Linguagem Lang *
+* Projeto do Interpretador para a Linguagem Lang        *
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
 *                                                       *
 *********************************************************/
@@ -164,6 +164,6 @@ CHAR: ('\'' '\\n' '\'')
     | ('\'' '\\r' '\'') 
     | ('\'' '\\\\' '\'') 
     | ('\'' '\\' '\'') 
-    | ('\''[\u0000-\u007F]'\'')       // Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
+    | ('\''[\u0000\u007F]'\'')       // (000 - 127) Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
     ;
     

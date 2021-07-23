@@ -1,3 +1,10 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*                                                       *
+* Projeto do Interpretador para a Linguagem Lang        *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.interpreter;
 
 import lang.ast.SuperNode;
@@ -19,14 +26,18 @@ public class Interpreter {
             stream = CharStreams.fromFileName(src);
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
         LangLexer lexer = new LangLexer(stream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LangParser parser = new LangParser(tokens);
         ParseTree tree = parser.prog();
+        
+        // Cria um adaptador da ParseTree do ANTLR para receber o padrão Node criado para a AST do trabalho
         VisitorAdapter ast = new VisitorAdapter();
-        Node node = ast.visit(tree);
-        InterpretVisitor interpreter = new InterpretVisitor();
-        node.accept(interpreter);
+        Node node = ast.visit(tree);            // Passa um do tipo parseTree e retorna do tipo Node
+        // Interpreta o Visitor com a elaboração do ambiente de desenvolvimento
+        InterpretVisitor interpreter = new InterpretVisitor();      
+        node.accept(interpreter);               // Passa o node criado e testa o interpretador
     }
 }

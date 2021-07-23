@@ -1,3 +1,10 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*                                                       *
+* Projeto do Interpretador para a Linguagem Lang        *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.interpreter;
 
 import java.util.ArrayList;
@@ -103,10 +110,9 @@ public class InterpretVisitor extends Visitor {
         try {
             for (Type type : p.getType()) {
                 type.accept(this);
-
                 int pos = 0;
                 for (String id : p.getId()) {
-                    // salva a variavel no escopo da funcao, de acordo com valor do parametro
+                    // salva a variável no escopo da funcao, de acordo com valor do parametro
                     // passado
                     env.peek().put(id, parms.get(pos));
                     pos++;
