@@ -301,26 +301,26 @@ public interface LangVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNull(LangParser.NullContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Integer}
+	 * Visit a parse tree produced by the {@code IntegerNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInteger(LangParser.IntegerContext ctx);
+	T visitIntegerNumber(LangParser.IntegerNumberContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Float}
+	 * Visit a parse tree produced by the {@code FloatNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFloat(LangParser.FloatContext ctx);
+	T visitFloatNumber(LangParser.FloatNumberContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Character}
+	 * Visit a parse tree produced by the {@code CharLitteral}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCharacter(LangParser.CharacterContext ctx);
+	T visitCharLitteral(LangParser.CharLitteralContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code PExpCall}
 	 * labeled alternative in {@link LangParser#sexp}.

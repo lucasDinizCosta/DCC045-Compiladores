@@ -8,8 +8,11 @@
 
 package lang.ast;
 
+import lang.interpreter.Visitable;
+import lang.interpreter.Visitor;
+
 // Faz a implementação dos métodos presentes no SuperNode
-public class Node extends SuperNode {
+public class Node extends SuperNode implements Visitable {
 
 	// Linha e coluna do nó com base no texto do arquivo de entrada passado
     private int line;
@@ -38,5 +41,8 @@ public class Node extends SuperNode {
 	public int getColumn() {
 		return column;
 	}
+
+	// Metodo base do Visitor para caminhar nos nós da AST e verificar se é aceito ou não
+	public void accept(Visitor v) {/* Vazio => A função é implementada nos outros nós */}
 
 }

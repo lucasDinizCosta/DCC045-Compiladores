@@ -307,21 +307,21 @@ public class LangBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements L
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitInteger(LangParser.IntegerContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIntegerNumber(LangParser.IntegerNumberContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFloat(LangParser.FloatContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFloatNumber(LangParser.FloatNumberContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCharacter(LangParser.CharacterContext ctx) { return visitChildren(ctx); }
+	@Override public T visitCharLitteral(LangParser.CharLitteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

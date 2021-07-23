@@ -498,41 +498,41 @@ public interface LangListener extends ParseTreeListener {
 	 */
 	void exitNull(LangParser.NullContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Integer}
+	 * Enter a parse tree produced by the {@code IntegerNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void enterInteger(LangParser.IntegerContext ctx);
+	void enterIntegerNumber(LangParser.IntegerNumberContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Integer}
+	 * Exit a parse tree produced by the {@code IntegerNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void exitInteger(LangParser.IntegerContext ctx);
+	void exitIntegerNumber(LangParser.IntegerNumberContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Float}
+	 * Enter a parse tree produced by the {@code FloatNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void enterFloat(LangParser.FloatContext ctx);
+	void enterFloatNumber(LangParser.FloatNumberContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Float}
+	 * Exit a parse tree produced by the {@code FloatNumber}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void exitFloat(LangParser.FloatContext ctx);
+	void exitFloatNumber(LangParser.FloatNumberContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code Character}
+	 * Enter a parse tree produced by the {@code CharLitteral}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void enterCharacter(LangParser.CharacterContext ctx);
+	void enterCharLitteral(LangParser.CharLitteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code Character}
+	 * Exit a parse tree produced by the {@code CharLitteral}
 	 * labeled alternative in {@link LangParser#sexp}.
 	 * @param ctx the parse tree
 	 */
-	void exitCharacter(LangParser.CharacterContext ctx);
+	void exitCharLitteral(LangParser.CharLitteralContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code PExpCall}
 	 * labeled alternative in {@link LangParser#sexp}.

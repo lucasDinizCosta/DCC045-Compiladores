@@ -1,8 +1,8 @@
 package lang.interpreter;
 
-import ast.*;
+import lang.ast.*;
 
-public abstract  class  Visitor {
+public abstract class Visitor {
     public abstract void visit(Command c);
     public abstract void visit(Addition a);
     public abstract void visit(Declaration d);

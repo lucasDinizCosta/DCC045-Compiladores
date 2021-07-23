@@ -71,12 +71,12 @@ sexp:<assoc=right> EXCLAMATION sexp # Not
     | TRUE  # True
     | FALSE # False
     | NULL  # Null
-    | INT   # Integer
-    | FLOAT # Float
-    | CHAR  # Character
+    | INT   # IntegerNumber
+    | FLOAT # FloatNumber
+    | CHAR  # CharLitteral
     | pexp  # PExpCall
     ;
-pexp: lvalue    # LitteralValueCall
+pexp: lvalue    # PexpIdentifier       // Chama lValue e o ID
     |<assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
     | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
     | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]

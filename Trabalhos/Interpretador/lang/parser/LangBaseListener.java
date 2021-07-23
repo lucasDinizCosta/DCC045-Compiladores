@@ -506,37 +506,37 @@ public class LangBaseListener implements LangListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInteger(LangParser.IntegerContext ctx) { }
+	@Override public void enterIntegerNumber(LangParser.IntegerNumberContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInteger(LangParser.IntegerContext ctx) { }
+	@Override public void exitIntegerNumber(LangParser.IntegerNumberContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFloat(LangParser.FloatContext ctx) { }
+	@Override public void enterFloatNumber(LangParser.FloatNumberContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFloat(LangParser.FloatContext ctx) { }
+	@Override public void exitFloatNumber(LangParser.FloatNumberContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCharacter(LangParser.CharacterContext ctx) { }
+	@Override public void enterCharLitteral(LangParser.CharLitteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCharacter(LangParser.CharacterContext ctx) { }
+	@Override public void exitCharLitteral(LangParser.CharLitteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
