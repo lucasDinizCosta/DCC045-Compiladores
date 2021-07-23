@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.tree.*;
 
 public class Interpreter {
     public void interpret() {
-        String src = "../../input.txt";
+        String src = "input.txt";
         CharStream stream = null;
         try {
             stream = CharStreams.fromFileName(src);
