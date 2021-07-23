@@ -20,36 +20,37 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
 
     // Retorna null se encontrar erros de sintaxe no arquivo de entrada
     @Override
-    public SuperNode parseFile(String path){
-        try{
-            // Cria uma variavel que irá armazenar um charStream de ANTLR 
-        // a partir de um arquivo
-        CharStream stream = CharStreams.fromFileName(path);
+    public SuperNode parseFile(String path) {
+        try {
+            // Cria uma variavel que irá armazenar um charStream de ANTLR
+            // a partir de um arquivo
+            CharStream stream = CharStreams.fromFileName(path);
 
-        // Cria um analisador léxico que é carregado com os dados do arquivo
-        LangLexer lexer = new LangLexer(stream);
+            // Cria um analisador léxico que é carregado com os dados do arquivo
+            LangLexer lexer = new LangLexer(stream);
 
-        // Cria um buffer de tokens com base no analisador léxico
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
+            // Cria um buffer de tokens com base no analisador léxico
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-        // Utiliza o analisador sintático criado e será alimentado com os buffers 
-        // dos tokens
-        LangParser parser = new LangParser(tokens);
+            // Utiliza o analisador sintático criado e será alimentado com os buffers
+            // dos tokens
+            LangParser parser = new LangParser(tokens);
 
-        // Cria uma árvore da sintaxe
-        ParseTree tree = parser.prog();
+            // Cria uma árvore da sintaxe
+            ParseTree tree = parser.prog();
 
-        // Verifica se o analisador sintático encontrou erros
-        if(parser.getNumberOfSyntaxErrors() != 0){
-            return null;
-        }
-        // Retorna um nó caso não encontre erros no arquivo passado
-        // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do compilador
-        return new Node();
-        }
-        catch(IOException e){
+            // Verifica se o analisador sintático encontrou erros
+            if (parser.getNumberOfSyntaxErrors() != 0) {
+                return null;
+            }
+            // Retorna um nó caso não encontre erros no arquivo passado
+            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
+            // compilador
+            return new Node();
+        } catch (IOException e) {
             e.printStackTrace();
-            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do compilador
+            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
+            // compilador
             return new Node();
         }
     }

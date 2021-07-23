@@ -329,12 +329,12 @@ public interface LangVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPExpCall(LangParser.PExpCallContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LitteralValueCall}
+	 * Visit a parse tree produced by the {@code PexpIdentifier}
 	 * labeled alternative in {@link LangParser#pexp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLitteralValueCall(LangParser.LitteralValueCallContext ctx);
+	T visitPexpIdentifier(LangParser.PexpIdentifierContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExpParenthesis}
 	 * labeled alternative in {@link LangParser#pexp}.
