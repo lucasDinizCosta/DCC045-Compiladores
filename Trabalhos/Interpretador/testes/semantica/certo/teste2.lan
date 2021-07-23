@@ -1,0 +1,11 @@
+-- Saída esperada
+-- > [valor digitado]
+
+main(){
+   x = 0;
+   print '>';
+   read x;
+   print x;
+   print '\n';
+   
+}

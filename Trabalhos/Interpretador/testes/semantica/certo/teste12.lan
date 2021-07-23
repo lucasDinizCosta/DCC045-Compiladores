@@ -1,0 +1,23 @@
+even(n :: Int) : Bool {
+    if(n == 0)
+        return true;
+    else
+        return odd(n-1)[0];
+}
+
+odd(n :: Int) : Bool {
+    if(n == 0)
+        return false;
+    else
+        return even(n-1)[0];
+}
+
+main() {
+    r = even(3)[0];
+    if(r) {
+        print 'P'; print 'A'; print 'R';
+    }
+    else {
+        print 'I'; print 'M'; print 'P'; print 'A'; print 'R';
+    }
+}
