@@ -29,7 +29,7 @@ func: ID OPEN_PARENT params? CLOSE_PARENT (COLON type (COMMA type)*)? OPEN_BRACE
     ;
 params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*  # ParametersFunction
       ;
-type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
+type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration   // tipo de array. Exemplo: Int[]
     | btype     # BTypeCall
     ;
 btype: INT_TYPE     # BTypeInt

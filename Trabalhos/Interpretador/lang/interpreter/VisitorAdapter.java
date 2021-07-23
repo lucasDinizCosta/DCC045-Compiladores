@@ -1,7 +1,13 @@
 package lang.interpreter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lang.ast.*;
+import lang.parser.LangBaseVisitor;
 import lang.parser.LangParser.*;
+
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * Classe auxiliar que pega o visitor base do ANTLR e implementa os métodos com
@@ -25,7 +31,16 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
 
         Program program = new Program(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine()); // Linha e coluna
 
-        // FAZER
+        for (int i = 0; i < (ctx.data().size()) && this.shouldVisitNextChild(ctx, this.defaultResult()); i++) {
+            ParseTree childTree = ctx.data(i);
+            program.addData((Data) this.aggregateResult(this.defaultResult(), childTree.accept(this)));
+        }
+
+        for (int i = 0; i < (ctx.func().size()) && this.shouldVisitNextChild(ctx, this.defaultResult()); i++) {
+            ParseTree childTree = ctx.func(i);
+            program.addFunction((Function) this.aggregateResult(this.defaultResult(), childTree.accept(this)));
+        }
+
         return program;
     }
 
@@ -74,7 +89,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         //    OPEN_BRACES cmd* CLOSE_BRACES    # Function
 
         // (COLON type (COMMA type)*)? -- Tipos de Retorno da função
-        
+
 
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
@@ -106,7 +121,17 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*  # ParametersFunction
         
-        return super.visitBTypeCall(ctx);
+        List<String> ids = new ArrayList<>();
+        List<Type> types = new ArrayList<>();
+
+        for (int i = 0; i < ctx.type().size(); i++) {   // Encontra os ids e os tipos e armazena na classe Parameter
+            ids.add(ctx.ID().get(i).getText());
+            types.add((Type) ctx.type().get(i).accept(this));
+        }
+
+        Parameters parameters = new Parameters(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ids, types);
+
+        return parameters;
     }
 
     @Override
@@ -120,7 +145,8 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitTypeDeclaration(TypeDeclarationContext ctx) {
         // ----- Regra
         // type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
-        return visitChildren(ctx);
+        Type type = (Type) ctx.getChild(0).accept(this);
+        return new TypeArray(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
     }
 
     @Override
@@ -173,7 +199,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitBTypeID(BTypeIDContext ctx) {
         // ----- Regra
         // btype: ID     # BTypeID
-        String id = ctx.getChild(0).getText();    // Captura o nome do tipo
+        String id = ctx.getChild(0).getText();    // Captura o nome do id
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
         return new ID(line, column, id);
@@ -183,67 +209,107 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitCommandsList(CommandsListContext ctx) {
         // ----- Regra
         // cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
-        return visitChildren(ctx);
+        List<Command> cmds = new ArrayList<>();
+
+        for (int i = 0; i < ctx.cmd().size(); i++) {
+            cmds.add((Command) ctx.cmd().get(i).accept(this));
+        }
+
+        return new CommandsList(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), cmds);
     }
 
     @Override
     public Node visitIf(IfContext ctx) {
         // ----- Regra
         // cmd: IF OPEN_PARENT exp CLOSE_PARENT cmd   # If
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.getChild(2).accept(this);
+        Command cmd = (Command) ctx.getChild(4).accept(this);
+
+        return new If(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, cmd);
     }
 
     @Override
     public Node visitIfElse(IfElseContext ctx) {
         // ----- Regra
         // cmd: IF OPEN_PARENT exp CLOSE_PARENT cmd ELSE cmd  # IfElse
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.getChild(2).accept(this);
+        Command cmd = (Command) ctx.getChild(4).accept(this);
+        Command elseCmd = (Command) ctx.getChild(6).accept(this);
+
+        return new IfElse(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, cmd, elseCmd);
     }
 
     @Override
     public Node visitIterate(IterateContext ctx) {
         // ----- Regra
         // cmd: ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
-        return visitChildren(ctx);
+        Iterate it = (Iterate) ctx.getChild(0).accept(this);
+        Expression exp = (Expression) ctx.getChild(2).accept(this);
+        Command cmd = (Command) ctx.getChild(4).accept(this);
+
+        return new Iterate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), it, exp, cmd);
     }
 
     @Override
     public Node visitRead(ReadContext ctx) {
         // ----- Regra
         // cmd: READ lvalue SEMI  # Read
-        
-        String readName = ctx.getChild(0).getText();    // Captura o nome do tipo
+        Lvalue lValue = (Lvalue) ctx.getChild(1).accept(this);
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
-        return new Read(line, column, readName);
+        return new Read(line, column, lValue);
     }
 
     @Override
     public Node visitPrint(PrintContext ctx) {
         // ----- Regra
         // cmd: PRINT exp SEMI    # Print
-        return visitChildren(ctx);
+        Expression expression = (Expression) ctx.exp().accept(this);
+        return new Imprimir(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), expression);
     }
 
     @Override
     public Node visitReturn(ReturnContext ctx) {
         // ----- Regra
         // cmd: RETURN exp (COMMA exp)* SEMI  # Return
-        return visitChildren(ctx);
+        List<Expression> exps = new ArrayList<Expression>();
+        exps.add((Expression) ctx.getChild(1).accept(this));
+
+        for (int i = 4; i < ctx.exp().size(); i = i + 2) {  // Pega todos os exp pulando os Comma(',')
+            exps.add((Expression) ctx.getChild(i).accept(this));
+        }
+
+        return new Return(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exps);
     }
 
     @Override
     public Node visitAttribution(AttributionContext ctx) {
         // ----- Regra
         // cmd: lvalue EQUALS exp SEMI    # Attribution
-        return visitChildren(ctx);
+        return new Attribution(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+                (Lvalue) ctx.lvalue().accept(this), (Expression) ctx.exp().accept(this));
     }
 
     @Override
     public Node visitFunctionCall(FunctionCallContext ctx) {
         // ----- Regra
         // cmd: ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA lvalue)* GREATER_THAN)? SEMI   # FunctionCall
-        return visitChildren(ctx);
+
+        FunctionCall fcall = new FunctionCall(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.getChild(0).getText());
+
+        // Verifica se há parametros na função
+        if (ctx.exps() != null) {
+            FCallParams exps = (FCallParams) ctx.exps().accept(this);
+
+            fcall = new FunctionCall(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.getChild(0).getText(), exps);
+        }
+
+        for (int i = 0; i < ctx.lvalue().size() && this.shouldVisitNextChild(ctx, this.defaultResult()); i++) {
+            ParseTree childTree = ctx.lvalue(i);
+            fcall.addLvalues((Lvalue) this.aggregateResult(this.defaultResult(), childTree.accept(this)));
+        }
+
+        return fcall;
     }
 
     @Override
@@ -257,7 +323,10 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitAndOperation(AndOperationContext ctx) {
         // ----- Regra
         // exp:<assoc=left> exp AND exp    # AndOperation
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new And(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
@@ -271,28 +340,40 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitLessThan(LessThanContext ctx) {
         // ----- Regra
         // rexp: aexp LESS_THAN aexp   # LessThan
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new LessThan(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
     public Node visitEquality(EqualityContext ctx) {
         // ----- Regra
         // rexp: <assoc=left> rexp EQUALITY aexp    # Equality
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new Equality(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
     public Node visitDifference(DifferenceContext ctx) {
         // ----- Regra
         // rexp: <assoc=left> rexp DIFFERENCE aexp  # Difference
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new Difference(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
     public Node visitAdditionOperation(AdditionOperationContext ctx) {
         // ----- Regra
         // aexp: aexp PLUS mexp    # AdditionOperation
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new Addition(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
@@ -333,28 +414,38 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitMultiplicationOperation(MultiplicationOperationContext ctx) {
         // ----- Regra
         // mexp: <assoc=left> mexp TIMES sexp   # MultiplicationOperation
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new Multiplication(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
     public Node visitModularOperation(ModularOperationContext ctx) {
         // ----- Regra
         // mexp: <assoc=left> mexp PERCENT sexp # ModularOperation
-        return visitChildren(ctx);
+        Expression left = (Expression) ctx.getChild(0).accept(this);
+        Expression right = (Expression) ctx.getChild(2).accept(this);
+
+        return new Modular(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), left, right);
     }
 
     @Override
     public Node visitNot(NotContext ctx) {
         // ----- Regra
         // sexp: <assoc=right> EXCLAMATION sexp # Not
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.getChild(1).accept(this);
+
+        return new Not(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
     }
 
     @Override
     public Node visitMinus(MinusContext ctx) {
         // ----- Regra
         // sexp: <assoc=right> MINUS sexp   # Minus
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.getChild(1).accept(this);
+
+        return new Minus(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
     }
 
     @Override
@@ -377,7 +468,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitNull(NullContext ctx) {
         // ----- Regra
         // sexp: NULL  # Null
-        return visitChildren(ctx);
+        return new Null(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     }
 
     @Override
@@ -391,7 +482,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitFloatNumber(FloatContext ctx) {
         // ----- Regra
         // sexp: FLOAT   # FloatNumber
-        return new FloatNumber(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), Float.parseFloat(ctx.getChild(0).getText()));
+        return new FloatNumber(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), Float.parseFloat(ctx.FLOAT().getText()));
     }
 
     @Override
@@ -411,10 +502,10 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     }
 
     @Override
-    public Node visitLitteralValueCall(LitteralValueCallContext ctx) {
+    public Node visitPexpIdentifier(PexpIdentifierContext ctx) {
         // ----- Regra
-        // pexp: lvalue    # LitteralValueCall
-        return super.visitLitteralValueCall(ctx);
+        // pexp: lvalue    # PexpIdentifier
+        return super.visitPexpIdentifier(ctx);
     }
 
     @Override
@@ -422,48 +513,69 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // pexp: <assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
         
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.getChild(1).accept(this);
+
+        return new ExpParenthesis(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
     }
 
     @Override
     public Node visitTypeInstanciate(TypeInstanciateContext ctx) {
         // ----- Regra
         // pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
-        return visitChildren(ctx);
+        Expression exp = (Expression) ctx.exp().accept(this);
+        Type type = (Type) ctx.type().accept(this);
+
+        return new TypeInstantiate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
     }
 
     @Override
     public Node visitFunctionReturn(FunctionReturnContext ctx) {
         // ----- Regra
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
-        return visitChildren(ctx);
+        String str = ctx.getChild(0).getText();
+        FCallParams fCallPar = (FCallParams) ctx.getChild(2).accept(this);
+        Expression exp = (Expression) ctx.getChild(5).accept(this);
+        return new FunctionReturn(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), str, fCallPar, exp);
     }
 
     @Override
     public Node visitArrayAccess(ArrayAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
-        return visitChildren(ctx);
+        Lvalue lVal = (Lvalue) ctx.getChild(0).accept(this);
+        Expression exp = (Expression) ctx.getChild(2).accept(this);
+
+        return new ArrayAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, exp);
     }
 
     @Override
     public Node visitIdentifier(IdentifierContext ctx) {
         // ----- Regra
         // lvalue: ID      # Identifier
-        return visitChildren(ctx);
+        return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+                ctx.getChild(0).getText());
     }
 
     @Override
     public Node visitDataAccess(DataAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue DOT ID     # DataAccess
-        return visitChildren(ctx);
+        Lvalue lVal = (Lvalue) ctx.lvalue().accept(this);
+        String id = ctx.getChild(2).getText();
+        return new DataAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, id);
     }
 
     @Override
     public Node visitFCallParams(FCallParamsContext ctx) {
         // ----- Regra
         // exps: exp (COMMA exp)*      # FCallParams
-        return visitChildren(ctx);
+        FCallParams fcall = new FCallParams(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+        List<Expression> exps = new ArrayList<>();
+        // Captura as expressoes 'exp'
+        for (int i = 0; i < ctx.exp().size(); i++) {
+            exps.add((Expression) ctx.exp().get(i).accept(this));
+        }
+        fcall.setExps(exps);
+        return fcall;
     }
 }
