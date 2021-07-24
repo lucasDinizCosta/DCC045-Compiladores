@@ -16,7 +16,7 @@ del LangLexer.*
 del LangParser.*
 del LangBaseListener.*
 del LangListener.*
-echo "----  Gera as classes java do analisador sintatico"
+echo "----  Gera as classes java do interpretador"
 java -jar ../../lib/ANTLR.jar -visitor Lang.g4
 echo "----  COMPILACAO ------------"
 cd ..

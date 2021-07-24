@@ -5,6 +5,10 @@
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C *
 ******************************************************/
 -}
+data Racional {
+	numerador :: Int,
+	denominador :: Int,
+}
 
 main(){
 

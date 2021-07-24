@@ -82,23 +82,17 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Function f){
         HashMap<String, Object> localEnv = new HashMap<String, Object>();
-
         if (f.getParameters() != null) {
-
             Parameters params = f.getParameters();
             params.accept(this);
-
             for (int i = f.getParameters().size() - 1; i >= 0; i--) {
                 localEnv.put(params.getSingleId(i), operands.pop());
             }
         }
-
         env.push(localEnv);
-
         for (Command command : f.getCommands()) {
             command.accept(this);
         }
-
         env.pop();
         retMode = false;
     }

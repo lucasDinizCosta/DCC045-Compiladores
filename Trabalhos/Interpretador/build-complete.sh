@@ -11,17 +11,17 @@ rm LangLexer.*
 rm LangParser.*
 rm LangBaseListener.*
 rm LangListener.*
-echo "----  Gera as classes java do analisador sintatico"
-java -jar ../../lib/ANTLR.jar Lang.g4
+echo "----  Gera as classes java do interpretador"
+java -jar ../../lib/ANTLR.jar -visitor Lang.g4
+echo "\n\n----  COMPILACAO ------------\n\n"
 cd ..
-cd ast
-rm *.class
+cd ..
 echo "----  Compila as classes do AST"
-javac -cp ../lib/ANTLR.jar:.. *.java
-cd ..
+javac -cp lib/ANTLR.jar:. -d . lang/ast/*.java
 echo "----  Compila as classes do PARSER"
-javac -cp ../lib/ANTLR.jar:.. ./parser/*.java
-rm *.class
+javac -cp lib/ANTLR.jar:. -d . lang/parser/*.java
+echo "----  Compila as classes do INTERPRETER"
+javac -cp lib/ANTLR.jar:. -d . lang/interpreter/*.java
 echo "----  Compila a classe LangCompiler"
-javac -cp ../lib/ANTLR.jar:.. LangCompiler.java
+javac -cp lib/ANTLR.jar:. -d . lang/LangCompiler.java
 echo "----  PROCESSO DE BUILD CONCLUIDO"
