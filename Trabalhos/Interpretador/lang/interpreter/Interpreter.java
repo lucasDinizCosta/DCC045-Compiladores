@@ -32,6 +32,7 @@ public class Interpreter {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LangParser parser = new LangParser(tokens);
         ParseTree tree = parser.prog();
+
         // Verifica se o analisador sintático encontrou erros
         if (parser.getNumberOfSyntaxErrors() != 0) {
             return;
@@ -40,7 +41,7 @@ public class Interpreter {
         // Cria um adaptador da ParseTree do ANTLR para receber o padrão Node criado para a AST do trabalho
         VisitorAdapter ast = new VisitorAdapter();
         Node node = ast.visit(tree);            // Passa um do tipo parseTree e retorna do tipo Node
-        // Interpreta o Visitor com a elaboração do ambiente de desenvolvimento
+        // Interpreta o Visitor e elabora o ambiente de desenvolvimento
         InterpretVisitor interpreter = new InterpretVisitor();      
         node.accept(interpreter);               // Passa o node criado e testa o interpretador
     }

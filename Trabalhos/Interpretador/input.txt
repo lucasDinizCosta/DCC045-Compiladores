@@ -1,59 +1,21 @@
-{-
-/******************************************************
-* Trabalho de Teoria dos Compiladores(DCC045)(2021/1) *
-*                                                     *
-* Nome: Lucas Diniz da Costa -- Matricula: 201465524C *
-******************************************************/
--}
-data Racional {
-	numerador :: Int,
-	denominador :: Int,
-}
+
+--Saída esperada:
+
+--*****
+--****
+--***
+--**
+--*
+---- The marvelous env Debugger ------ 
+--nlines  :  5
+--i  :  0
 
 main(){
-
-  test(2, 20, 30);
-  test2(true, false, 300) < t >;
-
-  print t;
-
-  x = 2;
-  y = 10;
-  print 5 + 5 * x;
-  print x + y;
-
-  if (50 != 100){
-    a = 10;
-    b = 30;
-    print a + b;
-  }
-    
-  if (10 == 11)
-    print 2000;
-  else
-    print 1000;
-
-  iterate (3){
-    print 7;
-  }
-    
-}
-
-test(num :: Int, num2 :: Int, num3 :: Int){
-  x = 5 * num;
-  print x;
-  print num2;
-  print num3;
-}
-
-test2(verTrue :: Bool, verFalse :: Bool, num3 :: Int) : Int {
-  if (verTrue){
-    print true;
-  }
-  if (verFalse){
-    print false;
-  }
-
-  return 123;
-  
+   nlines = 5;
+   i = nlines;
+   iterate(nlines){
+     iterate(i){ print '*';}
+     i = i - 1;
+     print '\n';
+   }
 }

@@ -164,6 +164,6 @@ CHAR: ('\'' '\\n' '\'')
     | ('\'' '\\r' '\'') 
     | ('\'' '\\\\' '\'') 
     | ('\'' '\\' '\'') 
-    | ('\''[\u0000\u007F]'\'')       // (000 - 127) Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
+    | ('\''[\u0000-\u007F]'\'')       // (000 - 127) Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
     ;
     
