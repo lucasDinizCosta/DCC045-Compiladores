@@ -1,4 +1,7 @@
 grammar Lang;
+options {
+    defaultErrorHandler=false;
+}
 
 // No cabeçalho de todas as classes geradas irá aparecer que estiver dentro do header
 @header
@@ -158,12 +161,13 @@ NAME_TYPE : [A-Z][a-zA-Z0-9_]* ;
 
 INT: [0-9]+ ;                 // Identifica os inteiros:(Com pelo menos 1 digito)
 FLOAT: [0-9]* '.' ([0-9] [0-9]*) ;  // Identifica os reais(Float): 123.23, 1.0, .12345
-CHAR: ('\'' '\\n' '\'') 
-    | ('\'' '\\t' '\'') 
-    | ('\'' '\\b' '\'') 
-    | ('\'' '\\r' '\'') 
-    | ('\'' '\\\\' '\'') 
-    | ('\'' '\\' '\'') 
-    | ('\''[\u0000-\u007F]'\'')       // (000 - 127) Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
+CHAR: ('\''([\u0000-\u0026]|[\u0028-\u005B]|[\u005D-\u007F])'\'')       // (000 - 127)(Menos o 27 => aspas simples ' e nem 97 => Contrabarra \ ) Captura todos os caracteres da tabela ASCII, conforme a especificação da linguagem
+    | ('\'''\\n''\'')           // '\n' => Contrabarra_n
+    | ('\'''\\t''\'')           // '\t' => Contrabarra_t
+    | ('\'''\\b''\'')           // '\b' => Contrabarra_b
+    | ('\'''\\r''\'')           // '\r' => Contrabarra_r
+    | ('\'''\\\\''\'')          // Especifica '\\' que é a '\' => Contrabarra
+    | ('\'\\\'\'')              // Especifica a aspas simples: "\\\'" => \' => '
     ;
     
+// TRATAMENTO DE ERRO DE ENCONTRAR UM 

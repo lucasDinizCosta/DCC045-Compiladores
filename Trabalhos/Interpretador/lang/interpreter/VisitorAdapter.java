@@ -497,8 +497,10 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // sexp: CHAR   # CharLitteral
         // Se atentar e lembrar que tem '\\n', '\\t'...
+        // return new CharLitteral(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+                // ctx.CHAR().getText().charAt(1));
         return new CharLitteral(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-                ctx.CHAR().getText().charAt(1));
+                ctx.CHAR().getText());
     }
 
     @Override

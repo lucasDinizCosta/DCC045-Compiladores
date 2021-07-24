@@ -291,7 +291,7 @@ public class InterpretVisitor extends Visitor {
         try {
             i.getExpression().accept(this);
             Object obj = operands.pop();
-            System.out.println(obj);
+            System.out.print(obj);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
