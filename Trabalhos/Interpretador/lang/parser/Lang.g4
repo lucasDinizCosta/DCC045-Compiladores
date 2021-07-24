@@ -1,7 +1,4 @@
 grammar Lang;
-options {
-    defaultErrorHandler=false;
-}
 
 // No cabeçalho de todas as classes geradas irá aparecer que estiver dentro do header
 @header
@@ -52,25 +49,25 @@ cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
     | lvalue EQUALS exp SEMI    # Attribution
     | ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA lvalue)* GREATER_THAN)? SEMI   # FunctionCall
     ;
-exp:<assoc=left> exp AND exp    # AndOperation
+exp: exp AND exp    # AndOperation
     | rexp      # RExpCall
     ;
 rexp: aexp LESS_THAN aexp   # LessThan
-    |<assoc=left> rexp EQUALITY aexp    # Equality
-    |<assoc=left> rexp DIFFERENCE aexp  # Difference
+    | rexp EQUALITY aexp    # Equality
+    | rexp DIFFERENCE aexp  # Difference
     | aexp      # AExpCall
     ;
 aexp: aexp PLUS mexp    # AdditionOperation
     | aexp MINUS mexp   # SubtractionOperation
     | mexp      # MExpCall
     ;
-mexp:<assoc=left> mexp TIMES sexp   # MultiplicationOperation
-    |<assoc=left> mexp SLASH sexp   # DivisionOperation
-    |<assoc=left> mexp PERCENT sexp # ModularOperation
+mexp: mexp TIMES sexp   # MultiplicationOperation
+    | mexp SLASH sexp   # DivisionOperation
+    | mexp PERCENT sexp # ModularOperation
     | sexp      # SExpCall
     ;
-sexp:<assoc=right> EXCLAMATION sexp # Not
-    |<assoc=right> MINUS sexp   # Minus
+sexp: EXCLAMATION sexp # Not
+    | MINUS sexp   # Minus  //<assoc=right> MINUS sexp   # Minus
     | TRUE  # True
     | FALSE # False
     | NULL  # Null
@@ -80,13 +77,13 @@ sexp:<assoc=right> EXCLAMATION sexp # Not
     | pexp  # PExpCall
     ;
 pexp: lvalue    # PexpIdentifier       // Chama lValue e o ID
-    |<assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
+    | OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
     | NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
     | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
     ;
 lvalue: ID      # Identifier
-    |<assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
-    |<assoc=left> lvalue DOT ID     # DataAccess
+    | lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
+    | lvalue DOT ID     # DataAccess
     ;
 exps: exp (COMMA exp)*      # FCallParams
     ;

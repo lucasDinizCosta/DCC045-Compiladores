@@ -10,10 +10,13 @@ package lang.parser;
 
 import lang.ast.SuperNode;
 import lang.ast.Node;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.io.IOException;
+
+// import lang.parser.LexerErrors;
 
 // Adaptador para classe de parser. a Função parseFile deve retornar null caso o parser resulte em erro. 
 public class ParseAdaptorImplementation implements ParseAdaptor {
@@ -28,6 +31,7 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
 
             // Cria um analisador léxico que é carregado com os dados do arquivo
             LangLexer lexer = new LangLexer(stream);
+            // LangLexer lexer = new LexerErrors(stream);
 
             // Cria um buffer de tokens com base no analisador léxico
             CommonTokenStream tokens = new CommonTokenStream(lexer);

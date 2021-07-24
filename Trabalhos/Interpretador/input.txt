@@ -11,11 +11,29 @@
 --i  :  0
 
 main(){
+  
    nlines = 5;
    i = nlines;
    iterate(nlines){
      iterate(i){ print '*';}
      i = i - 1;
+     print i;
      print '\n';
    }
+   --print '\n';
+   --print i;
+   --print '\n';
+   -- i = i + 2; // Faz certo a soma
+   --print i + 2;
+  {-
+  i = 80;
+  iterate(5){
+    print i;
+    print '\n';
+    --i = i - 1;
+    --i = i / 2;
+  }
+  --i = i / 2;
+  --print i;
+  -}
 }

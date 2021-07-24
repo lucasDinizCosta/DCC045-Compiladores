@@ -114,7 +114,7 @@ public class InterpretVisitor extends Visitor {
 
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -134,7 +134,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -145,7 +145,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -156,7 +156,8 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
-            throw new RuntimeException("Erro!");
+            // throw new RuntimeException("Erro!");
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -167,7 +168,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -178,10 +179,11 @@ public class InterpretVisitor extends Visitor {
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
                 operands.push(r);
             } else {
-                throw new RuntimeException("Erro!");
+                // throw new RuntimeException("Erro!");
+                throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + " : Erro !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -198,7 +200,7 @@ public class InterpretVisitor extends Visitor {
         try {
             c.accept(this);
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -215,7 +217,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -226,9 +228,8 @@ public class InterpretVisitor extends Visitor {
             if ((boolean) operands.pop()) {
                 i.getCmd().accept(this);
             }
-
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -241,9 +242,8 @@ public class InterpretVisitor extends Visitor {
             } else {
                 i.getElseCmd().accept(this);
             }
-
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -264,7 +264,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -282,7 +282,7 @@ public class InterpretVisitor extends Visitor {
                 ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -293,7 +293,7 @@ public class InterpretVisitor extends Visitor {
             Object obj = operands.pop();
             System.out.print(obj);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -310,6 +310,7 @@ public class InterpretVisitor extends Visitor {
         try {
             a.getExp().accept(this);
             LValue lvalue = a.getLValue();
+
             if (lvalue instanceof DataAccess) {
                 String str = a.getLValue().toString();
                 Object obj = operands.pop();
@@ -319,7 +320,7 @@ public class InterpretVisitor extends Visitor {
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -357,7 +358,7 @@ public class InterpretVisitor extends Visitor {
             }
 
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
     }
     
@@ -369,12 +370,12 @@ public class InterpretVisitor extends Visitor {
             a.getLeft().accept(this);
             a.getRight().accept(this);
 
-            boolean left = (Boolean) operands.pop();
             boolean right = (Boolean) operands.pop();
+            boolean left = (Boolean) operands.pop();
 
             operands.push(left && right);
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -387,8 +388,8 @@ public class InterpretVisitor extends Visitor {
             l.getLeft().accept(this);
             l.getRight().accept(this);
 
-            Number left = (Number) operands.pop();
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
 
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) < ((Float) right)) {
@@ -403,9 +404,8 @@ public class InterpretVisitor extends Visitor {
                     operands.push(false);
                 }
             }
-
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -414,8 +414,8 @@ public class InterpretVisitor extends Visitor {
         try {
             e.getLeft().accept(this);
             e.getRight().accept(this);
-            Number left = (Number) operands.pop();
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) == ((Float) right)) {
                     operands.push(true);
@@ -430,7 +430,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -439,8 +439,8 @@ public class InterpretVisitor extends Visitor {
         try {
             n.getLeft().accept(this);
             n.getRight().accept(this);
-            Number left = (Number) operands.pop();
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) == ((Float) right)) {
                     operands.push(false);
@@ -455,7 +455,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -474,7 +474,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push((Integer) left + (Integer) right);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -483,15 +483,17 @@ public class InterpretVisitor extends Visitor {
         try {
             s.getLeft().accept(this);
             s.getRight().accept(this);
-            Number left = (Number) operands.pop();
+            // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha 
+            // é o operando da direita
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left - (Float) right);
             } else {
                 operands.push((Integer) left - (Integer) right);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -501,15 +503,17 @@ public class InterpretVisitor extends Visitor {
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
-            Number left = (Number) operands.pop();
+            // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha 
+            // é o operando da direita
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left * (Float) right);
             } else {
                 operands.push((Integer) left * (Integer) right);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -518,15 +522,17 @@ public class InterpretVisitor extends Visitor {
         try {
             d.getLeft().accept(this);
             d.getRight().accept(this);
-            Number left = (Number) operands.pop();
+            // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha 
+            // é o operando da direita
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push(((Float) left) / ((Float) right));
             } else {
                 operands.push(((Integer) left) / ((Integer) right));
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -535,15 +541,15 @@ public class InterpretVisitor extends Visitor {
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
-            Number left = (Number) operands.pop();
             Number right = (Number) operands.pop();
+            Number left = (Number) operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left % (Float) right);
             } else {
                 operands.push((Integer) left % (Integer) right);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -555,7 +561,7 @@ public class InterpretVisitor extends Visitor {
             n.getExpression().accept(this);
             operands.push(!(boolean) operands.pop());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -570,7 +576,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push((Integer) number * -1);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -579,7 +585,7 @@ public class InterpretVisitor extends Visitor {
         try{
             operands.push(b.getValue());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(" (" + b.getLine() + ", " + b.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -588,7 +594,7 @@ public class InterpretVisitor extends Visitor {
         try{
             operands.push(null);
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -597,7 +603,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(i.getValue());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -606,7 +612,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(p.getValue());
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -615,7 +621,7 @@ public class InterpretVisitor extends Visitor {
         try{
             operands.push(c.getValue());
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -657,7 +663,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -686,10 +692,11 @@ public class InterpretVisitor extends Visitor {
             if (r != null || (r == null && env.peek().containsKey(i.getId()))) {
                 operands.push(r);
             } else {
-                throw new RuntimeException("Erro!");
+                // throw new RuntimeException("Erro!");
+                throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Erro!!");
             }
         }catch(Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -707,7 +714,7 @@ public class InterpretVisitor extends Visitor {
                 ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -725,7 +732,7 @@ public class InterpretVisitor extends Visitor {
                 expression.accept(this);
             }
         } catch (Exception x) {
-            throw new RuntimeException(x.getMessage());
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
     }
 }
