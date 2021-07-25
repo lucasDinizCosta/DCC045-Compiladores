@@ -119,12 +119,12 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Function f) {
-        // if(debug){
-        // Imprime a função
-        System.out.println("\n");
-        // System.out.println(f.toString());
-        System.out.println("\n");
-        // }
+        if (debug) {
+            // Imprime a função
+            System.out.println("\n");
+            System.out.println(f.toString());
+            System.out.println("\n");
+        }
 
         // Cria um escopo local
         HashMap<String, Object> localEnv = new HashMap<String, Object>();
@@ -214,7 +214,6 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
-            // throw new RuntimeException("Erro!");
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
@@ -395,46 +394,34 @@ public class InterpretVisitor extends Visitor {
                 String str = a.getLValue().toString();
                 Object obj = operands.pop();
                 env.peek().put(str, obj);
-            } else if (lvalue instanceof Identifier) { // Se é um Identificador literal, variavel ou resultados de funções
-
-                // Se a expressão for uma FunctionReturn
-                if (a.getExp() instanceof FunctionReturn) {
-                    System.out.println("Antes da atribuição");
-                    debugMode();
-
-                    // Pega o valor da posicão da que identifica qual variavel o 
-                    // usuario quer que seja retornada
-                    Expression aux = ((FunctionReturn) a.getExp()).getExpIndex();
-                    IntegerNumber valueReturnedPos = (IntegerNumber) aux;
-
-                    // Desempilha e pega somente a posicao da variavel identificada pelo usuario
-                    if ((Integer) valueReturnedPos.getValue() < 2) {
-                        // Posicao 0, ou seja mais abaixo na pilha, logo, descarta o de cima
-                        if((Integer) valueReturnedPos.getValue() == 0) {
-                            operands.pop();
-                        }
-                        // Se for posicao 1, desempilha normalmente
-                    } else {
-                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn()
-                                + ") Acesso a posicao invalida de elemento na funcao");
-                    }
-
-                    env.peek().put(((Identifier) lvalue).getId(), operands.pop());
-
-                    // Limpa a pilha de operandos depois
-                    while(operands.size() > 0){
-                        operands.pop();
-                    }
-
-                    // Limpa dos parametros
-                    while(parms.size() > 0){
-                        parms.values().clear();
-                    }
-                }
-                else{
-                    env.peek().put(((Identifier) lvalue).getId(), operands.pop());
-                }
+            } else if (lvalue instanceof Identifier) { // Se é um Identificador literal, variavel ou resultados de
+                                                       // funções
+                /*
+                 * System.out.println(a.toString() + " --- " + a.getExp().getClass()); // Trata
+                 * quando tem algo como: soma = func(1,2)[0]; // Se a expressão for uma
+                 * FunctionReturn if (a.getExp() instanceof FunctionReturn) { // Pega o valor da
+                 * posicão da que identifica qual variavel o // usuario quer que seja retornada
+                 * Expression aux = ((FunctionReturn) a.getExp()).getExpIndex(); IntegerNumber
+                 * valueReturnedPos = (IntegerNumber) aux;
+                 * 
+                 * // Desempilha e pega somente a posicao da variavel identificada pelo usuario
+                 * if ((Integer) valueReturnedPos.getValue() < 2) { // Posicao 0, ou seja mais
+                 * abaixo na pilha, logo, descarta o de cima if((Integer)
+                 * valueReturnedPos.getValue() == 0) { operands.pop(); } // Se for posicao 1,
+                 * desempilha normalmente } else { throw new RuntimeException(" (" + a.getLine()
+                 * + ", " + a.getColumn() +
+                 * ") Acesso a posicao invalida de elemento na funcao"); }
+                 * 
+                 * env.peek().put(((Identifier) lvalue).getId(), operands.pop());
+                 * 
+                 * // Limpa a pilha de operandos depois while(operands.size() > 0){
+                 * operands.pop(); }
+                 * 
+                 * // Limpa dos parametros while(parms.size() > 0){ parms.values().clear(); }
+                 */
+                env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
+
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -631,6 +618,7 @@ public class InterpretVisitor extends Visitor {
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
+            debugMode();
             // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha
             // é o operando da direita
             Number right = (Number) operands.pop();
@@ -768,7 +756,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInstanciate t) {
         try {
-            if(debug){
+            if (debug) {
                 // Imprime a função
                 System.out.println("\n -- TypeInstanciate");
                 System.out.println(t.toString());
@@ -808,10 +796,10 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(FunctionReturn f) {
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
-        // FunctionReturn // Como retorna 2 valores, logo precisa do
+        // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
         try {
-            if(debug){
+            if (debug) {
                 // Imprime a função
                 System.out.println("\n -- Function Return");
                 System.out.println(f.toString());
@@ -838,6 +826,36 @@ public class InterpretVisitor extends Visitor {
 
                 // Executa a função e coloca o retorno dos parametros em operands
                 function.accept(this);
+
+                // Pega o valor da posicão da que identifica qual variavel o
+                // usuario quer que seja retornada
+                Expression aux = f.getExpIndex();
+                IntegerNumber valueReturnedPos = (IntegerNumber) aux;
+
+                // Desempilha e pega somente a posicao da variavel identificada pelo usuario
+                // TRATAR CONDICAO SE TIVER UM VALOR DE RETORNO SÓ
+                if ((Integer) valueReturnedPos.getValue() < 2) {
+                    // Posicao 0, ou seja mais abaixo na pilha, logo, descarta o de cima
+                    if ((Integer) valueReturnedPos.getValue() == 0) {
+                        operands.pop();
+                    }
+                    // Tira da pilha, remove o resto e volta com ele pra pilha
+                    Object topoPilha = operands.pop();
+                    Integer qtdParametros = function.getParameters().getId().size();
+                    // retira os valores que estão no operands que não são retorno da função
+                    for(int i = 0; i < qtdParametros; i++){
+                        operands.pop();
+                    }
+                    // Empilha de novo o topo
+                    operands.push(topoPilha);
+                    // Limpa dos parametros 
+                    while(parms.size() > 0){ 
+                        parms.values().clear(); 
+                    }
+                } else {
+                    throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                            + ") Acesso a posicao invalida de elemento no retorno da funcao");
+                }
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());

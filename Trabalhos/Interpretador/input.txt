@@ -34,17 +34,35 @@ divMod(n :: Int, q :: Int ) : Int, Int{
 main(){
    n = 13;
    q = 5;
-   k = divMod(n, q)[1];
+   
+   k = divMod(n, q)[0];
    print 'k';
    print ':';
    print k;
    print '\n';
    
-   k = fun2(n, q)[0];
+   k = fun2(n, q)[1];
    print 'k';
    print ':';
    print k;
    print '\n';
+   
+   -- fun2(n, q)[0] => retorna 13
+   -- fun2(n, q)[1] => retorna 2
+   -- divMod(n, q)[0] => retorna 2
+   -- divMod(n, q)[1] => retorna 3
+   soma = fun2(n, q)[0] + divMod(n, q)[1];
+   --soma = fun2(n, q)[0] * divMod(n, q)[1];
+   soma = fun2(n, q)[0] / divMod(n, q)[1];
+   print 's';
+   print 'o';
+   print 'm';
+   print 'a';
+   print ':';
+   print soma;
+   print '\n';
+   
+  
     print 'n';
     print ':';
     print n;
