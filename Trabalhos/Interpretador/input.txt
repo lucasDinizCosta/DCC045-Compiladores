@@ -4,7 +4,7 @@ data Ponto {
 }
 
 fun(x :: Int){
-   x = 3;
+   teste = 3;
    print 95 + x;
 }
 
@@ -53,13 +53,24 @@ main(){
    -- divMod(n, q)[1] => retorna 3
    soma = fun2(n, q)[0] + divMod(n, q)[1];
    --soma = fun2(n, q)[0] * divMod(n, q)[1];
-   soma = fun2(n, q)[0] / divMod(n, q)[1];
+  --soma = fun2(n, q)[0] / divMod(n, q)[1];
+  -- soma = fun(fun2(n, q)[1]) / divMod(n, q)[0];
+  -- fun é uma função sem retorno
+  soma = ((fun2(n, q)[0] * divMod(n, q)[1]) + (5 *(4 + 1))) + 1;
+  
+   --soma = );
    print 's';
    print 'o';
    print 'm';
    print 'a';
    print ':';
    print soma;
+   print '\n';
+   print 'f';
+   print 'u';
+   print 'u';
+   print ':';
+   fun(fun2(n, q)[1] + 5);
    print '\n';
    
   

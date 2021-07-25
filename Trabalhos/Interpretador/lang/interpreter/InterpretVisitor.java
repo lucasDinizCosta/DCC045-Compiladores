@@ -382,7 +382,9 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(a.toString());
                 System.out.println("\n");
             }
+            
             a.getExp().accept(this);
+
 
             // TALVEZ TENHA QUE TRATAR PARA ARRAY na atribuição
 
@@ -829,33 +831,63 @@ public class InterpretVisitor extends Visitor {
 
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
-                Expression aux = f.getExpIndex();
-                IntegerNumber valueReturnedPos = (IntegerNumber) aux;
+                IntegerNumber valueReturnedPos = (IntegerNumber) f.getExpIndex();
 
                 // Desempilha e pega somente a posicao da variavel identificada pelo usuario
                 // TRATAR CONDICAO SE TIVER UM VALOR DE RETORNO SÓ
-                if ((Integer) valueReturnedPos.getValue() < 2) {
-                    // Posicao 0, ou seja mais abaixo na pilha, logo, descarta o de cima
-                    if ((Integer) valueReturnedPos.getValue() == 0) {
-                        operands.pop();
+
+                // Verifica se a função tem dois retornos
+                if(function.getReturnTypes().size() == 2){
+                    if ((Integer) valueReturnedPos.getValue() == 0 ||
+                        (Integer) valueReturnedPos.getValue() == 1
+                    ) {
+                        // Posicao 0, ou seja mais abaixo na pilha, logo, descarta o de cima
+                        if ((Integer) valueReturnedPos.getValue() == 0) {
+                            operands.pop();
+                        }
+                        // Tira da pilha, remove o resto e volta com ele pra pilha
+                        Object topoPilha = operands.pop();
+                        Integer qtdParametros = function.getParameters().getId().size();
+                        // retira os valores que estão no operands que não são retorno da função
+                        for(int i = 0; i < qtdParametros; i++){
+                            operands.pop();
+                        }
+                        // Empilha de novo o topo
+                        operands.push(topoPilha);
+                        // Limpa dos parametros 
+                        while(parms.size() > 0){ 
+                            parms.values().clear(); 
+                        }
+                    } else {
+                        throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                + ") Acesso a posicao invalida de elemento no retorno da funcao");
                     }
-                    // Tira da pilha, remove o resto e volta com ele pra pilha
-                    Object topoPilha = operands.pop();
-                    Integer qtdParametros = function.getParameters().getId().size();
-                    // retira os valores que estão no operands que não são retorno da função
-                    for(int i = 0; i < qtdParametros; i++){
-                        operands.pop();
-                    }
-                    // Empilha de novo o topo
-                    operands.push(topoPilha);
-                    // Limpa dos parametros 
-                    while(parms.size() > 0){ 
-                        parms.values().clear(); 
-                    }
-                } else {
-                    throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
-                            + ") Acesso a posicao invalida de elemento no retorno da funcao");
                 }
+                else if(function.getReturnTypes().size() == 1){
+                    if ((Integer) valueReturnedPos.getValue() == 0) {
+
+                        // Tira da pilha, remove o resto e volta com ele pra pilha
+                        Object topoPilha = operands.pop();
+                        Integer qtdParametros = function.getParameters().getId().size();
+                        // retira os valores que estão no operands que não são retorno da função
+                        for(int i = 0; i < qtdParametros; i++){
+                            operands.pop();
+                        }
+                        // Empilha de novo o topo
+                        operands.push(topoPilha);
+                        // Limpa dos parametros 
+                        while(parms.size() > 0){ 
+                            parms.values().clear(); 
+                        }
+                    } else {
+                        throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                + ") Acesso a posicao invalida de elemento no retorno da funcao");
+                    }
+                }
+                else{
+                    throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                + ") A funcao nao apresenta tipos de retorno");
+                }   
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
