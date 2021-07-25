@@ -39,18 +39,14 @@ public class Return extends Command {
     public String toString(){
         String s = "";
         for (Expression expression : exps) {
-            s += expression.toString() + "; " ;
+            s += expression.toString() + ", " ;
         }
         s = "return " + s;
         if(exps.size() > 0){
-            System.out.println("exps.size: " + exps.size());
             s = s.substring(0, s.length() - 2);
         }
-        else{
-            s = "return;";
-        }
+        s += ";";
         return s;
-        //return "return" + (bld.length() > 0 ? bld.substring(0, bld.length() - 2) : bld.toString());
     }
 
     @Override

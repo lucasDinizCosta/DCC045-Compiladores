@@ -10,6 +10,11 @@ fun(x :: Int){
 
 fun2(x :: Int, y :: Bool) : Int, Int{
    k = 9 + 1;
+   print '\n';
+   print 'x';
+   print ':';
+   print x;
+   print '\n';
    return x, 2;
 }
 
@@ -17,9 +22,29 @@ divMod(n :: Int, q :: Int ) : Int, Int{
     return n / q, n % q;
 }
 
+-- Saída esperada:
+--Q:2
+--R:3
+---- The marvelous env Debugger ------ 
+--q  :  5
+--res  :  3
+--quo  :  2
+--n  :  13
+
 main(){
    n = 13;
    q = 5;
+   k = divMod(n, q)[1];
+   print 'k';
+   print ':';
+   print k;
+   print '\n';
+   
+   k = fun2(n, q)[0];
+   print 'k';
+   print ':';
+   print k;
+   print '\n';
     print 'n';
     print ':';
     print n;

@@ -58,4 +58,13 @@ public class FunctionReturn extends Expression {
     public void setFCallParams(FCallParams fCallParams) {
         this.fCallParams = fCallParams;
     }
+
+    // RETORNA O INDICE DA POSICAO QUE O USUARIO DESEJA RECEBER DAS VARIAVEIS DA FUNCAO
+    public Expression getExpIndex() {
+        return exp;
+    }
+
+    public void setExpIndex(Expression exp) {
+        this.exp = exp;
+    }
 }

@@ -562,9 +562,9 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitFunctionReturn(FunctionReturnContext ctx) {
         // ----- Regra
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
-        String str = ctx.getChild(0).getText();
-        FCallParams fCallPar = (FCallParams) ctx.getChild(2).accept(this);
-        Expression exp = (Expression) ctx.getChild(5).accept(this);
+        String str = ctx.ID().getText();
+        FCallParams fCallPar = (FCallParams) ctx.exps().accept(this);//ctx.getChild(2).accept(this);
+        Expression exp = (Expression) ctx.exp().accept(this);
         return new FunctionReturn(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), str, fCallPar, exp);
     }
 
