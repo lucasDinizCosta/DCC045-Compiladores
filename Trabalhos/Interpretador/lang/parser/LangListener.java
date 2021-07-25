@@ -162,18 +162,6 @@ public interface LangListener extends ParseTreeListener {
 	 */
 	void exitBTypeNameType(LangParser.BTypeNameTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code BTypeID}
-	 * labeled alternative in {@link LangParser#btype}.
-	 * @param ctx the parse tree
-	 */
-	void enterBTypeID(LangParser.BTypeIDContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code BTypeID}
-	 * labeled alternative in {@link LangParser#btype}.
-	 * @param ctx the parse tree
-	 */
-	void exitBTypeID(LangParser.BTypeIDContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code CommandsList}
 	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
@@ -617,6 +605,18 @@ public interface LangListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIdentifier(LangParser.IdentifierContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code NameType}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void enterNameType(LangParser.NameTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code NameType}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 */
+	void exitNameType(LangParser.NameTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code DataAccess}
 	 * labeled alternative in {@link LangParser#lvalue}.

@@ -34,7 +34,6 @@ public abstract class Visitor {
     public abstract void visit(TypeChar t);
     public abstract void visit(TypeBool t);
     public abstract void visit(TypeFloat t);
-    public abstract void visit(NameType n);
     public abstract void visit(Type t);
 
     // Partem do cmd
@@ -85,6 +84,7 @@ public abstract class Visitor {
     public abstract void visit(LValue l);
     public abstract void visit(ID i);
     public abstract void visit(Identifier i);
+    public abstract void visit(NameType i);
     public abstract void visit(DataAccess d);
     public abstract void visit(ArrayAccess a);
 

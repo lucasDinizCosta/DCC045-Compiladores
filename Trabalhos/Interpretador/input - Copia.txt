@@ -18,8 +18,21 @@ divMod(n :: Int, q :: Int ) : Int, Int{
 }
 
 main(){
+   x = 200;
+   y = 1 + 1;
+   --print 10;
+   --print 20;
+--   p = new Ponto[2];
+   --k = new Int[2];    -- PROBLEMA
+   --k = new Ponto;    -- PROBLEMA
+
+   x = 20;
+
+   f = false;
+   t = true;
+   
    n = 13;
-   q = 5;
+    q = 5;
     print 'n';
     print ':';
     print n;
@@ -46,13 +59,20 @@ main(){
    fun(3);
    fun2(1, false)<a,b>;			-- a = 1, b = 2
    print '\n';
-   print 'a';
-    print ':';
-    print a;
-    print '\n';
-    
-    print 'b';
-    print ':';
-    print b;
-    print '\n';
+   print a;
+   print '\t';
+   print '-';
+   print '\t';
+   print b;
+   print '\n';
+
+   iterate(4){
+      print 10;
+   }
+   if(true){
+      print 20;
+   }else{
+      print 30;
+   }
+
 }

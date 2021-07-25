@@ -64,10 +64,15 @@ public class Data extends Node{
         return nameType;
     }
 
-    // @Override
-    // public String toString(){
-    //     return "Size";
-    // }
+    @Override
+    public String toString(){
+        String s = "data " + this.nameType + " { \n";
+        for (Declaration declaration : declarations) {
+            s += declaration.toString() + "\n";
+        }
+        s += " } ";
+        return s;
+    }
 
     @Override
     public void accept(Visitor v) {

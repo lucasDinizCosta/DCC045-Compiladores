@@ -170,18 +170,6 @@ public class LangBaseListener implements LangListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBTypeID(LangParser.BTypeIDContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBTypeID(LangParser.BTypeIDContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterCommandsList(LangParser.CommandsListContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -621,6 +609,18 @@ public class LangBaseListener implements LangListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIdentifier(LangParser.IdentifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNameType(LangParser.NameTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNameType(LangParser.NameTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

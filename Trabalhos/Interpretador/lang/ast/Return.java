@@ -37,11 +37,20 @@ public class Return extends Command {
 
     @Override
     public String toString(){
-        StringBuilder bld = new StringBuilder("");
+        String s = "";
         for (Expression expression : exps) {
-            bld.append(expression + "; ");
+            s += expression.toString() + "; " ;
         }
-        return "return" + (bld.length() > 0 ? bld.substring(0, bld.length() - 2) : bld.toString());
+        s = "return " + s;
+        if(exps.size() > 0){
+            System.out.println("exps.size: " + exps.size());
+            s = s.substring(0, s.length() - 2);
+        }
+        else{
+            s = "return;";
+        }
+        return s;
+        //return "return" + (bld.length() > 0 ? bld.substring(0, bld.length() - 2) : bld.toString());
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+
 import java.util.Scanner;
 
 import lang.ast.*;
@@ -33,7 +34,38 @@ public class InterpretVisitor extends Visitor {
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
         retMode = false;
-        debug = false;
+        debug = false;       // Colocar false pra desligar
+    }
+
+    public void debugMode(){
+        System.out.println("\n----------------------------------\n");
+        System.out.println("---- DADOS DO DEBUG MODE ----\n");
+        System.out.println("---- DADOS DE env ----\n");
+        for(int i = 0; i < env.size(); i++){
+            System.out.println(env.elementAt(i));
+        }
+        System.out.println("\n---- DADOS DE funcs ----\n");
+        /*
+        * Entry.getKey method returns the key and 
+        * Entry.getValue returns the value of the HashMap entry.
+        */
+        // Esta tendo erro se deixar só o to string
+        for(HashMap.Entry<String, Function> entry : funcs.entrySet()){
+            System.out.println(entry.getKey() + " => " + entry.getValue().getId());
+        }
+        System.out.println("\n---- DADOS DE parms ----\n");
+        for(HashMap.Entry<Integer, Object> entry : parms.entrySet()){
+            System.out.println( entry.getKey() + " => " + entry.getValue().toString());
+        }   
+        System.out.println("\n---- DADOS DE datas ----\n");
+        for(HashMap.Entry<String, Data> entry : datas.entrySet()){
+            System.out.println( entry.getKey() + " => " + entry.getValue().toString());
+        }               
+        System.out.println("\n---- DADOS DE Operands ----\n");
+        for(int i = 0; i < operands.size(); i++){
+            System.out.println(operands.elementAt(i).toString());
+        }           
+        System.out.println("\n----------------------------------\n");
     }
 
     // Partem do prog
@@ -66,7 +98,12 @@ public class InterpretVisitor extends Visitor {
     
     @Override
     public void visit(Data d){
-
+        // if(debug){
+            // Imprime a função
+            System.out.println("\n");
+            System.out.println(d.toString());
+            System.out.println("\n");
+        // }
     }
 
 
@@ -81,18 +118,37 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Function f){
+        // if(debug){
+            // Imprime a função
+            System.out.println("\n");
+            //System.out.println(f.toString());
+            System.out.println("\n");
+        // }
+
+        // Cria um escopo local
         HashMap<String, Object> localEnv = new HashMap<String, Object>();
         if (f.getParameters() != null) {
             Parameters params = f.getParameters();
             params.accept(this);
+            // Adiciona as variaveis do parametro no escopo local
             for (int i = f.getParameters().size() - 1; i >= 0; i--) {
                 localEnv.put(params.getSingleId(i), operands.pop());
             }
         }
-        env.push(localEnv);
+        // Adiciona o escopo da função no env
+        env.push(localEnv); 
+
+        // Verifica os commandos que compoem o corpo da função
         for (Command command : f.getCommands()) {
             command.accept(this);
         }
+
+        // System.out.println("\nEnv atual:");
+        // for(HashMap.Entry<String, Object> entry : localEnv.entrySet()){
+        //     System.out.println(entry.getKey() + " => " + entry.getValue());
+        // }
+
+        // Remove o escopo local criado pra função
         env.pop();
         retMode = false;
     }
@@ -102,6 +158,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Parameters p){
         try {
+            // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
                 type.accept(this);
                 int pos = 0;
@@ -111,7 +168,6 @@ public class InterpretVisitor extends Visitor {
                     env.peek().put(id, parms.get(pos));
                     pos++;
                 }
-
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
@@ -131,6 +187,7 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeInt t){
         try {
             for (Integer key : parms.keySet()) {
+                // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
             }
         } catch (Exception x) {
@@ -225,8 +282,9 @@ public class InterpretVisitor extends Visitor {
     public void visit(If i){
         try {
             i.getExp().accept(this);
+            // Desempilha os operandos com "parametro" do if
             if ((boolean) operands.pop()) {
-                i.getCmd().accept(this);
+                i.getCmd().accept(this);    // Verifica se o corpo de comandos do if é aceito
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
@@ -237,8 +295,10 @@ public class InterpretVisitor extends Visitor {
     public void visit(IfElse i){
         try {
             i.getExp().accept(this);
+
+            // Desempilha os operandos com "parametro" do if
             if ((boolean) operands.pop()) {
-                i.getCmd().accept(this);
+                i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
             } else {
                 i.getElseCmd().accept(this);
             }
@@ -252,13 +312,14 @@ public class InterpretVisitor extends Visitor {
         try {
             i.getExp().accept(this);
             Object obj = operands.pop();
-            if (obj instanceof Boolean)
-                while ((Boolean) obj) {
+            if (obj instanceof Boolean)     // Objeto do tipo booleano na lista de operandos
+                while ((Boolean) obj) {     // Repito enquanto esse objeto do parametro do iterate for falso
                     i.getExp().accept(this);
                     i.getCmd().accept(this);
                     obj = operands.pop();
                 }
             else if (obj instanceof Integer) {
+                // Iterate com um número limitado de vezes
                 for (int j = 0; j < (Integer) obj; j++) {
                     i.getCmd().accept(this);
                 }
@@ -271,16 +332,24 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Read r){
         try {
+            if(debug){
+                System.out.println("\n");
+                System.out.println(r.toString());
+                System.out.println("\n");
+            }
             LValue lvalue = r.getLValue();
             Scanner sc = new Scanner(System.in);    // Scanner para fazer a leitura de entrada pelo teclado
             String input = sc.nextLine();
             if (lvalue instanceof Identifier) {
+                // Adiciona o valor digitado pelo usuário no escopo
+                // (Nome da variavel, valor digitado)
                 env.peek().put(((Identifier) lvalue).getId(), input);
             }
             else if (lvalue instanceof DataAccess) {
                 Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
                 ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
             }
+            sc.close();
         } catch (Exception x) {
             throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") " + x.getMessage());
         }
@@ -290,6 +359,8 @@ public class InterpretVisitor extends Visitor {
     public void visit(Print i){
         try {
             i.getExpression().accept(this);
+
+            // Tira o objeto da lista de operandos e imprime
             Object obj = operands.pop();
             System.out.print(obj);
         } catch (Exception e) {
@@ -309,14 +380,19 @@ public class InterpretVisitor extends Visitor {
     public void visit(Attribution a){
         try {
             a.getExp().accept(this);
+
+            // TALVEZ TENHA QUE TRATAR PARA ARRAY na atribuição
+            
+            // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
+            // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
                 String str = a.getLValue().toString();
                 Object obj = operands.pop();
                 env.peek().put(str, obj);
             }
-            else if (lvalue instanceof Identifier) {
+            else if (lvalue instanceof Identifier) {    // Se é uma variavel somente
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
         } catch (Exception x) {
@@ -327,36 +403,64 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(FunctionCall f){
         try {
+            // Trata chamadas de função do tipo: fat(10)<q>
+            /**
+             * ---- Regra
+             * cmd: ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue 
+             * (COMMA lvalue)* GREATER_THAN)? SEMI   # FunctionCall
+             * 
+             * Exemplo: divmod(5, 2)<q, r>;     // Será retornada 2 valores e armazenados na variavel q e r
+            */
+            // System.out.println("ANTES DA CHAMADA");
+            // debugMode();
+
+            // Pega a função correspondente
             Function function = funcs.get(f.getId());
+
+            // Garante a existencia da função
             if (f != null) {
+                // Aceita cada expressão 
                 for (Expression exp : f.getExps()) {
                     exp.accept(this);
                 }
+
                 if (f.getFCallParams() != null) {
                     int tempID = 0;
+
+                    // Verifica os parametros da função
                     for (Expression exp : f.getFCallParams().getExps()) {
                         exp.accept(this);
                         Object obj = (Object) operands.pop();
+
+                        // Adiciona o parametro no ambiente da função
                         parms.put(tempID, obj);
                         tempID++;
                     }
                 }
                 function.accept(this);
+
+                // System.out.println("ANTES DO RETORNO CHAMADA");
+                // debugMode();
+
+                // Retorno da função para as duas variaveis determinadas
                 if (f.getLValues() != null) {
                     List<LValue> ret = f.getLValues();
-                    int it = 0;
+                    int it = ret.size() - 1;
+                    // Inverte a ordem quando empilha os operadores, logo, deve ser
+                    // Desempilhado do direita pra esquerda
                     for (LValue l : ret) {
                         env.peek().put(ret.get(it).getId(), operands.pop());
-                        it++;
+                        it--;
                     }
 
-                    // for(int i = ret.size() - 1; i >= 0 ; i++){
-                    // env.peek().put(ret.get(i).getId(),operands.pop());
+                    // for(int i = ret.size() - 1; i >= 0 ; i--){
+                    //     env.peek().put(ret.get(i).getId(), operands.pop());
                     // }
 
                 }
+                // System.out.println("DEPOIS DA CHAMADA");
+                // debugMode();
             }
-
         } catch (Exception x) {
             throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
@@ -387,10 +491,8 @@ public class InterpretVisitor extends Visitor {
         try {
             l.getLeft().accept(this);
             l.getRight().accept(this);
-
             Number right = (Number) operands.pop();
             Number left = (Number) operands.pop();
-
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) < ((Float) right)) {
                     operands.push(true);
@@ -640,18 +742,29 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInstanciate t){
         try {
+            // if(debug){
+                // Imprime a função
+                System.out.println("\n -- TypeInstanciate");
+                System.out.println(t.toString());
+                System.out.println("\n");
+            // }
+            debugMode();
+            System.out.println("AQUI");
             t.getType().accept(this);
-            if (t.getExpression() != null) {
-                t.getExpression().accept(this);
+            if (t.getExp() != null) {
+                t.getExp().accept(this);
                 Integer i = (Integer) operands.pop();
+                System.out.println(i);
                 Object obj = operands.pop();
-                List<Object> lista = new ArrayList<Object>(i);
+                System.out.println(obj.toString());
+                List<Object> lista = new ArrayList<Object>(i);          // Tipo array
                 for (int k = 0; k < i; k++) {
                     lista.add(obj);
                 }
                 operands.push(lista);
+                System.out.println("AQUI--2");
             }
-            if (t.getExpression() == null) {
+            if (t.getExp() == null) {
                 if (t.getType() instanceof TypeData) {
                     String data_id = ((TypeData) t.getType()).getId();
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
@@ -662,6 +775,7 @@ public class InterpretVisitor extends Visitor {
                     operands.push(newVar);
                 }
             }
+            System.out.println("AQUI--FINAL");
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
@@ -669,6 +783,45 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(FunctionReturn f){
+        //pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
+        try {
+            if(debug){
+                // Imprime a função
+                System.out.println("\n -- Function Return");
+                System.out.println(f.toString());
+                System.out.println("\n");
+            }
+            // Function function = funcs.get(f.getId());
+            // if (f != null) {
+            //     for (Expression exp : f.getExps()) {
+            //         exp.accept(this);
+            //     }
+            //     if (f.getFCallParams() != null) {
+            //         int tempID = 0;
+            //         for (Expression exp : f.getFCallParams().getExps()) {
+            //             exp.accept(this);
+            //             Object obj = (Object) operands.pop();
+            //             parms.put(tempID, obj);
+            //             tempID++;
+            //         }
+            //     }
+            //     function.accept(this);
+            //     // Retorno da função para as duas variaveis determinadas
+            //     // if (f.getLValues() != null) {
+            //     //     List<LValue> ret = f.getLValues();
+            //     //     int it = 0;
+            //     //     for (LValue l : ret) {
+            //     //         System.out.println(operands.peek());
+            //     //         env.peek().put(ret.get(it).getId(), operands.pop());
+            //     //         System.out.println(ret.get(it).getId() + " -- teste -- 354");
+            //     //         System.out.println(operands.peek() + " -- DPS");
+            //     //         it++;
+            //     //     }
+            //     // }
+            // }
+        } catch (Exception x) {
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
+        }
 
     }
 
@@ -703,15 +856,16 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(DataAccess d){
         try {
-            LValue lvalue = d.getLValue();
-            Scanner sc = new Scanner(System.in);
-            String input = sc.nextLine();
-            if (lvalue instanceof Identifier) {
-                env.peek().put(((Identifier) lvalue).getId(), input);
-            }
-            else if (lvalue instanceof DataAccess) {
-                Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
-                ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
+            DataAccess dAccess = (DataAccess) d.getLValue();
+            Object obj = env.peek().get(dAccess.getId());
+            if (obj != null) {
+                if (((HashMap<String, Object>) obj).containsKey(d.getId())) {
+                    operands.push(((HashMap<String, Object>) obj).get(d.getId()));
+                } else {
+                    throw new RuntimeException("Erro!");
+                }
+            } else {
+                throw new RuntimeException("Erro!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());

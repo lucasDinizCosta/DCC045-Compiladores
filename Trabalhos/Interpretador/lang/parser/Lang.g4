@@ -37,7 +37,6 @@ btype: INT_TYPE     # BTypeInt
     | BOOL_TYPE     # BTypeBool
     | FLOAT_TYPE    # BTypeFloat
     | NAME_TYPE     # BTypeNameType
-    | ID            # BTypeID
     ;
 cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
     | IF OPEN_PARENT exp CLOSE_PARENT cmd   # If
@@ -82,6 +81,7 @@ pexp: lvalue    # PexpIdentifier       // Chama lValue e o ID
     | ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
     ;
 lvalue: ID      # Identifier
+    | NAME_TYPE      # NameType
     | lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
     | lvalue DOT ID     # DataAccess
     ;
@@ -167,4 +167,3 @@ CHAR: ('\''([\u0000-\u0026]|[\u0028-\u005B]|[\u005D-\u007F])'\'')       // (000 
     | ('\'\\\'\'')              // Especifica a aspas simples: "\\\'" => \' => '
     ;
     
-// TRATAMENTO DE ERRO DE ENCONTRAR UM 

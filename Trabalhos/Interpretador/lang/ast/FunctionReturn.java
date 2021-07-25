@@ -8,6 +8,10 @@
 package lang.ast;
 
 import lang.ast.Type;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lang.ast.Expression;
 import lang.ast.FCallParams;
 import lang.interpreter.Visitor;
@@ -19,20 +23,19 @@ public class FunctionReturn extends Expression {
      * // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
     */
     private String id;
-    private FCallParams exps;
+    private FCallParams fCallParams;
     private Expression exp;
-    private Type type;
 
-    public FunctionReturn (int line, int column, String id, FCallParams exps, Expression exp){
+    public FunctionReturn (int line, int column, String id, FCallParams fCallParams, Expression exp){
         super(line, column);
         this.id = id;
-        this.exps = exps;
+        this.fCallParams = fCallParams;
         this.exp = exp;
     }
 
     @Override
     public String toString(){
-        return id + " ( " + (exps != null ? exps : "") + " ) [ " + exp + " ] ";
+        return id + " ( " + (fCallParams != null ? fCallParams : "") + " ) [ " + exp + " ] ";
     }
 
     @Override
@@ -40,4 +43,19 @@ public class FunctionReturn extends Expression {
         v.visit(this);
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public FCallParams getFCallParams() {
+        return fCallParams;
+    }
+
+    public void setFCallParams(FCallParams fCallParams) {
+        this.fCallParams = fCallParams;
+    }
 }

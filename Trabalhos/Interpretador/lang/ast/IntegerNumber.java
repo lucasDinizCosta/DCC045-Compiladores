@@ -32,7 +32,7 @@ public class IntegerNumber extends LValue{
 
     @Override
     public String toString(){
-        return " " + value.toString() + " ";
+        return value.toString() + "";
     }
 
     @Override

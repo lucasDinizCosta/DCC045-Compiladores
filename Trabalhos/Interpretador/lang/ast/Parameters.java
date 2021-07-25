@@ -25,8 +25,8 @@ public class Parameters extends Node {
     
     public Parameters (int line, int column){
         super(line, column);
-        this.id = new ArrayList<>();
-        this.type = new ArrayList<>();
+        this.id = new ArrayList<String>();
+        this.type = new ArrayList<Type>();
     }
 
     public Parameters (int line, int column, List<String> id, List<Type> type){
@@ -67,6 +67,17 @@ public class Parameters extends Node {
         this.id.add(id);
         this.type.add(type);
     }
+
+    @Override
+    public String toString(){
+        String s = "";
+        for(int i = 0; i < id.size(); i++){
+            String idAux = id.get(i).toString();
+            String typeAux = type.get(i).toString();
+            s += idAux.toString() + " : " + typeAux.toString() + ", ";
+        }
+        return s;
+     }
 
     @Override
     public void accept(Visitor v) {

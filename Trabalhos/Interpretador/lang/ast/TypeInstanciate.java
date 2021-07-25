@@ -18,11 +18,25 @@ public class TypeInstanciate extends Expression {
     */
     private Expression exp;
     private Type type;
+    private String dataName;
 
     public TypeInstanciate (int line, int column, Expression exp, Type type){
         super(line, column);
         this.exp = exp;
         this.type = type;
+    }
+
+    public TypeInstanciate (int line, int column, Type type){
+        super(line, column);
+        this.exp = null;
+        this.type = type;
+    }
+
+    public TypeInstanciate (int line, int column, String dataName){
+        super(line, column);
+        this.exp = null;
+        this.type = null;
+        this.dataName = dataName;
     }
 
     @Override
@@ -49,5 +63,13 @@ public class TypeInstanciate extends Expression {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getDataName() {
+        return dataName;
+    }
+
+    public void setDataName(String dataName) {
+        this.dataName = dataName;
     }
 }

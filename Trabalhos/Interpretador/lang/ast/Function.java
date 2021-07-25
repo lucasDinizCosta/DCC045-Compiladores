@@ -39,7 +39,7 @@ public class Function extends Node{
     public Function(int line, int column, String id){
         super(line, column);
         this.id = id;
-        this.parameters = null;
+        this.parameters = new Parameters(line, column);
         this.returnTypes = new ArrayList<Type>();
         this.commands = new ArrayList<Command>();
     }
@@ -68,8 +68,26 @@ public class Function extends Node{
         this.returnTypes.add(returnType);
     }
 
+    @Override
     public String toString(){
-        return "";
+        String s = id.toString() + "(";
+        s += parameters.toString();
+        if(returnTypes.size() > 0){
+            s += ") : ";
+            for(int i = 0; i < returnTypes.size() - 1; i++){
+                String typeAux = returnTypes.get(i).toString();
+                s += typeAux.toString() + ", ";
+            }
+            s += returnTypes.get(returnTypes.size() - 1).toString();
+        }else{
+            s += ")";
+        }
+        s += "{\n";
+        for (Command command : commands) {
+            s += command.toString() + "\n";
+        }
+        s += " } ";
+        return s;
     }
 
     public void setCommands(List<Command> commands) {

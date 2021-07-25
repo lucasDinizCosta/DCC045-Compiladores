@@ -105,13 +105,6 @@ public interface LangVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBTypeNameType(LangParser.BTypeNameTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code BTypeID}
-	 * labeled alternative in {@link LangParser#btype}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBTypeID(LangParser.BTypeIDContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code CommandsList}
 	 * labeled alternative in {@link LangParser#cmd}.
 	 * @param ctx the parse tree
@@ -370,6 +363,13 @@ public interface LangVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIdentifier(LangParser.IdentifierContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NameType}
+	 * labeled alternative in {@link LangParser#lvalue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNameType(LangParser.NameTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code DataAccess}
 	 * labeled alternative in {@link LangParser#lvalue}.

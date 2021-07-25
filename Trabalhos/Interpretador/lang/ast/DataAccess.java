@@ -17,32 +17,30 @@ public class DataAccess extends LValue{
     */
     private LValue lvalue;
     private String id;
+    private String dataId;
 
-    public DataAccess(int line, int column, LValue lvalue, String id){
+    public DataAccess (int line, int column, LValue lvalue, String id, String dataId){
         super(line, column);
         this.lvalue = lvalue;
         this.id = id;
+        this.dataId = dataId;
     }
 
-    public void setLValue(LValue lvalue){
-        this.lvalue = lvalue;
+    public LValue getLValue() {
+        return lvalue;
     }
 
-    public void setId(String id){
-        this.id = id;
+    public String getId() {
+        return id;
     }
 
-    public LValue getLValue(){
-        return (this.lvalue);
-    }
-
-    public String getId(){
-        return (this.id);
+    public String getDataId() {
+        return dataId;
     }
 
     @Override
     public String toString(){
-        return lvalue.toString() + '.' + id.toString();
+        return lvalue.toString() + "." + id.toString();
     }
 
     @Override

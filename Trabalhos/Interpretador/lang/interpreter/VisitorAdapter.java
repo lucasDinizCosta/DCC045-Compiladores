@@ -152,7 +152,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitTypeDeclaration(TypeDeclarationContext ctx) {
         // ----- Regra
         // type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
-        Type type = (Type) ctx.getChild(0).accept(this);
+        Type type = (Type) ctx.type().accept(this);
         return new TypeArray(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
     }
 
@@ -202,15 +202,15 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         return new NameType(line, column, nameType);
     }
 
-    @Override
-    public Node visitBTypeID(BTypeIDContext ctx) {
-        // ----- Regra
-        // btype: ID     # BTypeID
-        String id = ctx.getChild(0).getText();    // Captura o nome do id
-        int line = ctx.getStart().getLine();
-        int column = ctx.getStart().getCharPositionInLine();
-        return new ID(line, column, id);
-    }
+    // @Override
+    // public Node visitBTypeID(BTypeIDContext ctx) {
+    //     // ----- Regra
+    //     // btype: ID     # BTypeID
+    //     String id = ctx.getChild(0).getText();    // Captura o nome do id
+    //     int line = ctx.getStart().getLine();
+    //     int column = ctx.getStart().getCharPositionInLine();
+    //     return new ID(line, column, id);
+    // }
 
     @Override
     public Node visitCommandsList(CommandsListContext ctx) {
@@ -280,11 +280,15 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // cmd: RETURN exp (COMMA exp)* SEMI  # Return
         List<Expression> exps = new ArrayList<Expression>();
-        exps.add((Expression) ctx.getChild(1).accept(this));
 
-        for (int i = 4; i < ctx.exp().size(); i = i + 2) {  // Pega todos os exp pulando os Comma(',')
-            exps.add((Expression) ctx.getChild(i).accept(this));
+        for (int i = 0; i < ctx.exp().size(); i++) {
+            exps.add((Expression) ctx.exp().get(i).accept(this));
         }
+
+        // System.out.println("LISTA DE EXPRESSION");
+        // for(int i = 0; i < exps.size(); i++){
+        //     System.out.println("\""+exps.get(i)+"\"");
+        // }
 
         return new Return(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exps);
     }
@@ -522,19 +526,36 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // pexp: <assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
         
-        Expression exp = (Expression) ctx.getChild(1).accept(this);
+        //Expression exp = (Expression) ctx.getChild(1).accept(this);
 
-        return new ExpParenthesis(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
+        //return new ExpParenthesis(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
+        return (Expression) ctx.getChild(1).accept(this);
     }
 
     @Override
     public Node visitTypeInstanciate(TypeInstanciateContext ctx) {
         // ----- Regra
         // pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
-        Expression exp = (Expression) ctx.exp().accept(this);
-        Type type = (Type) ctx.type().accept(this);
+        // Expression exp = (Expression) ctx.exp().accept(this);
+        // Type type = (Type) ctx.type().accept(this);
 
-        return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
+        // return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
+        // se for um data, so coloca o nome dele
+        if(ctx.type().accept(this) instanceof NameType){
+            return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.type().getText());
+        }
+
+        // caso seja um new array, aceita a expressao   
+        if (ctx.exp() != null){
+            Expression exp = (Expression) ctx.exp().accept(this);
+            Type type = (Type) ctx.type().accept(this);
+            return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
+        }
+        else {  // caso nao seja um new array, só aceita o type mesmo
+            Type type = (Type) ctx.type().accept(this);
+            System.out.println("TIPO " + type);
+            return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
+        }
     }
 
     @Override
@@ -566,12 +587,23 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     }
 
     @Override
+    public Node visitNameType(NameTypeContext ctx) {
+        // ----- Regra
+        // lvalue: NAME_TYPE      # NameType
+        
+        return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+                ctx.getChild(0).getText());
+    }
+
+    @Override
     public Node visitDataAccess(DataAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue DOT ID     # DataAccess
+        
         LValue lVal = (LValue) ctx.lvalue().accept(this);
-        String id = ctx.getChild(2).getText();
-        return new DataAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, id);
+        String str = ctx.getChild(2).getText();
+        String dataId = ctx.lvalue().getText();
+        return new DataAccess(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), lVal, str, dataId);
     }
 
     @Override

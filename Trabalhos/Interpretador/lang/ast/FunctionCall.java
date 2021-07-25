@@ -26,9 +26,9 @@ public class FunctionCall extends Command{
      * Exemplo: divmod(5, 2)<q, r>;     // Será retornada 2 valores e armazenados na variavel q e r
     */
     private String id;
-    private FCallParams functionCallParams;
-    private List<LValue> lvalues = new ArrayList<>();
-    private List<Expression> exps = new ArrayList<>();
+    private FCallParams functionCallParams;             //'exps?'
+    private List<LValue> lvalues = new ArrayList<>();       // Variaveis que serão retornadas
+    private List<Expression> exps = new ArrayList<>();      // Atributo que pega da classe Function, basicamente o corpo da função
 
     public FunctionCall (int line, int column, String id){
         super(line, column);
@@ -90,9 +90,9 @@ public class FunctionCall extends Command{
         if(exps != null){
             if(bld.length() > 0){
                 return id.toString() + " ( " +  exps.toString() + " ) " + 
-                " < " + bld.substring(0, bld.length() - 2) + " > " + " ; ";
+                " < " + bld.substring(0, bld.length() - 2) + " > ; ";
             }
-            return id.toString() + " ( " +  exps.toString() + " ) " + "" + " ; ";
+            return id.toString() + " ( " +  exps.toString() + " ) ; ";
         }
         else{
             if(bld.length() > 0){
