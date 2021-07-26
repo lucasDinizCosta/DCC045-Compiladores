@@ -14,9 +14,11 @@ main(){
    --p = new Ponto;
    vetor = new Ponto;
    vetor.x = 2;
-   --vetor.y = 2;
+   vetor.y = 2;
    print '\n';
    --print vetor.x;
+   --	k = null;    -- TRATAR O NULL TYPE
+   -- print k;
    print '\n';
    
 }

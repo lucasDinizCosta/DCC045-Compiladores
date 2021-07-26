@@ -394,11 +394,16 @@ public class InterpretVisitor extends Visitor {
                 String nomeObjeto = ((DataAccess)a.getLValue()).getDataId();
                 // Atributo do lado do '=' 
                 Object atributo = operands.pop();
-
                 // Busca o objeto no env e adiciona o atributo na variavel dele
-                ((HashMap<String, Object>) env.peek().get(nomeObjeto)).put(nomeAtributo, atributo);
-                //Object objeto = env.peek().remove(((DataAccess)a.getLValue()).getDataId());
-                //HashMap<String, Object> objeto;
+                HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) env.peek().get(nomeObjeto));
+                
+                // Verifica se o atributo do objeto existe no hashmap
+                if(objetoDinamico.get(nomeAtributo) != null){
+                    objetoDinamico.put(nomeAtributo, atributo);
+                }
+                else{
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" no inexistente no objeto " + "\""+nomeObjeto+"\"");
+                }
                 debugMode();
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
@@ -786,10 +791,18 @@ public class InterpretVisitor extends Visitor {
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
                     
                     for (Declaration d : datas.get(dataID).getDeclarations()) {
+                        // Verifica as declações das variaveis e tipos no data
                         System.out.println(d.getId() +" -- 789");
                         System.out.println(d.toString() +" -- 790");
                         d.getType().accept(this);
-                        newVar.put(d.getId(), null);
+
+                        // Cria um objeto especial para destacar quais variaveis e seu tipo
+                        // dentro do data
+                        Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
+                        d.getId(), d.getType());
+
+                        // Adiciona o objeto com as variaveis vazias
+                        newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
                     }
                     operands.push(newVar);
                     System.out.println("\n -- MEIO DO TYPE --DATA- INSTANCIATE");
