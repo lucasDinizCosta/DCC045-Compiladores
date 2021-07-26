@@ -188,15 +188,14 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInt t) {
         try {
-            int size = 0;
+            boolean ehParametro = false;
             // Empilha os parametros de função
             for (Integer key : parms.keySet()) {
                 // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
-                size++;
+                ehParametro = true;
             }
-            if(size == 0){  // Não é função, é um instanciamento de tipo
-                System.out.println("Teste --- 199");
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
@@ -207,8 +206,15 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeChar t) {
         try {
+            boolean ehParametro = false;
+            // Empilha os parametros de função
             for (Integer key : parms.keySet()) {
+                // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
+                ehParametro = true;
+            }
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
+                operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
@@ -218,8 +224,15 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeBool t) {
         try {
+            boolean ehParametro = false;
+            // Empilha os parametros de função
             for (Integer key : parms.keySet()) {
+                // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
+                ehParametro = true;
+            }
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
+                operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
@@ -229,8 +242,15 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeFloat t) {
         try {
+            boolean ehParametro = false;
+            // Empilha os parametros de função
             for (Integer key : parms.keySet()) {
+                // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
+                ehParametro = true;
+            }
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
+                operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
@@ -364,7 +384,7 @@ public class InterpretVisitor extends Visitor {
                 Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
                 ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
             }
-            sc.close();
+            sc.close();     // Fecha o scanner
         } catch (Exception x) {
             throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") " + x.getMessage());
         }
@@ -373,6 +393,11 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Print i) {
         try {
+            if (debug) {
+                System.out.println("\n");
+                System.out.println(r.toString());
+                System.out.println("\n");
+            }
             i.getExpression().accept(this);
 
             // Tira o objeto da lista de operandos e imprime
@@ -800,9 +825,9 @@ public class InterpretVisitor extends Visitor {
                     // Pega o tamanho do vetor na pilha de operandos
                     Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
                     System.out.println(i);
-                    System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
+                    System.out.println("\n -- Meio DO TYPE INSTANCIATE");
                     debugMode();
-                    Object obj = operands.pop();
+                    Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
                     System.out.println(obj.toString());
                     List<Object> lista = new ArrayList<Object>(i); // Tipo array
                     for (int k = 0; k < i; k++) {
@@ -1011,7 +1036,35 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
-        
+        try{
+            if (debug) {
+                // Imprime a função
+                System.out.println("\n -- ArrayAccess --- " + a.getClass().getName());
+                System.out.println(a.toString());
+                System.out.println("\n");
+            }
+            // obj é uma lista => lista de elementos do array
+            Object obj = env.peek().get(a.getLValue().getId());
+            if (obj != null) {
+                a.getExp().accept(this);        // Adiciona a posicao no vetor nos operands
+                Integer position = (Integer) operands.pop();
+                Integer tamanhoArray = ((List)obj).size();
+                if((position >= 0) && (position <= tamanhoArray - 1)){
+                    operands.push(((List)obj).get(position));
+                }
+                else{
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+a.getLValue().getId()+"\'  !!!");
+                }
+            } else {
+                // Objeto não existe
+                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O array "+ "\""+a.getLValue().getId()+"\" nao existe!!!");
+            }
+            System.out.println("Teste --- 1036");
+            
+        }
+        catch (Exception x) {
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
+        }
     }
 
     // Partem do exps

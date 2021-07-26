@@ -66,10 +66,12 @@ main(){
    print vetor.x;
    
 	-}
-
+	-- i = 5 + 5;
+	-- print i;
    
    
    numeros = new Int[3];
+   print numeros[2];
    --array = new Ponto[3];
    
    --imprimePonto(2,3);
