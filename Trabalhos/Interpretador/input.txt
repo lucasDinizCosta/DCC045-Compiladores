@@ -72,6 +72,9 @@ main(){
    
    numeros = new Int[3];
    print numeros[2];
+   -- a = null + null; -- NAO FUNCIONA
+   a = null;
+   print a;
    --array = new Ponto[3];
    
    --imprimePonto(2,3);

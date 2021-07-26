@@ -346,6 +346,12 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Iterate i) {
         try {
+            if (debug) {
+                System.out.println("\n");
+                System.out.println(i.toString());
+                System.out.println("\n");
+            }
+
             i.getExp().accept(this);
             Object obj = operands.pop();
             if (obj instanceof Boolean) // Objeto do tipo booleano na lista de operandos
@@ -398,7 +404,7 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(i.toString());
                 System.out.println("\n");
             }
-            i.getExpression().accept(this);
+            i.getExpression().accept(this);     // Faz a expressão e coloca no operando
 
             // Tira o objeto da lista de operandos e imprime
             Object obj = operands.pop();
@@ -754,7 +760,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Null n) {
         try {
-            operands.push(null);    // Talvez adicionar n ali
+            operands.push(n.getValue());
         } catch (Exception x) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }

@@ -15,14 +15,21 @@ public class Null extends Expression {
      * sexp: NULL  # Null
      *
     */
+
+    private String value = null;
     
     public Null (int line, int column){
         super(line, column);
     }
 
+    public String getValue(){
+        return value;
+    }
+
     @Override
     public String toString(){
-        return "null";
+        //return "null";
+        return value.toString();
     }
 
     @Override
