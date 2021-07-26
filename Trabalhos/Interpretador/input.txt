@@ -69,16 +69,21 @@ main(){
 	-- i = 5 + 5;
 	-- print i;
    
-   pontos = new Ponto[3];
-   pontos[0].x = 2;
-   pontos[1].x = 3;
+   --pontos = new Ponto[3];
+   --pontos2 = new Ponto[][2];			-- FAZER MATRIZ
+   --pontos[0].x = 2;
+   --pontos[1].x = 3;
+   --u = retornaPonto(3, 4)[0];
+   --print u;
+   --print retornaPonto(3, 4)[0].x; -- NAO FUNCIONA ASSIM
    print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
-   print pontos[0].x + pontos[1].x;
+   --print pontos[0].x + pontos[1].x * 50 + 10 - 12 / 5 + 90;
    --print pontos[0].x;
    --numeros[0].x = 2;
    --print '\n';
    
    --numeros[1].x = 7;
+   
    {-
    -- FUNCIONA
    
@@ -90,16 +95,20 @@ main(){
    numeros[1] = 7;
    print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
    --print numeros[0];
-   print numeros[0] + numeros[1];		-- 9
-   print '\n';
+   --print numeros[0] + numeros[1];		-- 9
+   --print '\n';
    -- a = null + null; -- NAO FUNCIONA
-   a = null;
-   print a;
+   -- a = null;
+   --print a;
    -}
    --array = new Ponto[3];
    
    --imprimePonto(2,3);
    
+   print 'R';
+   vetor = new Ponto[3];
+   read vetor[2].x;
+   print vetor[2].x;
    
    {-
    -- Read funciona com tipo Data

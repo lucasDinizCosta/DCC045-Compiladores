@@ -384,8 +384,34 @@ public class InterpretVisitor extends Visitor {
                 // (Nome da variavel, valor digitado)
                 env.peek().put(((Identifier) lvalue).getId(), input);
             } else if (lvalue instanceof DataAccess) {
-                Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
-                ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
+                if(((DataAccess)lvalue).getLValue() instanceof ArrayAccess){ // array de data
+                    // Quando chega array do tipo pontos[0].x => lValue é um dataAccess
+                    ArrayAccess arrayElement = ((ArrayAccess)((DataAccess)lvalue).getLValue());
+                    arrayElement.getExp().accept(this); // Aceita e adiciona a posicao do array no operandos
+
+                    String nomeAtributo = ((DataAccess)lvalue).getId();
+                    Integer position = (Integer)operands.pop();
+
+                    // o array é um list de elementos
+                    String nomeArray = arrayElement.getId();
+
+                    // Busca o array no env
+                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                    Integer tamanhoArray = ((List)objetoArray).size();
+                    
+                    if((position >= 0) && (position <= tamanhoArray - 1)){
+                        Object elemento = objetoArray.get(position);    // pega o elemento na posicao
+                        ((HashMap<String, Object>) elemento).put(nomeAtributo, input);
+                    }
+                    else{
+                        throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                    }
+                }
+                else{   // Tipo data normal
+                    Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
+                    ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
+
+                }
             }
             sc.close();     // Fecha o scanner
         } catch (Exception x) {
