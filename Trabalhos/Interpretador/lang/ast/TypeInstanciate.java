@@ -16,9 +16,9 @@ public class TypeInstanciate extends Expression {
      * ---- Regra
      * pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate 
     */
-    private Expression exp;
-    private Type type;
-    private String dataName;
+    private Expression exp;         // Array
+    private Type type;              // Outros tipos como Int, Float, Char
+    private String dataName;        // Caso for tipo data
 
     public TypeInstanciate (int line, int column, Expression exp, Type type){
         super(line, column);
@@ -41,8 +41,12 @@ public class TypeInstanciate extends Expression {
 
     @Override
     public String toString(){
-        return " new " + type + (exp != null ? (" [ " + exp + " ] ") : " ");
-    }
+        if(type != null){
+            return " new " + type + (exp != null ? (" [ " + exp + " ] ") : " ");
+        }
+        else
+            return " new " + dataName + (exp != null ? (" [ " + exp + " ] ") : " ");
+    }   
 
     @Override
     public void accept(Visitor v) {

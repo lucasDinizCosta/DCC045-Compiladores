@@ -11,10 +11,11 @@ import lang.ast.Expression;
 
 import lang.interpreter.Visitor;
 
-public class NameType extends Expression{
+public class NameType extends Expression{ 
     /**
      * ---- Regra
      * btype: NAME_TYPE     # BTypeNameType
+     * 
     */
 
     private String val;

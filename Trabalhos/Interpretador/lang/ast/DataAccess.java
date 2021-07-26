@@ -16,8 +16,8 @@ public class DataAccess extends LValue{
      * lValue: <assoc=left> lvalue DOT ID     # DataAccess
     */
     private LValue lvalue;
-    private String id;
-    private String dataId;
+    private String id;              // Atributo do objeto
+    private String dataId;          // Nome do objeto
 
     public DataAccess (int line, int column, LValue lvalue, String id, String dataId){
         super(line, column);

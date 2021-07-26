@@ -64,7 +64,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
          * }
          */
 
-        String nametype = ctx.getChild(1).getText(); // Captura o nome de tipo
+        String nametype = ctx.NAME_TYPE().getText(); // Captura o nome de tipo
         List<Declaration> decls = new ArrayList<Declaration>(); // Declarações
 
         // Percorre o número de declarações
@@ -85,7 +85,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
             ctx.getStart().getLine(), 
             ctx.getStart().getCharPositionInLine(),
             ctx.getChild(0).getText(),      // Nome da variavel
-            (Type) ctx.type().accept(this)  // Tipo da variavel: Int, Char, Bool,...
+            (Type) ctx.type().accept(this)  // Tipo da variavel: Int, Char, Bool,... OU NameType
         );
     }
 
@@ -525,10 +525,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitExpParenthesis(ExpParenthesisContext ctx) {
         // ----- Regra
         // pexp: <assoc=left> OPEN_PARENT exp CLOSE_PARENT  # ExpParenthesis
-        
-        //Expression exp = (Expression) ctx.getChild(1).accept(this);
-
-        //return new ExpParenthesis(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp);
         return (Expression) ctx.getChild(1).accept(this);
     }
 
@@ -536,15 +532,12 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitTypeInstanciate(TypeInstanciateContext ctx) {
         // ----- Regra
         // pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
-        // Expression exp = (Expression) ctx.exp().accept(this);
-        // Type type = (Type) ctx.type().accept(this);
 
-        // return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
         // se for um data, so coloca o nome dele
         if(ctx.type().accept(this) instanceof NameType){
+            System.out.println(ctx.type().getText() + " --- 538");
             return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.type().getText());
         }
-
         // caso seja um new array, aceita a expressao   
         if (ctx.exp() != null){
             Expression exp = (Expression) ctx.exp().accept(this);
@@ -553,7 +546,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         }
         else {  // caso nao seja um new array, só aceita o type mesmo
             Type type = (Type) ctx.type().accept(this);
-            System.out.println("TIPO " + type);
             return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
         }
     }

@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import org.antlr.v4.gui.SystemFontMetrics;
-
 import java.util.Scanner;
 
 import lang.ast.*;
@@ -36,7 +34,7 @@ public class InterpretVisitor extends Visitor {
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
         retMode = false;
-        debug = false; // Colocar false pra desligar
+        debug = false; // Colocar false pra desligar o debug
     }
 
     public void debugMode() {
@@ -100,12 +98,12 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Data d) {
-        // if(debug){
-        // Imprime a função
-        System.out.println("\n");
-        System.out.println(d.toString());
-        System.out.println("\n");
-        // }
+        if(debug){
+            // Imprime a função
+            System.out.println("\n");
+            System.out.println(d.toString());
+            System.out.println("\n");
+        }
     }
 
     // Partem do decl
@@ -143,11 +141,6 @@ public class InterpretVisitor extends Visitor {
         for (Command command : f.getCommands()) {
             command.accept(this);
         }
-
-        // System.out.println("\nEnv atual:");
-        // for(HashMap.Entry<String, Object> entry : localEnv.entrySet()){
-        // System.out.println(entry.getKey() + " => " + entry.getValue());
-        // }
 
         // Remove o escopo local criado pra função
         env.pop();
@@ -232,6 +225,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(NameType n) {
         try {
+            System.out.println("TESTE -- 230");
             Object r = env.peek().get(n.getID());
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
                 operands.push(r);
@@ -382,7 +376,9 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(a.toString());
                 System.out.println("\n");
             }
-            
+            System.out.println("Linha 380 - ATTRIBUTION");
+            if(a.getExp() == null)
+            System.out.println(" linha 382: "+ a.toString());
             a.getExp().accept(this);
 
 
@@ -393,37 +389,28 @@ public class InterpretVisitor extends Visitor {
 
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
-                String str = a.getLValue().toString();
-                Object obj = operands.pop();
-                env.peek().put(str, obj);
-            } else if (lvalue instanceof Identifier) { // Se é um Identificador literal, variavel ou resultados de
-                                                       // funções
-                /*
-                 * System.out.println(a.toString() + " --- " + a.getExp().getClass()); // Trata
-                 * quando tem algo como: soma = func(1,2)[0]; // Se a expressão for uma
-                 * FunctionReturn if (a.getExp() instanceof FunctionReturn) { // Pega o valor da
-                 * posicão da que identifica qual variavel o // usuario quer que seja retornada
-                 * Expression aux = ((FunctionReturn) a.getExp()).getExpIndex(); IntegerNumber
-                 * valueReturnedPos = (IntegerNumber) aux;
-                 * 
-                 * // Desempilha e pega somente a posicao da variavel identificada pelo usuario
-                 * if ((Integer) valueReturnedPos.getValue() < 2) { // Posicao 0, ou seja mais
-                 * abaixo na pilha, logo, descarta o de cima if((Integer)
-                 * valueReturnedPos.getValue() == 0) { operands.pop(); } // Se for posicao 1,
-                 * desempilha normalmente } else { throw new RuntimeException(" (" + a.getLine()
-                 * + ", " + a.getColumn() +
-                 * ") Acesso a posicao invalida de elemento na funcao"); }
-                 * 
-                 * env.peek().put(((Identifier) lvalue).getId(), operands.pop());
-                 * 
-                 * // Limpa a pilha de operandos depois while(operands.size() > 0){
-                 * operands.pop(); }
-                 * 
-                 * // Limpa dos parametros while(parms.size() > 0){ parms.values().clear(); }
-                 */
-                env.peek().put(((Identifier) lvalue).getId(), operands.pop());
-            }
+                System.out.println("392");
+                String nomeAtributo = ((DataAccess)a.getLValue()).getId();      // a.getLValue().toString();  Retorna 
+                String nomeObjeto = ((DataAccess)a.getLValue()).getDataId();
+                // Atributo do lado do '=' 
+                Object atributo = operands.pop();
 
+                // Busca o objeto no env e adiciona o atributo na variavel dele
+                ((HashMap<String, Object>) env.peek().get(nomeObjeto)).put(nomeAtributo, atributo);
+                //Object objeto = env.peek().remove(((DataAccess)a.getLValue()).getDataId());
+                //HashMap<String, Object> objeto;
+                debugMode();
+            } else if (lvalue instanceof Identifier) { 
+                // Se é um Identificador literal, variavel ou resultados de funções
+                System.out.println("Linha 398 - ATTRIBUTION");
+                debugMode();
+                // if(a.getExp().){
+
+                // }
+                env.peek().put(((Identifier) lvalue).getId(), operands.pop());
+                System.out.println("Linha 403 - ATTRIBUTION");
+                debugMode();
+            }
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -620,7 +607,6 @@ public class InterpretVisitor extends Visitor {
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
-            debugMode();
             // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha
             // é o operando da direita
             Number right = (Number) operands.pop();
@@ -758,38 +744,65 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInstanciate t) {
         try {
-            if (debug) {
+            // if (debug) {
                 // Imprime a função
                 System.out.println("\n -- TypeInstanciate");
                 System.out.println(t.toString());
                 System.out.println("\n");
-            }
-            // debugMode();
-            // System.out.println("AQUI");
-            t.getType().accept(this);
-            if (t.getExp() != null) {
-                t.getExp().accept(this);
-                Integer i = (Integer) operands.pop();
-                System.out.println(i);
-                Object obj = operands.pop();
-                System.out.println(obj.toString());
-                List<Object> lista = new ArrayList<Object>(i); // Tipo array
-                for (int k = 0; k < i; k++) {
-                    lista.add(obj);
+            // }
+            System.out.println(t.toString());
+            System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
+            debugMode();
+            
+
+            // Garante que não é um tipo Data
+            if(t.getType() != null){
+                t.getType().accept(this);
+                if (t.getExpression() != null) {
+                    t.getExp().accept(this);
+                    debugMode();
+                    Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+                    // System.out.println(i);
+                    Object obj = operands.pop();
+                    // System.out.println(obj.toString());
+                    List<Object> lista = new ArrayList<Object>(i); // Tipo array
+                    for (int k = 0; k < i; k++) {
+                        lista.add(obj);
+                    }
+                    operands.push(lista);
+                    System.out.println("TESTE -- 2");
                 }
-                operands.push(lista);
+                else{   // É um tipo de dado comum: Int, Float, Char
+                    t.getExpression().accept(this);                
+                    //System.out.println("TTTTTTT");
+                }
             }
-            if (t.getExp() == null) {
-                if (t.getType() instanceof TypeData) {
-                    String data_id = ((TypeData) t.getType()).getId();
+            else{   // Tipo data que no qual o atributo Type é null
+                System.out.println("Type = NULL --- ");
+                if (t.getExp() == null) {                   // Tipo normal de data
+                    // Pega o nome do objeto do Data
+                    String dataID = t.getDataName();   
+                    // Cria um Hashmap pra servir de alocação variaveis para o objeto
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
-                    for (Declaration d : datas.get(data_id).getDeclarations()) {
+                    
+                    for (Declaration d : datas.get(dataID).getDeclarations()) {
+                        System.out.println(d.getId() +" -- 789");
+                        System.out.println(d.toString() +" -- 790");
                         d.getType().accept(this);
-                        newVar.put(d.getId(), operands.pop());
+                        newVar.put(d.getId(), null);
                     }
                     operands.push(newVar);
+                    System.out.println("\n -- MEIO DO TYPE --DATA- INSTANCIATE");
+                    debugMode();
+                }
+                else{   // Tipo array de data
+
                 }
             }
+
+            
+            
+            
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
@@ -797,6 +810,10 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(FunctionReturn f) {
+        /********************************************************************************
+         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0] *
+         * AGORA SEM RETORNO PODE SER SÓ: fat(num−1)                                    *
+         ********************************************************************************/
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
@@ -834,8 +851,6 @@ public class InterpretVisitor extends Visitor {
                 IntegerNumber valueReturnedPos = (IntegerNumber) f.getExpIndex();
 
                 // Desempilha e pega somente a posicao da variavel identificada pelo usuario
-                // TRATAR CONDICAO SE TIVER UM VALOR DE RETORNO SÓ
-
                 // Verifica se a função tem dois retornos
                 if(function.getReturnTypes().size() == 2){
                     if ((Integer) valueReturnedPos.getValue() == 0 ||
@@ -863,7 +878,7 @@ public class InterpretVisitor extends Visitor {
                                 + ") Acesso a posicao invalida de elemento no retorno da funcao");
                     }
                 }
-                else if(function.getReturnTypes().size() == 1){
+                else if(function.getReturnTypes().size() == 1){ // Quando tiver somente 1 retorno
                     if ((Integer) valueReturnedPos.getValue() == 0) {
 
                         // Tira da pilha, remove o resto e volta com ele pra pilha
