@@ -163,7 +163,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitBTypeInt(BTypeIntContext ctx) {
         // ----- Regra
         // btype: INT_TYPE     # BTypeInt
-        System.out.println("TESTE --- 166  --- " + ctx.INT_TYPE().getText());
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
         return new TypeInt(line, column);
@@ -539,14 +538,14 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
 
         // se for um data, so coloca o nome dele
         if(ctx.type().accept(this) instanceof NameType){
-            System.out.println("Instancia um TypeInstanciate -- VisitorAdapter -- 541");
+            // System.out.println("Instancia um TypeInstanciate -- VisitorAdapter -- 541");
             return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.type().getText());
         }
         // caso seja um new array, aceita a expressao   
         if (ctx.exp() != null){
             Expression exp = (Expression) ctx.exp().accept(this);
             Type type = (Type) ctx.type().accept(this);
-            System.out.println("Instancia um TypeInstanciate -- VisitorAdapter(ARRAY COMUM) -- 548 -- " + type.toString() + " -- " + exp.toString());
+            // System.out.println("Instancia um TypeInstanciate -- VisitorAdapter(ARRAY COMUM) -- 548 -- " + type.toString() + " -- " + exp.toString());
             return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, type);
         }
         else {  // caso nao seja um new array, só aceita o type mesmo

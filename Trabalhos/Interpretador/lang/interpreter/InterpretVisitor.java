@@ -457,15 +457,27 @@ public class InterpretVisitor extends Visitor {
                 }
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
-                System.out.println("Linha 398 - ATTRIBUTION");
-                // debugMode();
-                // if(a.getExp().){
-
-                // }
+                //System.out.println("Linha 398 - ATTRIBUTION");
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
-            debugMode();
-            System.out.println("TESTE --- 436");
+            else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
+                // o array é um list de elementos
+                String nomeArray = ((ArrayAccess)a.getLValue()).getId();
+                ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
+                Integer position = (Integer)operands.pop();         // Posicao do array
+
+                // Busca o array no env
+                List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                Integer tamanhoArray = ((List)objetoArray).size();
+                
+                if((position >= 0) && (position <= tamanhoArray - 1)){
+                    // Pega o elemento do topo de operands e adiciona na posição do vetor
+                    ((List)objetoArray).set(position, (Integer)operands.pop());
+                }
+                else{
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                }
+            }
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -814,34 +826,25 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(t.toString());
                 System.out.println("\n");
             }
-            System.out.println(t.toString());
             //System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
             //debugMode();
             
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
-                System.out.println(t.getType().toString() + " -- 784");
                 t.getType().accept(this);           // Empilha o tipo no operands
                 if (t.getExp() != null) {
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-                    System.out.println("787 ---- Linha");
-                    System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
-                    debugMode();
                     // Pega o tamanho do vetor na pilha de operandos
                     Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                    System.out.println(i);
-                    System.out.println("\n -- Meio DO TYPE INSTANCIATE");
-                    debugMode();
+                    //System.out.println(i);
                     Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
-                    System.out.println(obj.toString());
+                    //System.out.println(obj.toString());
                     List<Object> lista = new ArrayList<Object>(i); // Tipo array
                     for (int k = 0; k < i; k++) {
                         lista.add(obj);
                     }
                     operands.push(lista);
-                    debugMode();
-                    System.out.println("TESTE -- 2");
                 }
                 else{   // É um tipo de dado comum: Int, Float, Char
                     System.out.println("TTTTTTT");
@@ -1062,11 +1065,9 @@ public class InterpretVisitor extends Visitor {
                     throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+a.getLValue().getId()+"\'  !!!");
                 }
             } else {
-                // Objeto não existe
+                // Array não existe
                 throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O array "+ "\""+a.getLValue().getId()+"\" nao existe!!!");
             }
-            System.out.println("Teste --- 1036");
-            
         }
         catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());

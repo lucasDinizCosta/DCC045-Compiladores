@@ -71,7 +71,15 @@ main(){
    
    
    numeros = new Int[3];
+   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
    print numeros[2];
+   print '\n';
+   numeros[0] = 2;
+   numeros[1] = 7;
+   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   --print numeros[0];
+   print numeros[0] + numeros[1];		-- 9
+   print '\n';
    -- a = null + null; -- NAO FUNCIONA
    a = null;
    print a;
