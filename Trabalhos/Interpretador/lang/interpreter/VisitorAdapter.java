@@ -579,6 +579,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitArrayAccess(ArrayAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
+        System.out.println("582 - ARRAY Access --- "+ ctx.lvalue().getText() + " --- " + ctx.exp().getText());
         LValue lVal = (LValue) ctx.getChild(0).accept(this);
         Expression exp = (Expression) ctx.getChild(2).accept(this);
 
@@ -605,7 +606,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitDataAccess(DataAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue DOT ID     # DataAccess
-        
+        System.out.println("608 - DATA Access --- "+ ctx.ID().getText() + " --- " + ctx.lvalue().getText() + " --- " + ctx.lvalue().getText());
         LValue lVal = (LValue) ctx.lvalue().accept(this);
         String str = ctx.getChild(2).getText();
         String dataId = ctx.lvalue().getText();

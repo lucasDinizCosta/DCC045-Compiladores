@@ -265,10 +265,7 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(n.toString());
                 System.out.println("\n");
             }
-            debugMode();
-            System.out.println("TESTE -- 230 -- " + n.getID());
             Object r = env.peek().get(n.getID());
-            // System.out.println("TESTE -- 235 -- " + r.toString());
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
                 operands.push(r);
             } else {
@@ -425,40 +422,72 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Attribution a) {
         try {
-            // if (debug) {
+            if (debug) {
                 System.out.println("\n --- Attribution --- " + a.getClass().getName());
                 System.out.println(a.toString());
                 System.out.println("\n");
-            // }
-            debugMode();
+            }
             a.getExp().accept(this);
-
-            // TALVEZ TENHA QUE TRATAR PARA ARRAY na atribuição
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
-                String nomeAtributo = ((DataAccess)a.getLValue()).getId();
-                String nomeObjeto = ((DataAccess)a.getLValue()).getDataId();
-
-                // Atributo do lado do '=' 
-                Object atributo = operands.pop();
-                // Busca o objeto no env e adiciona o atributo na variavel dele
-                HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) env.peek().get(nomeObjeto));
                 
-                // Verifica se o atributo do objeto existe no hashmap
-                if(objetoDinamico.get(nomeAtributo) != null){
-                    objetoDinamico.put(nomeAtributo, atributo);
+                // Se o lvalue do data for um arrayACCESS
+                // Significa que é um ARRAY DE DATA
+                if(((DataAccess)lvalue).getLValue() instanceof ArrayAccess){
+                    ArrayAccess arrayElement = ((ArrayAccess)((DataAccess)lvalue).getLValue());
+                    arrayElement.getExp().accept(this); // Aceita e adiciona a posicao do array no operandos
+
+                    String nomeAtributo = ((DataAccess)lvalue).getId();
+                    String nomeObjeto = ((DataAccess)lvalue).getDataId();
+                    Integer position = (Integer)operands.pop();
+                    a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
+                    Integer valorAtribuicao = (Integer) operands.pop();
+
+                    // o array é um list de elementos
+                    String nomeArray = arrayElement.getId();
+
+                    // Busca o array no env
+                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                    Integer tamanhoArray = ((List)objetoArray).size();
+
+                    // System.out.println("461 --- " + objetoArray.toString() + " -- " + nomeAtributo +" -- "+ valorAtribuicao);
+                    
+                    if((position >= 0) && (position <= tamanhoArray - 1)){
+                        Object elemento = objetoArray.get(position);    // pega o elemento na posicao
+                        ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
+                        //debugMode();
+                    }
+                    else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                    }
                 }
-                else{
-                    // Lança um erro se o atributo não tiver no objeto
-                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" eh inexistente no objeto " + "\""+nomeObjeto+"\"");
+                else{   // Somente o DATA 
+                    // System.out.println("LINHA --- 443 --- " + a.getExp() + " --- " + lvalue.toString() + " --- " + arrayElement.toString());
+                    String nomeAtributo = ((DataAccess)lvalue).getId();
+                    String nomeObjeto = ((DataAccess)lvalue).getDataId();
+                    // System.out.println("448 ---- " + nomeAtributo + " -- " + nomeObjeto);
+    
+                    // Atributo do lado do '=' 
+                    Object atributo = operands.pop();
+                    // Busca o objeto no env e adiciona o atributo na variavel dele
+                    HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) env.peek().get(nomeObjeto));
+                    
+                    // Verifica se o atributo do objeto existe no hashmap
+                    if(objetoDinamico.get(nomeAtributo) != null){
+                        objetoDinamico.put(nomeAtributo, atributo);
+                    }
+                    else{
+                        // Lança um erro se o atributo não tiver no objeto
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" eh inexistente no objeto " + "\""+nomeObjeto+"\"");
+                    }
                 }
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
-                System.out.println("Linha 398 - ATTRIBUTION");
+                // System.out.println("Linha 398 - ATTRIBUTION -- " + lvalue.getId() + " -- " + a.getExp());
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
@@ -479,7 +508,6 @@ public class InterpretVisitor extends Visitor {
                     throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
                 }
             }
-            System.out.println("LINHA 482 ----- ");
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -828,19 +856,16 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(t.toString());
                 System.out.println("\n");
             }
-            //System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
-            //debugMode();
-            
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
                 t.getType().accept(this);           // Empilha o tipo no operands
                 if (t.getExp() != null) {
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-                    System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
+                    // System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
                     // Trata a condição de ser array do tipo DATA
                     if(t.getType() instanceof NameType){   
-                        debugMode();
+
                         // Pega o tamanho do vetor na pilha de operandos
                         Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
                         //System.out.println(i);
@@ -851,7 +876,6 @@ public class InterpretVisitor extends Visitor {
                             lista.add(obj);
                         }
                         operands.push(lista);
-                        debugMode();
                     }
                     else{       // Array generico 
                         // Pega o tamanho do vetor na pilha de operandos
@@ -1070,16 +1094,39 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("\n");
             }
             Object obj = env.peek().get(d.getLValue().getId());
-            if (obj != null) {
-                if (((HashMap<String, Object>) obj).containsKey(d.getId())) {
-                    operands.push(((HashMap<String, Object>) obj).get(d.getId()));
+            if(d.getLValue() instanceof ArrayAccess){ // array de data
+                // Quando chega array do tipo pontos[0].x => d é um dataAccess
+                if (obj != null) {
+                    // obj chega como uma lista
+                    ArrayAccess array = ((ArrayAccess)d.getLValue());
+                    array.getExp().accept(this);    // Adiciona a posicao do vetor no operands
+                    Integer position = (Integer)operands.pop();
+                    String atributoDoObjeto = d.getId();
+                    HashMap objeto = (HashMap)((List)obj).get(position);
+                    if(objeto.containsKey(atributoDoObjeto)){   // Se o objeto tem o atributo
+                        operands.push(objeto.get(atributoDoObjeto));
+                    }
+                    else{
+                        // Atributo que não pertence ao objeto
+                        throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: Atributo "+ "\'"+d.getId()+"\'"+" eh inexistente no objeto " + "\""+d.getLValue().getId()+"\" !!!");
+                    }
                 } else {
-                    // Atributo que não pertence ao objeto
-                    throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: Atributo "+ "\'"+d.getId()+"\'"+" eh inexistente no objeto " + "\""+d.getLValue().getId()+"\" !!!");
+                    // Objeto não existe
+                    throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: O Objeto "+ "\""+d.getLValue().getId()+"\" nao existe!!!");
                 }
-            } else {
-                // Objeto não existe
-                throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: O Objeto "+ "\""+d.getLValue().getId()+"\" nao existe!!!");
+            }
+            else{       // Data
+                if (obj != null) {
+                    if (((HashMap<String, Object>) obj).containsKey(d.getId())) {
+                        operands.push(((HashMap<String, Object>) obj).get(d.getId()));
+                    } else {
+                        // Atributo que não pertence ao objeto
+                        throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: Atributo "+ "\'"+d.getId()+"\'"+" eh inexistente no objeto " + "\""+d.getLValue().getId()+"\" !!!");
+                    }
+                } else {
+                    // Objeto não existe
+                    throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: O Objeto "+ "\""+d.getLValue().getId()+"\" nao existe!!!");
+                }
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());

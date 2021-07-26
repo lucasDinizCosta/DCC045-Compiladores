@@ -70,9 +70,12 @@ main(){
 	-- print i;
    
    pontos = new Ponto[3];
+   pontos[0].x = 2;
+   pontos[1].x = 3;
+   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   print pontos[0].x + pontos[1].x;
+   --print pontos[0].x;
    --numeros[0].x = 2;
-   --print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
-   --print numeros[0].x;
    --print '\n';
    
    --numeros[1].x = 7;
