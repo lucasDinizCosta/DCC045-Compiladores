@@ -26,12 +26,21 @@ public class TypeInstanciate extends Expression {
         this.type = type;
     }
 
+    // Construtor para um ARRAY DE DATA
+    public TypeInstanciate (int line, int column, Expression exp, String dataName){
+        super(line, column);
+        this.exp = exp;
+        this.type = null;
+        this.dataName = dataName;
+    }
+
     public TypeInstanciate (int line, int column, Type type){
         super(line, column);
         this.exp = null;
         this.type = type;
     }
 
+    // Construtor para um DATA
     public TypeInstanciate (int line, int column, String dataName){
         super(line, column);
         this.exp = null;

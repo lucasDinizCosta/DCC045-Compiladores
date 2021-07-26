@@ -65,10 +65,19 @@ main(){
    print 'R';
    print vetor.x;
    
-	-}
+   -}
 	-- i = 5 + 5;
 	-- print i;
    
+   pontos = new Ponto[3];
+   --numeros[0].x = 2;
+   --print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   --print numeros[0].x;
+   --print '\n';
+   
+   --numeros[1].x = 7;
+   {-
+   -- FUNCIONA
    
    numeros = new Int[3];
    print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
@@ -83,6 +92,7 @@ main(){
    -- a = null + null; -- NAO FUNCIONA
    a = null;
    print a;
+   -}
    --array = new Ponto[3];
    
    --imprimePonto(2,3);

@@ -536,11 +536,22 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // pexp: NEW type (OPEN_BRACKET exp CLOSE_BRACKET)?    # TypeInstanciate
 
-        // se for um data, so coloca o nome dele
+        // SE FOR SÓ O DATA
+        
         if(ctx.type().accept(this) instanceof NameType){
             // System.out.println("Instancia um TypeInstanciate -- VisitorAdapter -- 541");
-            return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.type().getText());
+            // caso seja um ARRAY DE DATA 
+            if (ctx.exp() != null){
+                Expression exp = (Expression) ctx.exp().accept(this);
+                // Type type = (Type) ctx.type().accept(this);
+                // System.out.println("Instancia um TypeInstanciate -- VisitorAdapter(ARRAY COMUM) -- 548 -- " + type.toString() + " -- " + exp.toString());
+                return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exp, ctx.type().getText());
+            }
+            else{   // Caso seja somente o TIPO DATA MESMO
+                return new TypeInstanciate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.type().getText());
+            }
         }
+
         // caso seja um new array, aceita a expressao   
         if (ctx.exp() != null){
             Expression exp = (Expression) ctx.exp().accept(this);

@@ -265,8 +265,8 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(n.toString());
                 System.out.println("\n");
             }
-            // debugMode();
-            // System.out.println("TESTE -- 230 -- " + n.getID());
+            debugMode();
+            System.out.println("TESTE -- 230 -- " + n.getID());
             Object r = env.peek().get(n.getID());
             // System.out.println("TESTE -- 235 -- " + r.toString());
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
@@ -425,11 +425,12 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Attribution a) {
         try {
-            if (debug) {
-                System.out.println("\n");
+            // if (debug) {
+                System.out.println("\n --- Attribution --- " + a.getClass().getName());
                 System.out.println(a.toString());
                 System.out.println("\n");
-            }
+            // }
+            debugMode();
             a.getExp().accept(this);
 
             // TALVEZ TENHA QUE TRATAR PARA ARRAY na atribuição
@@ -457,7 +458,7 @@ public class InterpretVisitor extends Visitor {
                 }
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
-                //System.out.println("Linha 398 - ATTRIBUTION");
+                System.out.println("Linha 398 - ATTRIBUTION");
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
@@ -478,6 +479,7 @@ public class InterpretVisitor extends Visitor {
                     throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
                 }
             }
+            System.out.println("LINHA 482 ----- ");
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -835,16 +837,34 @@ public class InterpretVisitor extends Visitor {
                 t.getType().accept(this);           // Empilha o tipo no operands
                 if (t.getExp() != null) {
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-                    // Pega o tamanho do vetor na pilha de operandos
-                    Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                    //System.out.println(i);
-                    Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
-                    //System.out.println(obj.toString());
-                    List<Object> lista = new ArrayList<Object>(i); // Tipo array
-                    for (int k = 0; k < i; k++) {
-                        lista.add(obj);
+                    System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
+                    // Trata a condição de ser array do tipo DATA
+                    if(t.getType() instanceof NameType){   
+                        debugMode();
+                        // Pega o tamanho do vetor na pilha de operandos
+                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+                        //System.out.println(i);
+                        Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        //System.out.println(obj.toString());
+                        List<Object> lista = new ArrayList<Object>(i); // Tipo array
+                        for (int k = 0; k < i; k++) {
+                            lista.add(obj);
+                        }
+                        operands.push(lista);
+                        debugMode();
                     }
-                    operands.push(lista);
+                    else{       // Array generico 
+                        // Pega o tamanho do vetor na pilha de operandos
+                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+                        //System.out.println(i);
+                        Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        //System.out.println(obj.toString());
+                        List<Object> lista = new ArrayList<Object>(i); // Tipo array
+                        for (int k = 0; k < i; k++) {
+                            lista.add(obj);
+                        }
+                        operands.push(lista);
+                    }
                 }
                 else{   // É um tipo de dado comum: Int, Float, Char
                     System.out.println("TTTTTTT");
@@ -852,7 +872,6 @@ public class InterpretVisitor extends Visitor {
                 }
             }
             else{   // Tipo data que no qual o atributo Type é null
-                System.out.println("Type = NULL --- ");
                 if (t.getExp() == null) {                   // Tipo normal de data
                     // Pega o nome do objeto do Data
                     String dataID = t.getDataName();   
@@ -873,8 +892,32 @@ public class InterpretVisitor extends Visitor {
                     }
                     operands.push(newVar);
                 }
-                else{   // Tipo array de data
-                    System.out.println("Linha 826");
+                else{   // Trata a condição de ser array do tipo DATA
+                    t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
+                    // Pega o nome do objeto do Data
+                    String dataID = t.getDataName();   
+
+                    // Pega o tamanho do vetor na pilha de operandos
+                    Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+                    System.out.println(i);
+
+                    List<Object> lista = new ArrayList<Object>(i); // Tipo array
+
+                    for (int k = 0; k < i; k++) {
+                        // Cria um Hashmap pra servir de alocação variaveis para o objeto
+                        HashMap<String, Object> newVar = new HashMap<String, Object>();
+                        for (Declaration d : datas.get(dataID).getDeclarations()) {
+                            // Cria um objeto especial para destacar quais variaveis e seu tipo
+                            // dentro do data
+                            Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
+                            d.getId(), d.getType());
+
+                            // Adiciona o objeto com as variaveis vazias
+                            newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
+                        }
+                        lista.add(newVar);
+                    }
+                    operands.push(lista);
                 }
             }
         } catch (Exception x) {
