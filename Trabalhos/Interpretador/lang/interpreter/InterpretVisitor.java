@@ -376,11 +376,7 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(a.toString());
                 System.out.println("\n");
             }
-            System.out.println("Linha 380 - ATTRIBUTION");
-            if(a.getExp() == null)
-            System.out.println(" linha 382: "+ a.toString());
             a.getExp().accept(this);
-
 
             // TALVEZ TENHA QUE TRATAR PARA ARRAY na atribuição
 
@@ -389,9 +385,9 @@ public class InterpretVisitor extends Visitor {
 
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
-                System.out.println("392");
-                String nomeAtributo = ((DataAccess)a.getLValue()).getId();      // a.getLValue().toString();  Retorna 
+                String nomeAtributo = ((DataAccess)a.getLValue()).getId();
                 String nomeObjeto = ((DataAccess)a.getLValue()).getDataId();
+
                 // Atributo do lado do '=' 
                 Object atributo = operands.pop();
                 // Busca o objeto no env e adiciona o atributo na variavel dele
@@ -402,9 +398,9 @@ public class InterpretVisitor extends Visitor {
                     objetoDinamico.put(nomeAtributo, atributo);
                 }
                 else{
-                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" no inexistente no objeto " + "\""+nomeObjeto+"\"");
+                    // Lança um erro se o atributo não tiver no objeto
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" eh inexistente no objeto " + "\""+nomeObjeto+"\"");
                 }
-                debugMode();
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
                 System.out.println("Linha 398 - ATTRIBUTION");
@@ -413,8 +409,6 @@ public class InterpretVisitor extends Visitor {
 
                 // }
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
-                System.out.println("Linha 403 - ATTRIBUTION");
-                debugMode();
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
@@ -792,8 +786,6 @@ public class InterpretVisitor extends Visitor {
                     
                     for (Declaration d : datas.get(dataID).getDeclarations()) {
                         // Verifica as declações das variaveis e tipos no data
-                        System.out.println(d.getId() +" -- 789");
-                        System.out.println(d.toString() +" -- 790");
                         d.getType().accept(this);
 
                         // Cria um objeto especial para destacar quais variaveis e seu tipo
@@ -805,17 +797,11 @@ public class InterpretVisitor extends Visitor {
                         newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
                     }
                     operands.push(newVar);
-                    System.out.println("\n -- MEIO DO TYPE --DATA- INSTANCIATE");
-                    debugMode();
                 }
                 else{   // Tipo array de data
 
                 }
             }
-
-            
-            
-            
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
@@ -938,6 +924,12 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Identifier i) {
         try {
+            if (debug) {
+                // Imprime a função
+                System.out.println("\n -- Identifier");
+                System.out.println(i.toString());
+                System.out.println("\n");
+            }
             Object r = env.peek().get(i.getId());
             if (r != null || (r == null && env.peek().containsKey(i.getId()))) {
                 operands.push(r);
@@ -953,16 +945,23 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(DataAccess d) {
         try {
-            DataAccess dAccess = (DataAccess) d.getLValue();
-            Object obj = env.peek().get(dAccess.getId());
+            if (debug) {
+                // Imprime a função
+                System.out.println("\n -- DataAccess");
+                System.out.println(d.toString());
+                System.out.println("\n");
+            }
+            Object obj = env.peek().get(d.getLValue().getId());
             if (obj != null) {
                 if (((HashMap<String, Object>) obj).containsKey(d.getId())) {
                     operands.push(((HashMap<String, Object>) obj).get(d.getId()));
                 } else {
-                    throw new RuntimeException("Erro!");
+                    // Atributo que não pertence ao objeto
+                    throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: Atributo "+ "\'"+d.getId()+"\'"+" eh inexistente no objeto " + "\""+d.getLValue().getId()+"\" !!!");
                 }
             } else {
-                throw new RuntimeException("Erro!");
+                // Objeto não existe
+                throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: O Objeto "+ "\""+d.getLValue().getId()+"\" nao existe!!!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
