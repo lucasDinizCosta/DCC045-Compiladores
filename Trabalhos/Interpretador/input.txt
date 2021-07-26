@@ -2,9 +2,54 @@ data Ponto {
    x :: Int;
    y :: Int;
 }
+{--
+-- Talvez nao precisa - Mas é bom verificar
+data Reta {
+   p1 :: Ponto;
+   p2 :: Ponto;
+}
+-}
 
 somarCalc(x :: Int, y :: Int): Int{
 	return x + y;
+}
+
+ajustaPonto(p1 :: Ponto, p2 :: Ponto){
+	--p3 = new Ponto;
+	--p3.x = p1.x + p2.x;
+	--p3.y = p1.y + p2.y;
+	--print p3.x;
+	--return p3;
+}
+
+retornaPonto(x :: Int, y :: Int): Ponto, Ponto{
+	p3 = new Ponto;
+	p3.x = x;
+	p3.y = y;
+	p4 = new Ponto;
+	p4.x = y;
+	p4.y = x;
+	--print p3.x;
+	return p3, p4;
+}
+
+imprimePonto(x :: Int, y :: Int){
+	p3 = new Ponto;
+	p3.x = x;
+	p3.y = y;
+	print '\n'; 
+	print 'P';
+	print 'x';
+	print ':';
+	print p3.x;
+	print '\t'; 
+	print 'P';
+	print 'y';
+	print ':';
+	print p3.y;
+	print '\n';
+	print '\n';
+	print somarCalc(2, 3)[0];
 }
 
 main(){
@@ -15,14 +60,46 @@ main(){
    vetor = new Ponto;
    vetor.x = 10;
    vetor.y = 2;
+   {-
+   -- Read funciona com tipo Data
+   
+   print 'R';
+   read vetor.x;
+   print vetor.x;
+   -}
+   --imprimePonto(2,3);
+   -- print retornaPonto(2,3)[0].x; -- ASSIM NAO VAI
+   {-
+   -- Teste de retorno de ponto na função
+   
+   pontoAux1 = retornaPonto(2,6)[0];	-- 2 e 6
+   pontoAux2 = retornaPonto(2,6)[1];	-- 6 e 2
+   print pontoAux1.x;
+   if(pontoAux1.x < pontoAux2.x){
+	print 'F';
+   }
+   
+   -}
+   --ajustaPonto(vetor, vetor);
+   
+   
+   
+   {-
+   
    --vetor.z = 3;
    print vetor.x;
-   --print vetor.z;
-   print tela.x;
+   --print vetor.z;	-- ATRIBUTO NAO EXISTE
+   -- print tela.x;	-- OBJETO NAO EXISTE
+   print '\n';
+   --print (somarCalc(vetor.x, vetor.y)[0] + 5);
+   vetor.x = (somarCalc(vetor.x, vetor.y)[0] + 5);
+   print vetor.x;
    print '\n';
    --print vetor.x;
    --	k = null;    -- TRATAR O NULL TYPE
    -- print k;
    print '\n';
+   
+   -}
    
 }

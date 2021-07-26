@@ -81,6 +81,9 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // decl: ID DOUBLE_COLON type SEMI
 
+        //Type tipo = ctx.type().accept(this);
+        //ctx.type().
+
         return new Declaration(
             ctx.getStart().getLine(), 
             ctx.getStart().getCharPositionInLine(),
@@ -555,7 +558,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         // ----- Regra
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0]
         String str = ctx.ID().getText();
-        FCallParams fCallPar = (FCallParams) ctx.exps().accept(this);//ctx.getChild(2).accept(this);
+        FCallParams fCallPar = (FCallParams) ctx.exps().accept(this);
         Expression exp = (Expression) ctx.exp().accept(this);
         return new FunctionReturn(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), str, fCallPar, exp);
     }
@@ -582,7 +585,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitNameType(NameTypeContext ctx) {
         // ----- Regra
         // lvalue: NAME_TYPE      # NameType
-        
         return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
                 ctx.getChild(0).getText());
     }

@@ -8,13 +8,18 @@
 package lang.ast;
 
 import lang.ast.Expression;
+import lang.ast.Type;
 
 import lang.interpreter.Visitor;
 
-public class NameType extends Expression{ 
+public class NameType extends Type{ 
+// public class NameType extends Expression{ 
     /**
      * ---- Regra
      * btype: NAME_TYPE     # BTypeNameType
+     * 
+     * Também presente na regra
+     * lvalue: NAME_TYPE      # NameType
      * 
     */
 

@@ -51,7 +51,8 @@ public class InterpretVisitor extends Visitor {
          */
         // Esta tendo erro se deixar só o to string
         for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
-            System.out.println(entry.getKey() + " => " + entry.getValue().getId());
+            // entry.getValue().toString() mostra a função completa
+            System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
         }
         System.out.println("\n---- DADOS DE parms ----\n");
         for (HashMap.Entry<Integer, Object> entry : parms.entrySet()) {
@@ -82,13 +83,13 @@ public class InterpretVisitor extends Visitor {
 
         for (Function f : p.getFunctions()) {
             funcs.put(f.getId(), f);
-            if (f.getId().equals("main")) {
+            if (f.getId().equals("main")) {     // Verifica se tem a função main
                 main = f;
             }
         }
 
         if (main == null) {
-            throw new RuntimeException("Não há uma função chamada main ! abortando !");
+            throw new RuntimeException("Não há uma função chamada \'main\' ! abortando !");
         }
 
         main.accept(this);
@@ -119,7 +120,7 @@ public class InterpretVisitor extends Visitor {
     public void visit(Function f) {
         if (debug) {
             // Imprime a função
-            System.out.println("\n");
+            System.out.println("\n ---- Function -- " + f.getClass().getName());
             System.out.println(f.toString());
             System.out.println("\n");
         }
@@ -152,6 +153,13 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Parameters p) {
         try {
+            if (debug) {
+                // Imprime a string da classe
+                System.out.println("\n --- Parameters --- " + p.getClass().getName());
+                System.out.println(p.toString());
+                System.out.println("\n");
+            }
+
             // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
                 type.accept(this);
@@ -225,8 +233,15 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(NameType n) {
         try {
-            System.out.println("TESTE -- 230");
+            if (debug) {
+                System.out.println("\n -- NameType -- " + n.getClass().getName());
+                System.out.println(n.toString());
+                System.out.println("\n");
+            }
+            // debugMode();
+            // System.out.println("TESTE -- 230 -- " + n.getID());
             Object r = env.peek().get(n.getID());
+            // System.out.println("TESTE -- 235 -- " + r.toString());
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
                 operands.push(r);
             } else {
@@ -275,6 +290,7 @@ public class InterpretVisitor extends Visitor {
     public void visit(If i) {
         try {
             i.getExp().accept(this);
+
             // Desempilha os operandos com "parametro" do if
             if ((boolean) operands.pop()) {
                 i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
@@ -426,7 +442,12 @@ public class InterpretVisitor extends Visitor {
              * Exemplo: divmod(5, 2)<q, r>; // Será retornada 2 valores e armazenados na
              * variavel q e r
              */
-
+            if (debug) {
+                System.out.println("\n --- FunctionCall  -- " + f.getClass().getName());
+                System.out.println(f.toString());
+                System.out.println("\n");
+            }
+                
             // Pega a função correspondente
             Function function = funcs.get(f.getId());
 
@@ -437,20 +458,24 @@ public class InterpretVisitor extends Visitor {
                     exp.accept(this);
                 }
 
+                // Passa do operand para o params
+                // monta o parametro da função
                 if (f.getFCallParams() != null) {
                     int tempID = 0;
-
+                    //System.out.println("Teste -- 455");
                     // Verifica os parametros da função
                     for (Expression exp : f.getFCallParams().getExps()) {
+                        //System.out.println("Teste -- 458 -- " + exp.toString());
                         exp.accept(this);
                         Object obj = (Object) operands.pop();
+                        //System.out.println("Teste -- 461 -- " + obj.toString());
 
                         // Adiciona o parametro no ambiente da função
                         parms.put(tempID, obj);
                         tempID++;
                     }
                 }
-                function.accept(this);
+                function.accept(this);  // Executa a função
 
                 // Retorno da função para as duas variaveis determinadas
                 if (f.getLValues() != null) {
@@ -695,7 +720,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Null n) {
         try {
-            operands.push(null);
+            operands.push(null);    // Talvez adicionar n ali
         } catch (Exception x) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
