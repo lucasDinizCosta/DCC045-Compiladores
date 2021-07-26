@@ -188,9 +188,16 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInt t) {
         try {
+            int size = 0;
+            // Empilha os parametros de função
             for (Integer key : parms.keySet()) {
                 // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
+                size++;
+            }
+            if(size == 0){  // Não é função, é um instanciamento de tipo
+                System.out.println("Teste --- 199");
+                operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
@@ -420,12 +427,14 @@ public class InterpretVisitor extends Visitor {
             } else if (lvalue instanceof Identifier) { 
                 // Se é um Identificador literal, variavel ou resultados de funções
                 System.out.println("Linha 398 - ATTRIBUTION");
-                debugMode();
+                // debugMode();
                 // if(a.getExp().){
 
                 // }
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
+            debugMode();
+            System.out.println("TESTE --- 436");
         } catch (Exception x) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
@@ -768,37 +777,44 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInstanciate t) {
         try {
-            // if (debug) {
+            if (debug) {
                 // Imprime a função
                 System.out.println("\n -- TypeInstanciate");
                 System.out.println(t.toString());
                 System.out.println("\n");
-            // }
+            }
             System.out.println(t.toString());
-            System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
-            debugMode();
+            //System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
+            //debugMode();
             
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
-                t.getType().accept(this);
-                if (t.getExpression() != null) {
-                    t.getExp().accept(this);
+                System.out.println(t.getType().toString() + " -- 784");
+                t.getType().accept(this);           // Empilha o tipo no operands
+                if (t.getExp() != null) {
+                    t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
+                    System.out.println("787 ---- Linha");
+                    System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
                     debugMode();
+                    // Pega o tamanho do vetor na pilha de operandos
                     Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                    // System.out.println(i);
+                    System.out.println(i);
+                    System.out.println("\n -- ANTES DO TYPE INSTANCIATE");
+                    debugMode();
                     Object obj = operands.pop();
-                    // System.out.println(obj.toString());
+                    System.out.println(obj.toString());
                     List<Object> lista = new ArrayList<Object>(i); // Tipo array
                     for (int k = 0; k < i; k++) {
                         lista.add(obj);
                     }
                     operands.push(lista);
+                    debugMode();
                     System.out.println("TESTE -- 2");
                 }
                 else{   // É um tipo de dado comum: Int, Float, Char
+                    System.out.println("TTTTTTT");
                     t.getExpression().accept(this);                
-                    //System.out.println("TTTTTTT");
                 }
             }
             else{   // Tipo data que no qual o atributo Type é null
@@ -824,7 +840,7 @@ public class InterpretVisitor extends Visitor {
                     operands.push(newVar);
                 }
                 else{   // Tipo array de data
-
+                    System.out.println("Linha 826");
                 }
             }
         } catch (Exception x) {
@@ -995,7 +1011,7 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
-
+        
     }
 
     // Partem do exps

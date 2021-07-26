@@ -53,13 +53,28 @@ imprimePonto(x :: Int, y :: Int){
 }
 
 main(){
-   --n = 13;
+	{-
+	
+	n = 13;
    --q = 5;
-   --print n;
+   print n;
    --p = new Ponto;
    vetor = new Ponto;
    vetor.x = 10;
    vetor.y = 2;
+   print 'R';
+   print vetor.x;
+   
+	-}
+
+   
+   
+   numeros = new Int[3];
+   --array = new Ponto[3];
+   
+   --imprimePonto(2,3);
+   
+   
    {-
    -- Read funciona com tipo Data
    
@@ -69,6 +84,7 @@ main(){
    -}
    --imprimePonto(2,3);
    -- print retornaPonto(2,3)[0].x; -- ASSIM NAO VAI
+   
    {-
    -- Teste de retorno de ponto na função
    
