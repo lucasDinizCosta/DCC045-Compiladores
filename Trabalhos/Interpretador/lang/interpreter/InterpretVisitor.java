@@ -395,7 +395,7 @@ public class InterpretVisitor extends Visitor {
         try {
             if (debug) {
                 System.out.println("\n");
-                System.out.println(r.toString());
+                System.out.println(i.toString());
                 System.out.println("\n");
             }
             i.getExpression().accept(this);
