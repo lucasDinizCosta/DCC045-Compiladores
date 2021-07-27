@@ -685,9 +685,8 @@ public class InterpretVisitor extends Visitor {
         try {
             l.getLeft().accept(this);
             l.getRight().accept(this);
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
-            System.out.println("692 --- RIGHT: " + right + "  -- LEFT: " + left); 
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) < ((Float) right)) {
                     operands.push(true);
@@ -700,6 +699,8 @@ public class InterpretVisitor extends Visitor {
                 } else {
                     operands.push(false);
                 }
+            } else{
+                throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") : Expressoes invalidas na operacao de comparacao menor com \'<\' !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + x.getMessage());
@@ -711,19 +712,30 @@ public class InterpretVisitor extends Visitor {
         try {
             e.getLeft().accept(this);
             e.getRight().accept(this);
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
-            if (left instanceof Float && right instanceof Float) {
-                if (((Float) left) == ((Float) right)) {
+            Object right = operands.pop();
+            Object left = operands.pop();
+            if(left instanceof Boolean && right instanceof Boolean){
+                if (left == right) {
                     operands.push(true);
                 } else {
                     operands.push(false);
                 }
-            } else if (left instanceof Integer && right instanceof Integer) {
-                if (((Integer) left) == ((Integer) right)) {
-                    operands.push(true);
-                } else {
-                    operands.push(false);
+            }
+            else{
+                if (left instanceof Float && right instanceof Float) {
+                    if (((Float) left) == ((Float) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                } else if (left instanceof Integer && right instanceof Integer) {
+                    if (((Integer) left) == ((Integer) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                } else{
+                    throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") : Expressoes invalidas na operacao de igualdade de comparacao usando \'==\' !!");
                 }
             }
         } catch (Exception x) {
@@ -736,19 +748,30 @@ public class InterpretVisitor extends Visitor {
         try {
             n.getLeft().accept(this);
             n.getRight().accept(this);
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
-            if (left instanceof Float && right instanceof Float) {
-                if (((Float) left) == ((Float) right)) {
-                    operands.push(false);
-                } else {
+            Object right = operands.pop();
+            Object left = operands.pop();
+            if(left instanceof Boolean && right instanceof Boolean){
+                if (left != right) {
                     operands.push(true);
+                } else {
+                    operands.push(false);
                 }
-            } else if (left instanceof Integer && right instanceof Integer) {
-                if (((Integer) left) == ((Integer) right)) {
-                    operands.push(false);
-                } else {
-                    operands.push(true);
+            }
+            else{
+                if (left instanceof Float && right instanceof Float) {
+                    if (((Float) left) != ((Float) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                } else if (left instanceof Integer && right instanceof Integer) {
+                    if (((Integer) left) != ((Integer) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                } else{
+                    throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") : Expressoes invalidas na operacao de diferencao na comparacao usando \'!=\' !!");
                 }
             }
         } catch (Exception x) {
@@ -763,12 +786,14 @@ public class InterpretVisitor extends Visitor {
         try {
             a.getLeft().accept(this);
             a.getRight().accept(this);
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left + (Float) right);
-            } else {
+            } else if (left instanceof Integer && right instanceof Integer) {
                 operands.push((Integer) left + (Integer) right);
+            } else{
+                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") : Expressoes invalidas na operacao de adicao \'+\' !!");
             }
         } catch (Exception e) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + e.getMessage());
@@ -782,12 +807,14 @@ public class InterpretVisitor extends Visitor {
             s.getRight().accept(this);
             // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha
             // é o operando da direita
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left - (Float) right);
-            } else {
+            } else if (left instanceof Integer && right instanceof Integer) {
                 operands.push((Integer) left - (Integer) right);
+            } else{
+                throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") : Expressoes invalidas na operacao de subtracao \'-\' !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + x.getMessage());
@@ -802,12 +829,14 @@ public class InterpretVisitor extends Visitor {
             m.getRight().accept(this);
             // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha
             // é o operando da direita
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left * (Float) right);
-            } else {
+            } else if (left instanceof Integer && right instanceof Integer) {
                 operands.push((Integer) left * (Integer) right);
+            } else{
+                throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") : Expressoes invalidas na operacao de multiplicacao \'*\' !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
@@ -821,13 +850,15 @@ public class InterpretVisitor extends Visitor {
             d.getRight().accept(this);
             // Primeiro é empilhado da esquerda pra direita, logo, o topo da pilha
             // é o operando da direita
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float || right instanceof Float) {
-                operands.push(((Float) left) / ((Float) right));
-            } else {
-                operands.push(((Integer) left) / ((Integer) right));
-            }
+                operands.push((Float) left / (Float) right);
+            } else if (left instanceof Integer && right instanceof Integer) {
+                operands.push((Integer) left / (Integer) right);
+            } else{
+                throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") : Expressoes invalidas na operacao de divisao \'/\' !!");
+            }  
         } catch (Exception x) {
             throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
         }
@@ -838,13 +869,15 @@ public class InterpretVisitor extends Visitor {
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
-            Number right = (Number) operands.pop();
-            Number left = (Number) operands.pop();
+            Object right = operands.pop();
+            Object left = operands.pop();
             if (left instanceof Float || right instanceof Float) {
                 operands.push((Float) left % (Float) right);
-            } else {
+            } else if (left instanceof Integer && right instanceof Integer) {
                 operands.push((Integer) left % (Integer) right);
-            }
+            } else{
+                throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") : Expressoes invalidas na operacao de divisao modular \'%\' !!");
+            }  
         } catch (Exception x) {
             throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
         }
@@ -856,7 +889,13 @@ public class InterpretVisitor extends Visitor {
     public void visit(Not n) {
         try {
             n.getExpression().accept(this);
-            operands.push(!(boolean) operands.pop());
+            Object valor = operands.pop();
+            if(valor instanceof Boolean){
+                operands.push(!(boolean) valor);
+            }
+            else{
+                throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") : Expressao invalida na operacao \'!\' em tipos logicos !!");
+            }  
         } catch (Exception e) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + e.getMessage());
         }
@@ -866,11 +905,13 @@ public class InterpretVisitor extends Visitor {
     public void visit(Minus n) {
         try {
             n.getExpression().accept(this);
-            Number number = (Number) operands.pop();
-            if (number instanceof Float) {
-                operands.push((Float) number * -1);
-            } else {
-                operands.push((Integer) number * -1);
+            Object valor = operands.pop();
+            if (valor instanceof Float) {
+                operands.push((Float) valor * -1);
+            } else if (valor instanceof Integer) {
+                operands.push((Integer) valor * -1);
+            } else{
+                throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") : Expressao invalida na operacao de inversao de sinal numerico \'-\' !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());

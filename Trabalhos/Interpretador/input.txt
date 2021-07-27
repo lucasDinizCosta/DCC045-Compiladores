@@ -96,7 +96,6 @@ main(){
    vetor.y = 2;
    print 'R';
    print vetor.x;
-   
    objeto = new Ponto;
 	objeto.x = 1200;
 	print objeto.x + objeto.x;
@@ -111,6 +110,12 @@ vet = somaArrays(k, k, size)[0];
 print 'V'; print ':'; print ' '; 
 print vet[0];
 print '\n';
+if(true != false){
+	print('s');
+}  
+if(true < 2){
+	print('s');
+}
 
 
 {-

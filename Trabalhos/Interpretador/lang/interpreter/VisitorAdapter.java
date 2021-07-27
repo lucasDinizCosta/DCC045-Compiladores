@@ -255,7 +255,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitIterate(IterateContext ctx) {
         // ----- Regra
         // cmd: ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
-        //Iterate it = (Iterate) ctx.getChild(0).accept(this);
         Expression exp = (Expression) ctx.getChild(2).accept(this);
         Command cmd = (Command) ctx.getChild(4).accept(this);
 
