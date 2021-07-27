@@ -54,12 +54,9 @@ public class InterpretVisitor extends Visitor {
         for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
             // entry.getValue().toString() mostra a função completa
             // entry.getValue().getId() mostra o nome da função somente
-            System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
+            System.out.println(entry.getKey() + " => " + entry.getValue().toString());     
         }
         System.out.println("\n---- DADOS DE parms ----\n");
-        /*for (HashMap.Entry<Integer, Object> entry : parms.entrySet()) {
-            System.out.println(entry.getKey() + " => " + entry.getValue().toString());
-        }*/
         for (int i = 0; i < parms.size(); i++) {
             System.out.println(parms.elementAt(i).toString());
         }
@@ -481,6 +478,8 @@ public class InterpretVisitor extends Visitor {
             // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue() + " -- " + a.getExp() + " --- " + a.toString() );
             a.getExp().accept(this);
 
+            debugMode();
+
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
@@ -513,7 +512,7 @@ public class InterpretVisitor extends Visitor {
                     if((position >= 0) && (position <= tamanhoArray - 1)){
                         Object elemento = objetoArray.get(position);    // pega o elemento na posicao
                         ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
-                        
+
                     }
                     else{
                         throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
@@ -555,7 +554,7 @@ public class InterpretVisitor extends Visitor {
                 List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                 Integer tamanhoArray = ((List)objetoArray).size();
 
-                debugMode();
+                //debugMode();
                 
                 if((position >= 0) && (position <= tamanhoArray - 1)){
                     /**
@@ -989,7 +988,6 @@ public class InterpretVisitor extends Visitor {
 
                     // Pega o tamanho do vetor na pilha de operandos
                     Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                    System.out.println(i);
 
                     List<Object> lista = new ArrayList<Object>(i); // Tipo array
 
@@ -1182,6 +1180,9 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(ArrayAccess a) {
         try{
+            // ---- Regra
+            // lvalue: lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
+
             if (debug) {
                 // Imprime a função
                 System.out.println("\n -- ArrayAccess --- " + a.getClass().getName());

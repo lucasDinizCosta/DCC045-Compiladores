@@ -85,6 +85,10 @@ main(){
 	print '\n';
    
 -}
+	k = new Char[5];
+	k[0] = 50;
+	print 'k';print 'A';print 'r';print 'r';print 'a';print 'y'; print ':'; print ' ';
+	print k[0]; print '\n';
 	u = retornaArrayPontos(3, 4)[0];
 	print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' '; print 'u'; print ':'; print ' ';
     print u[0].x + u[0].y;	-- 7 + 4 = 11

@@ -580,7 +580,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitArrayAccess(ArrayAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
-        System.out.println("582 - ARRAY Access --- "+ ctx.lvalue().getText() + " --- " + ctx.exp().getText());
+        // System.out.println("582 - ARRAY Access --- "+ ctx.lvalue().getText() + " --- " + ctx.exp().getText());
         LValue lVal = (LValue) ctx.getChild(0).accept(this);
         Expression exp = (Expression) ctx.getChild(2).accept(this);
 
