@@ -68,6 +68,9 @@ main(){
    -}
 	-- i = 5 + 5;
 	-- print i;
+	objeto = new Ponto;
+	objeto.x = 1200;
+	print objeto.x;
    
    --pontos = new Ponto[3];
    --pontos2 = new Ponto[][2];			-- FAZER MATRIZ

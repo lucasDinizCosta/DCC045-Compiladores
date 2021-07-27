@@ -199,6 +199,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitBTypeNameType(BTypeNameTypeContext ctx) {
         // ----- Regra
         // btype: NAME_TYPE     # BTypeNameType
+        System.out.println("B_NAME_TYPE - 202 - VisitorAdapter");
         String nameType = ctx.getChild(0).getText();    // Captura o nome do tipo
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
@@ -598,6 +599,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitNameType(NameTypeContext ctx) {
         // ----- Regra
         // lvalue: NAME_TYPE      # NameType
+        System.out.println("601 -- TESTE -- VISITORADAPTER - NAMETYPE");
         return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
                 ctx.getChild(0).getText());
     }
