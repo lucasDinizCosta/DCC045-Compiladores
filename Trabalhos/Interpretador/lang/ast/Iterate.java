@@ -17,11 +17,11 @@ public class Iterate extends Command {
      * ---- Regra
      * cmd: ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
     */
-    private Iterate it;
+    private String it;          // nome do iterate
     private Expression exp;
     private Command cmd;
 
-    public Iterate (int line, int column, Iterate it, Expression exp, Command cmd){
+    public Iterate (int line, int column, String it, Expression exp, Command cmd){
         super(line, column);
         this.it = it;
         this.exp = exp;
@@ -38,13 +38,13 @@ public class Iterate extends Command {
         v.visit(this);
     }
 
-    public Iterate getIterate() {
+    /*public Iterate getIterate() {
         return it;
     }
 
     public void setIterate(Iterate it) {
         this.it = it;
-    }
+    }*/
 
     public Expression getExp() {
         return exp;

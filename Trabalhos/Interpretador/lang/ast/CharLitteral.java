@@ -17,6 +17,7 @@ public class CharLitteral extends LValue{
     */
 
     private char value; 
+    private String originalValue;   // String pega pelo token sem o tratamento
     
     public CharLitteral(int line, int column, String valueString){
         super(line, column);
@@ -47,9 +48,11 @@ public class CharLitteral extends LValue{
                     this.value = '\'';
                     break;
             }
+            this.originalValue = valueString;
         }
         else{
             this.value = valueString.charAt(1);
+            this.originalValue = valueString;
         }
     }
 
@@ -63,7 +66,7 @@ public class CharLitteral extends LValue{
 
     @Override
     public String toString(){
-        return " "+ value + " ";
+        return value + "";
     }
 
     @Override

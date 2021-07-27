@@ -54,7 +54,8 @@ public class InterpretVisitor extends Visitor {
         for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
             // entry.getValue().toString() mostra a função completa
             // entry.getValue().getId() mostra o nome da função somente
-            System.out.println(entry.getKey() + " => " + entry.getValue().toString());     
+            System.out.println("getvalueType: " + entry.getValue().getClass().getSimpleName());
+            System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
         }
         System.out.println("\n---- DADOS DE parms ----\n");
         for (int i = 0; i < parms.size(); i++) {
@@ -113,6 +114,7 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Declaration d) {
+        // System.out.println("117 --- " + d.toString());
 
     }
 
@@ -132,6 +134,7 @@ public class InterpretVisitor extends Visitor {
         if (f.getParameters() != null) {
             Parameters params = f.getParameters();
             params.accept(this);    // Empilha os valores dos parametros no operands
+            System.out.println("136 --- " + params.toString());
 
             // Adiciona as variaveis do parametro no escopo local
             for (int i = 0; i < f.getParameters().size(); i++) {
@@ -166,12 +169,15 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(p.toString());
                 System.out.println("\n");
             }
-
+            System.out.println("--- Parameters --- " + p.getClass().getName());
+            System.out.println("170 -- TESTE -- " + p.getId() + " -- " + p.getType().toString());
             // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
                 // Aceita o tipo do parametro e empilha o valor do parametro no operands
+                System.out.println(type.toString());
                 type.accept(this);  
             }
+            System.out.println("175 -- TESTE -- " + p.getId());
             // salva a variável no escopo da funcao, de acordo com valor do parametro passado
             // Dado que os valores dos parametros foram empilhados no operands, a ideia é adicionar
             // a variavel no ambiente e escopo da função
@@ -187,12 +193,29 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(TypeArray t) {
-        // if (debug) {
-            // Imprime a string da classe
-            System.out.println("\n --- TypeArray --- " + t.getClass().getName());
-            System.out.println(t.toString());
-            System.out.println("\n");
-        // }
+        try {
+            boolean ehParametro = false;
+            System.out.println(" 194 ---- " + "typeArray");
+            // debugMode();
+            // Empilha os parametros de função
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
+                ehParametro = true;
+            }
+            System.out.println(" 200 ---- " + "typeArray");
+            /*operands.push();
+            for (Integer key : parms.keySet()) {    // Adiciona todos os parametros na pilha de operandos
+                // Adiciona na listagem de operandos
+                operands.push(parms.get(key));
+                ehParametro = true;
+            }*/
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
+                operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
+            }
+        } catch (Exception x) {
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
+        }
     }
 
     // Partem do btype
@@ -366,19 +389,20 @@ public class InterpretVisitor extends Visitor {
     public void visit(Iterate i) {
         try {
             if (debug) {
-                System.out.println("\n");
+                System.out.println("\n ---- ITERATE --- " + i.getClass().getSimpleName());
                 System.out.println(i.toString());
                 System.out.println("\n");
             }
-
-            i.getExp().accept(this);
+            i.getExp().accept(this);        // Empilha o valor lógico da expressão no operands
             Object obj = operands.pop();
-            if (obj instanceof Boolean) // Objeto do tipo booleano na lista de operandos
-                while ((Boolean) obj) { // Repito enquanto esse objeto do parametro do iterate for falso
-                    i.getExp().accept(this);
-                    i.getCmd().accept(this);
+            if (obj instanceof Boolean){ // Objeto do tipo booleano na lista de operandos
+                do{                    
+                    i.getCmd().accept(this);        // Executa os comandos do iterate
+                    i.getExp().accept(this);        // Empilha o criterio de repetição atualizado
                     obj = operands.pop();
                 }
+                while ((Boolean) obj); // Repito enquanto esse objeto do parametro do iterate for true
+            }
             else if (obj instanceof Integer) {
                 // Iterate com um número limitado de vezes
                 for (int j = 0; j < (Integer) obj; j++) {
@@ -478,7 +502,7 @@ public class InterpretVisitor extends Visitor {
             // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue() + " -- " + a.getExp() + " --- " + a.toString() );
             a.getExp().accept(this);
 
-            debugMode();
+            // debugMode();
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
@@ -663,6 +687,7 @@ public class InterpretVisitor extends Visitor {
             l.getRight().accept(this);
             Number right = (Number) operands.pop();
             Number left = (Number) operands.pop();
+            System.out.println("692 --- RIGHT: " + right + "  -- LEFT: " + left); 
             if (left instanceof Float && right instanceof Float) {
                 if (((Float) left) < ((Float) right)) {
                     operands.push(true);

@@ -155,6 +155,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitTypeDeclaration(TypeDeclarationContext ctx) {
         // ----- Regra --- TIPO DE ARRAY NOS PARAMETROS DE FUNCAO
         // type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
+        System.out.println("158 --- TypeArray -- VisitorAdapter -- " + ctx.getText());
         Type type = (Type) ctx.type().accept(this);
         return new TypeArray(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
     }
@@ -254,11 +255,11 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitIterate(IterateContext ctx) {
         // ----- Regra
         // cmd: ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
-        Iterate it = (Iterate) ctx.getChild(0).accept(this);
+        //Iterate it = (Iterate) ctx.getChild(0).accept(this);
         Expression exp = (Expression) ctx.getChild(2).accept(this);
         Command cmd = (Command) ctx.getChild(4).accept(this);
 
-        return new Iterate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), it, exp, cmd);
+         return new Iterate(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), ctx.getChild(0).getText(), exp, cmd);
     }
 
     @Override

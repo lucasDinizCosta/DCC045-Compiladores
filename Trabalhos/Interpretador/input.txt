@@ -8,7 +8,7 @@ data Reta {
    p1 :: Ponto;
    p2 :: Ponto;
 }
--}
+
 
 somarCalc(x :: Int, y :: Int): Int{
 	return x + y;
@@ -66,6 +66,24 @@ imprimePonto(x :: Int, y :: Int){
 	print somarCalc(2, 3)[0];
 }
 
+-}
+
+-- F3 
+
+somaArrays(t1 :: Int[], t2 :: Int[], size :: Int) : Ponto[]{
+	t3 = new Int[size];
+	indice = 0;
+	print 'I'; print 'T'; print 'E'; print 'R'; print 'A'; print '\n'; 
+	iterate(indice < size){ -- indice < size
+		print 'X';
+		print indice; print '\n';
+		t3[indice] = t1[indice] + t2[indice];
+		indice = indice + 1;
+	}
+	print 'F'; print '3'; print '\n'; 
+	return t3;
+}
+
 main(){
 {-
 	
@@ -85,7 +103,18 @@ main(){
 	print '\n';
    
 -}
-	k = new Char[5];
+
+k = new Int[1];
+k[0] = 15;
+size = 1;
+vet = somaArrays(k, k, size)[0];
+print 'V'; print ':'; print ' '; 
+print vet[0];
+print '\n';
+
+
+{-
+	 
 	k[0] = 50;
 	print 'k';print 'A';print 'r';print 'r';print 'a';print 'y'; print ':'; print ' ';
 	print k[0]; print '\n';
@@ -97,7 +126,7 @@ main(){
    --pontos2 = new Ponto[][2];			-- FAZER MATRIZ
    --pontos[0].x = 2;
    --pontos[1].x = 3;
-   
+-}  
    --print retornaPonto(3, 4)[0].x; -- NAO FUNCIONA ASSIM
    --print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
    --print pontos[0].x + pontos[1].x * 50 + 10 - 12 / 5 + 90;
