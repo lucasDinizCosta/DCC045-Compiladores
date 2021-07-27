@@ -23,14 +23,16 @@ public class InterpretVisitor extends Visitor {
     private HashMap<String, Function> funcs; // Funções da linguagem lang
     private HashMap<String, Data> datas; // Tipos de dados novos
     private Stack<Object> operands; // Operandos
-    public HashMap<Integer, Object> parms; // Parametros de funções
+    // public HashMap<Integer, Object> parms; // Parametros de funções
+    private Stack<Object> parms; // Parametros de funções
     private boolean retMode, debug;
 
     public InterpretVisitor() {
         env = new Stack<HashMap<String, Object>>();
         env.push(new HashMap<String, Object>());
         funcs = new HashMap<String, Function>();
-        parms = new HashMap<Integer, Object>();
+        //parms = new HashMap<Integer, Object>();
+        parms = new Stack<Object>();
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
         retMode = false;
@@ -49,14 +51,17 @@ public class InterpretVisitor extends Visitor {
          * Entry.getKey method returns the key and Entry.getValue returns the value of
          * the HashMap entry.
          */
-        // Esta tendo erro se deixar só o to string
         for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
             // entry.getValue().toString() mostra a função completa
+            // entry.getValue().getId() mostra o nome da função somente
             System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
         }
         System.out.println("\n---- DADOS DE parms ----\n");
-        for (HashMap.Entry<Integer, Object> entry : parms.entrySet()) {
+        /*for (HashMap.Entry<Integer, Object> entry : parms.entrySet()) {
             System.out.println(entry.getKey() + " => " + entry.getValue().toString());
+        }*/
+        for (int i = 0; i < parms.size(); i++) {
+            System.out.println(parms.elementAt(i).toString());
         }
         System.out.println("\n---- DADOS DE datas ----\n");
         for (HashMap.Entry<String, Data> entry : datas.entrySet()) {
@@ -129,15 +134,17 @@ public class InterpretVisitor extends Visitor {
         HashMap<String, Object> localEnv = new HashMap<String, Object>();
         if (f.getParameters() != null) {
             Parameters params = f.getParameters();
-            params.accept(this);
+            params.accept(this);    // Empilha os valores dos parametros no operands
+
             // Adiciona as variaveis do parametro no escopo local
-            for (int i = f.getParameters().size() - 1; i >= 0; i--) {
+            for (int i = 0; i < f.getParameters().size(); i++) {
                 localEnv.put(params.getSingleId(i), operands.pop());
             }
         }
         // Adiciona o escopo da função no env
         env.push(localEnv);
 
+        // Corpo da função
         // Verifica os commandos que compoem o corpo da função
         for (Command command : f.getCommands()) {
             command.accept(this);
@@ -145,6 +152,9 @@ public class InterpretVisitor extends Visitor {
 
         // Remove o escopo local criado pra função
         env.pop();
+
+        // Qualquer retorno possivel da função estará no operands, portanto não tem problema 
+        // remover o ambiente local
         retMode = false;
     }
 
@@ -162,15 +172,15 @@ public class InterpretVisitor extends Visitor {
 
             // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
-                type.accept(this);
-                int pos = 0;
-                for (String id : p.getId()) {
-                    // salva a variável no escopo da funcao, de acordo com valor do parametro
-                    // passado
-                    env.peek().put(id, parms.get(pos));
-                    pos++;
-                }
+                // Aceita o tipo do parametro e empilha o valor do parametro no operands
+                type.accept(this);  
             }
+            // salva a variável no escopo da funcao, de acordo com valor do parametro passado
+            // Dado que os valores dos parametros foram empilhados no operands, a ideia é adicionar
+            // a variavel no ambiente e escopo da função
+            /*for(int i = 0; i < p.getId().size(); i++){
+                env.peek().put(p.getId().get(i), operands.pop());
+            }*/
         } catch (Exception x) {
             throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
         }
@@ -180,7 +190,12 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(TypeArray t) {
-
+        // if (debug) {
+            // Imprime a string da classe
+            System.out.println("\n --- TypeArray --- " + t.getClass().getName());
+            System.out.println(t.toString());
+            System.out.println("\n");
+        // }
     }
 
     // Partem do btype
@@ -190,11 +205,17 @@ public class InterpretVisitor extends Visitor {
         try {
             boolean ehParametro = false;
             // Empilha os parametros de função
-            for (Integer key : parms.keySet()) {
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
+                ehParametro = true;
+            }
+            /*operands.push();
+            for (Integer key : parms.keySet()) {    // Adiciona todos os parametros na pilha de operandos
                 // Adiciona na listagem de operandos
                 operands.push(parms.get(key));
                 ehParametro = true;
-            }
+            }*/
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
@@ -207,10 +228,9 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeChar t) {
         try {
             boolean ehParametro = false;
-            // Empilha os parametros de função
-            for (Integer key : parms.keySet()) {
-                // Adiciona na listagem de operandos
-                operands.push(parms.get(key));
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
                 ehParametro = true;
             }
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
@@ -225,10 +245,9 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeBool t) {
         try {
             boolean ehParametro = false;
-            // Empilha os parametros de função
-            for (Integer key : parms.keySet()) {
-                // Adiciona na listagem de operandos
-                operands.push(parms.get(key));
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
                 ehParametro = true;
             }
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
@@ -243,10 +262,9 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeFloat t) {
         try {
             boolean ehParametro = false;
-            // Empilha os parametros de função
-            for (Integer key : parms.keySet()) {
-                // Adiciona na listagem de operandos
-                operands.push(parms.get(key));
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
                 ehParametro = true;
             }
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
@@ -267,6 +285,7 @@ public class InterpretVisitor extends Visitor {
             }
             Object r = env.peek().get(n.getID());
             if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
+                System.out.println("LINHA 282 --- " + r);
                 operands.push(r);
             } else {
                 // throw new RuntimeException("Erro!");
@@ -287,7 +306,12 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Command c) {
         try {
-            c.accept(this);
+            if (debug) {
+                System.out.println("\n -- Command -- " + c.getClass().getName());
+                System.out.println(c.toString());
+                System.out.println("\n");
+            }
+            c.accept(this); // Executa o comando 
         } catch (Exception x) {
             throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
@@ -301,6 +325,7 @@ public class InterpretVisitor extends Visitor {
         try {
             for (Command command : c.getCommands()) {
                 command.accept(this);
+
                 if (retMode) {
                     return;
                 }
@@ -453,11 +478,14 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(a.toString());
                 System.out.println("\n");
             }
+            // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue() + " -- " + a.getExp() + " --- " + a.toString() );
             a.getExp().accept(this);
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
+            // System.out.println("Linha 488 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + lvalue.toString() );
+            // System.out.println("Linha 488 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + a.toString() );
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
                 
@@ -470,7 +498,7 @@ public class InterpretVisitor extends Visitor {
                     String nomeAtributo = ((DataAccess)lvalue).getId();
                     String nomeObjeto = ((DataAccess)lvalue).getDataId();
                     Integer position = (Integer)operands.pop();
-                    a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
+                    // a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
                     Integer valorAtribuicao = (Integer) operands.pop();
 
                     // o array é um list de elementos
@@ -485,7 +513,7 @@ public class InterpretVisitor extends Visitor {
                     if((position >= 0) && (position <= tamanhoArray - 1)){
                         Object elemento = objetoArray.get(position);    // pega o elemento na posicao
                         ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
-                        //debugMode();
+                        
                     }
                     else{
                         throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
@@ -517,18 +545,25 @@ public class InterpretVisitor extends Visitor {
                 env.peek().put(((Identifier) lvalue).getId(), operands.pop());
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
+
                 // o array é um list de elementos
-                String nomeArray = ((ArrayAccess)a.getLValue()).getId();
+                String nomeArray = ((ArrayAccess)lvalue).getId();
                 ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
                 Integer position = (Integer)operands.pop();         // Posicao do array
 
                 // Busca o array no env
                 List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                 Integer tamanhoArray = ((List)objetoArray).size();
+
+                debugMode();
                 
                 if((position >= 0) && (position <= tamanhoArray - 1)){
+                    /**
+                     * NAO FAZ A VERIFICAÇÃO DE TIPOS, SE FOR UM TIPO INT, ELE VAI ACEITAR
+                     */
+
                     // Pega o elemento do topo de operands e adiciona na posição do vetor
-                    ((List)objetoArray).set(position, (Integer)operands.pop());
+                    ((List)objetoArray).set(position, operands.pop());  
                 }
                 else{
                     throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
@@ -579,7 +614,9 @@ public class InterpretVisitor extends Visitor {
                         //System.out.println("Teste -- 461 -- " + obj.toString());
 
                         // Adiciona o parametro no ambiente da função
-                        parms.put(tempID, obj);
+                        // parms.put(tempID, obj);
+                        // Adiciona no topo da pilha de parametros
+                        parms.push(obj);
                         tempID++;
                     }
                 }
@@ -885,7 +922,7 @@ public class InterpretVisitor extends Visitor {
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
-                t.getType().accept(this);           // Empilha o tipo no operands
+                t.getType().accept(this);           // Empilha o tipo no operand
                 if (t.getExp() != null) {
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
                     // System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
@@ -929,8 +966,11 @@ public class InterpretVisitor extends Visitor {
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
                     
                     for (Declaration d : datas.get(dataID).getDeclarations()) {
-                        // Verifica as declações das variaveis e tipos no data
+                        // Verifica as declarações das variaveis e tipos no data
                         d.getType().accept(this);
+
+                        // Desempilha os tipos que estão presenta no operands
+                        operands.pop();
 
                         // Cria um objeto especial para destacar quais variaveis e seu tipo
                         // dentro do data
@@ -991,6 +1031,8 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(f.toString());
                 System.out.println("\n");
             }
+            // debugMode();
+
             // Pega a função correspondente
             Function function = funcs.get(f.getId());
 
@@ -1001,11 +1043,12 @@ public class InterpretVisitor extends Visitor {
 
                     // Verifica os parametros da função
                     for (Expression exp : f.getFCallParams().getExps()) {
-                        exp.accept(this);
+                        exp.accept(this);               // Adiciona o valor do parametro no operands
                         Object obj = (Object) operands.pop();
 
-                        // Adiciona o parametro no ambiente da função
-                        parms.put(tempID, obj);
+                        // Adiciona o parametro na listagem
+                        // parms.put(tempID, obj);
+                        parms.push(obj);    // Adiciona no topo da pilha de parametros
                         tempID++;
                     }
                 }
@@ -1023,23 +1066,11 @@ public class InterpretVisitor extends Visitor {
                     if ((Integer) valueReturnedPos.getValue() == 0 ||
                         (Integer) valueReturnedPos.getValue() == 1
                     ) {
-                        // Posicao 0, ou seja mais abaixo na pilha, logo, descarta o de cima
+                        // Remove os retorno[1] caso o valor informado for [0]
                         if ((Integer) valueReturnedPos.getValue() == 0) {
                             operands.pop();
                         }
-                        // Tira da pilha, remove o resto e volta com ele pra pilha
-                        Object topoPilha = operands.pop();
-                        Integer qtdParametros = function.getParameters().getId().size();
-                        // retira os valores que estão no operands que não são retorno da função
-                        for(int i = 0; i < qtdParametros; i++){
-                            operands.pop();
-                        }
-                        // Empilha de novo o topo
-                        operands.push(topoPilha);
-                        // Limpa dos parametros 
-                        while(parms.size() > 0){ 
-                            parms.values().clear(); 
-                        }
+
                     } else {
                         throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
                                 + ") Acesso a posicao invalida de elemento no retorno da funcao");
@@ -1047,20 +1078,9 @@ public class InterpretVisitor extends Visitor {
                 }
                 else if(function.getReturnTypes().size() == 1){ // Quando tiver somente 1 retorno
                     if ((Integer) valueReturnedPos.getValue() == 0) {
+                        
+                        // Não faz nada pois o valor de retorno já está no operands
 
-                        // Tira da pilha, remove o resto e volta com ele pra pilha
-                        Object topoPilha = operands.pop();
-                        Integer qtdParametros = function.getParameters().getId().size();
-                        // retira os valores que estão no operands que não são retorno da função
-                        for(int i = 0; i < qtdParametros; i++){
-                            operands.pop();
-                        }
-                        // Empilha de novo o topo
-                        operands.push(topoPilha);
-                        // Limpa dos parametros 
-                        while(parms.size() > 0){ 
-                            parms.values().clear(); 
-                        }
                     } else {
                         throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
                                 + ") Acesso a posicao invalida de elemento no retorno da funcao");

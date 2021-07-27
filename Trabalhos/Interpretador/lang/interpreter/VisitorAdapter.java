@@ -199,7 +199,7 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitBTypeNameType(BTypeNameTypeContext ctx) {
         // ----- Regra
         // btype: NAME_TYPE     # BTypeNameType
-        System.out.println("B_NAME_TYPE - 202 - VisitorAdapter");
+        // System.out.println("B_NAME_TYPE - 202 - VisitorAdapter");
         String nameType = ctx.getChild(0).getText();    // Captura o nome do tipo
         int line = ctx.getStart().getLine();
         int column = ctx.getStart().getCharPositionInLine();
@@ -595,20 +595,20 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
                 ctx.ID().getText());
     }
 
-    @Override
-    public Node visitNameType(NameTypeContext ctx) {
-        // ----- Regra
-        // lvalue: NAME_TYPE      # NameType
-        System.out.println("601 -- TESTE -- VISITORADAPTER - NAMETYPE");
-        return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-                ctx.getChild(0).getText());
-    }
+    // @Override
+    // public Node visitNameType(NameTypeContext ctx) {
+    //     // ----- Regra
+    //     // lvalue: NAME_TYPE      # NameType
+    //     System.out.println("601 -- TESTE -- VISITORADAPTER - NAMETYPE");
+    //     return new Identifier(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+    //             ctx.getChild(0).getText());
+    // }
 
     @Override
     public Node visitDataAccess(DataAccessContext ctx) {
         // ----- Regra
         // lvalue: <assoc=left> lvalue DOT ID     # DataAccess
-        System.out.println("608 - DATA Access --- "+ ctx.ID().getText() + " --- " + ctx.lvalue().getText() + " --- " + ctx.lvalue().getText());
+        // System.out.println("608 - DATA Access --- "+ ctx.ID().getText() + " --- " + ctx.lvalue().getText() + " --- " + ctx.lvalue().getText());
         LValue lVal = (LValue) ctx.lvalue().accept(this);
         String str = ctx.getChild(2).getText();
         String dataId = ctx.lvalue().getText();

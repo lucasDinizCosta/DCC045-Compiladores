@@ -33,19 +33,33 @@ retornaPonto(x :: Int, y :: Int): Ponto, Ponto{
 	return p3, p4;
 }
 
+retornaArrayPontos(x :: Int, y :: Int) : Ponto[]{
+	p3 = new Ponto;
+	p3.x = 7;
+	p3.y = y;
+	p4 = new Ponto;
+	p4.x = y;
+	p4.y = x;
+	
+	-- Cria array de data(Ponto)
+	p5 = new Ponto[2];
+	p5[0] = p3;
+	p5[1] = p4;
+	--print p5[0].x;	-- 7
+	print 'F'; print 'u'; print 'n'; print 'c'; print '\n'; 
+	print p3.x; print '\n';
+	return p5;
+}
+
 imprimePonto(x :: Int, y :: Int){
 	p3 = new Ponto;
 	p3.x = x;
 	p3.y = y;
 	print '\n'; 
-	print 'P';
-	print 'x';
-	print ':';
+	print 'P'; print 'x'; print ':'; 
 	print p3.x;
 	print '\t'; 
-	print 'P';
-	print 'y';
-	print ':';
+	print 'P'; print 'y'; print ':';
 	print p3.y;
 	print '\n';
 	print '\n';
@@ -53,7 +67,7 @@ imprimePonto(x :: Int, y :: Int){
 }
 
 main(){
-	{-
+{-
 	
 	n = 13;
    --q = 5;
@@ -65,21 +79,23 @@ main(){
    print 'R';
    print vetor.x;
    
-   -}
-	-- i = 5 + 5;
-	-- print i;
-	objeto = new Ponto;
+   objeto = new Ponto;
 	objeto.x = 1200;
-	print objeto.x;
+	print objeto.x + objeto.x;
+	print '\n';
    
+-}
+	u = retornaArrayPontos(3, 4)[0];
+	print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' '; print 'u'; print ':'; print ' ';
+    print u[0].x + u[0].y;	-- 7 + 4 = 11
+	print '\n';
    --pontos = new Ponto[3];
    --pontos2 = new Ponto[][2];			-- FAZER MATRIZ
    --pontos[0].x = 2;
    --pontos[1].x = 3;
-   --u = retornaPonto(3, 4)[0];
-   --print u;
+   
    --print retornaPonto(3, 4)[0].x; -- NAO FUNCIONA ASSIM
-   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   --print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
    --print pontos[0].x + pontos[1].x * 50 + 10 - 12 / 5 + 90;
    --print pontos[0].x;
    --numeros[0].x = 2;
@@ -87,7 +103,7 @@ main(){
    
    --numeros[1].x = 7;
    
-   {-
+{-
    -- FUNCIONA
    
    numeros = new Int[3];
@@ -103,17 +119,19 @@ main(){
    -- a = null + null; -- NAO FUNCIONA
    -- a = null;
    --print a;
-   -}
+-}
    --array = new Ponto[3];
    
    --imprimePonto(2,3);
-   
-   print 'R';
-   vetor = new Ponto[3];
-   read vetor[2].x;
-   print vetor[2].x;
-   
-   {-
+{-
+	-- Read funciona com vetor
+      
+	   print 'R';
+	   vetor = new Ponto[3];
+	   read vetor[2].x;
+	   print vetor[2].x;
+-}
+{-
    -- Read funciona com tipo Data
    
    print 'R';
@@ -123,7 +141,7 @@ main(){
    --imprimePonto(2,3);
    -- print retornaPonto(2,3)[0].x; -- ASSIM NAO VAI
    
-   {-
+{-
    -- Teste de retorno de ponto na função
    
    pontoAux1 = retornaPonto(2,6)[0];	-- 2 e 6
@@ -133,12 +151,9 @@ main(){
 	print 'F';
    }
    
-   -}
+-}
    --ajustaPonto(vetor, vetor);
-   
-   
-   
-   {-
+{-
    
    --vetor.z = 3;
    print vetor.x;
@@ -154,6 +169,6 @@ main(){
    -- print k;
    print '\n';
    
-   -}
+-}
    
 }

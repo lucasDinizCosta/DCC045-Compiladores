@@ -18,9 +18,6 @@ public class NameType extends Type{
      * ---- Regra
      * btype: NAME_TYPE     # BTypeNameType
      * 
-     * Também presente na regra
-     * lvalue: NAME_TYPE      # NameType
-     * 
     */
 
     private String val;
