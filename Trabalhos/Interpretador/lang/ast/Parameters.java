@@ -71,7 +71,7 @@ public class Parameters extends Node {
     @Override
     public String toString(){
         String s = "";
-        System.out.println("74 -- parametros --Type " + type.toString() );
+        // System.out.println("74 -- parametros --Type " + type.toString() );
         for(int i = 0; i < id.size(); i++){
             String idAux = id.get(i).toString();
             String typeAux = type.get(i).toString();

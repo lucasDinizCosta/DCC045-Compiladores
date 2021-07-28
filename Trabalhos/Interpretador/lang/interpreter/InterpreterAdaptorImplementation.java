@@ -6,11 +6,12 @@
 *                                                       *
 *********************************************************/
 
-package lang.parser;
+package lang.interpreter;
 
 import lang.ast.SuperNode;
 import lang.ast.Node;
-import lang.interpreter.*;
+import lang.parser.*;
+import lang.interpreter.InterpreterAdaptor;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -19,12 +20,12 @@ import java.io.IOException;
 
 // import lang.parser.LexerErrors;
 
-// Adaptador para classe de parser. a Função parseFile deve retornar null caso o parser resulte em erro. 
-public class ParseAdaptorImplementation implements ParseAdaptor {
+// Adaptador para classe de interpreter. a Função parseFile deve retornar null caso o parser resulte em erro. 
+public class InterpreterAdaptorImplementation implements InterpreterAdaptor {
 
     // Retorna null se encontrar erros de sintaxe no arquivo de entrada
     @Override
-    public SuperNode parseFile(String path) {
+    public SuperNode interpretFile(String path) {
         try {
             // Cria uma variavel que irá armazenar um charStream de ANTLR
             // a partir de um arquivo
@@ -41,32 +42,34 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
             // dos tokens
             LangParser parser = new LangParser(tokens);
 
-            // Cria uma árvore da sintaxe
+            // Cria a árvore da sintaxe padrão (PARSETREE)
             ParseTree tree = parser.prog();
 
             // Verifica se o analisador sintático encontrou erros
             if (parser.getNumberOfSyntaxErrors() != 0) {
                 return null;
             }
-            // Retorna um nó caso não encontre erros no arquivo passado
-            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
-            // compilador
 
-            // Metodo do visitor --- apenas será utilizado onde houver visitor
             // Cria um adaptador da ParseTree do ANTLR para receber o padrão Node 
             // criado para a AST do trabalho
             VisitorAdapter ast = new VisitorAdapter();
 
             // Passa um objeto do tipo parseTree e retorna do tipo Node
             // Visita a árvore
-            Node node = ast.visit(tree);    
+            Node node = ast.visit(tree);     
+            
+            // Interpreta o Visitor e elabora o ambiente de desenvolvimento
+            InterpretVisitor interpreter = new InterpretVisitor();  
+            
+            // Aceita o nó e caminha na árvore
+            node.accept(interpreter);               // Passa o node criado e testa o interpretador
 
             return node;
         } catch (IOException e) {
             e.printStackTrace();
             // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
             // compilador
-            return null;
+            return null;//new Node();
         }
     }
 }

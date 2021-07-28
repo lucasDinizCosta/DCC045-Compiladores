@@ -16,14 +16,13 @@ public class LangCompiler {
     // Recupera o nome base (sem extensão) de um arquivo.
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Lang compiler v 0.0.1 - Maio de 2020");
+            System.out.println("Lang compiler v 0.0.1 - Julho de 2020");
             System.out.println("Use java -cp . Lang ação <Caminho para código Fonte> ");
             System.out.println("Ação (uma das seguintes possibilidades): ");
 
-            System.out.println(" -interp : Executa uma bateria de testes e interpreta o código");
             System.out.println(" -bs : Executa uma bateria de testes sintáticos");
-            System.out.println(" -bty : Executa uma bateria de testes no sistemas de tipos");
             System.out.println(" -bsm : Executa uma bateria de testes no interpretador");
+            // System.out.println(" -bty : Executa uma bateria de testes no sistemas de tipos");
 
             System.out.println(" -pp: Pretty print program.");
             System.out.println(" -tp: Verificar tipos e imprimir o ambiente de tipos");
@@ -37,6 +36,7 @@ public class LangCompiler {
         }
         try {
             ParseAdaptor langParser = new ParseAdaptorImplementation();
+            InterpreterAdaptorImplementation interpreterImplementation = new InterpreterAdaptorImplementation();
             Interpreter interp = new Interpreter();
 
             if (args[0].equals("-interp")) {
@@ -50,16 +50,17 @@ public class LangCompiler {
                 TestParser tp = new TestParser(langParser);
                 return;
             }
-            if (args[0].equals("-byt")) {
+            if (args[0].equals("-bsm")) {
+                System.out.println("\nExecuta uma bateria de testes no interpretador:\n");
+                TestVisitor tp = new TestVisitor(interpreterImplementation);
+                System.out.println("\nFim da execucao.\n");
+                return;
+            }
+            /*if (args[0].equals("-byt")) {
                 System.out.println("Executando bateria de testes sintáticos:");
                 // TestParser tp = new TestParser(langParser); ;
                 return;
-            }
-            if (args[0].equals("-bsm")) {
-                System.out.println("Executando bateria de testes sintáticos:");
-                // TestParser tp = new TestParser(langParser);
-                return;
-            }
+            }*/
             if (args.length != 2) {
                 System.out.println("Para usar essa opção, especifique um nome de arquivo");
                 return;
@@ -69,9 +70,14 @@ public class LangCompiler {
                 System.err.println("Aborting due to syntax error(s)");
                 System.exit(1);
             } else if (args[0].equals("-i")) {
-                // iv = new InterpreterVisitor();
-                // result.accept(iv);
-                // ((InterpreterVisitor)iv).printEnv();
+                // Interpreta o Visitor e elabora o ambiente de desenvolvimento
+                InterpretVisitor interpreter = new InterpretVisitor();  
+                
+                // Aceita o nó e caminha na árvore
+                ((Node)result).accept(interpreter);               // Passa o node criado e testa o interpretador
+
+                // Imprime o ambiente criado pelo interpretador
+                interpreter.debugMode();            // ((InterpreterVisitor)iv).printEnv();
             } else if (args[0].equals("-ii")) {
                 // iv = new InteractiveInterpreterVisitor();
                 // result.accept(iv);
