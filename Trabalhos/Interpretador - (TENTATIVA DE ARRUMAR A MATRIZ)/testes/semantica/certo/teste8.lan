@@ -1,0 +1,26 @@
+-- Saída esperada
+--5
+---- The marvelous env Debugger ------ 
+--k  :  5
+
+
+fat(n :: Int) : Int{
+  if(n == 0){
+      return 1;
+  }
+  return n*fat(n-1)[0];
+}
+      
+spook(n :: Int) : Int{
+    if(n == 1){ return 2*n;}
+    if(n == 2){ return 2*n+1;}
+    return n-1;
+}
+
+main(){
+   k = fat(6)[0];
+   k = spook(2)[0];
+   print k;
+   print '\n';
+}
+

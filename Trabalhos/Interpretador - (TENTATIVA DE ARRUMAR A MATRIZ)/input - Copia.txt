@@ -1,0 +1,78 @@
+data Ponto {
+   x :: Int;
+   y :: Int;
+}
+
+fun(x :: Int){
+   x = 3;
+   print 95 + x;
+}
+
+fun2(x :: Int, y :: Bool) : Int, Int{
+   k = 9 + 1;
+   return x, 2;
+}
+
+divMod(n :: Int, q :: Int ) : Int, Int{
+    return n / q, n % q;
+}
+
+main(){
+   x = 200;
+   y = 1 + 1;
+   --print 10;
+   --print 20;
+--   p = new Ponto[2];
+   --k = new Int[2];    -- PROBLEMA
+   --k = new Ponto;    -- PROBLEMA
+
+   x = 20;
+
+   f = false;
+   t = true;
+   
+   n = 13;
+    q = 5;
+    print 'n';
+    print ':';
+    print n;
+    print '\n';
+    print 'q';
+    print ':';
+    print q;
+    print '\n';
+	
+	print '\n';
+    print '\n';
+    divMod(n,q)< quo,res >; -- Function Call
+    print 'Q';
+    print ':';
+    print quo;
+    print '\n';
+    
+    print 'R';
+    print ':';
+    print res;
+    print '\n';
+   
+   print '\n';
+   fun(3);
+   fun2(1, false)<a,b>;			-- a = 1, b = 2
+   print '\n';
+   print a;
+   print '\t';
+   print '-';
+   print '\t';
+   print b;
+   print '\n';
+
+   iterate(4){
+      print 10;
+   }
+   if(true){
+      print 20;
+   }else{
+      print 30;
+   }
+
+}

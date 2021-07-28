@@ -1,0 +1,29 @@
+-- Saída esperada
+---- The marvelous env Debugger ------ 
+--x  :  [[1, null, null, null, null], [null, 3, null, null, null], [null, null, 5, null, null], [null, null, null, 7, null], [null, null, null, null, 9]]
+--i  :  5
+--z  :  7
+--k  :  5
+
+
+main(){
+    k = 5;
+    x = new Int[][k]; 
+    i = 0;
+    iterate(k){
+       x[i] = new Int[k];
+       i = i + 1;
+    }
+	{-
+    i = 0;
+    iterate(k){
+       x[i][i] = 2*i + 1;
+	   --x[0][1] = 2*i + 1;
+       i = i + 1;
+    }
+	print '\n';print '\n'; print '\n'; print 'M'; print 'a';print 't';print 'r';print 'i'; print 'z'; print ':';print '\n';print '\n';print '\n';
+    z = x[3][3];
+	print x[3][3];
+	-}
+}
+

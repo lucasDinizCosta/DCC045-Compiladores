@@ -1,0 +1,5 @@
+main(){
+  x = true;
+  if(x) 
+     x = 10;
+}

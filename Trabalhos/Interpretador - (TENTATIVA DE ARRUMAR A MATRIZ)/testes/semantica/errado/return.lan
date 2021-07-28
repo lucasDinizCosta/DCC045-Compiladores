@@ -1,0 +1,11 @@
+
+f(x :: Int) : Int, Float{
+   y = 2*x  + 1;
+   if( y < 10)
+    return y, 1.5;
+}
+
+main(){
+  z = 10;
+  h = 2*f(z)[0] + f(z)[1];
+}
