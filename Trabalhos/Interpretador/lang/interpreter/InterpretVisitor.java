@@ -31,8 +31,7 @@ public class InterpretVisitor extends Visitor {
         env = new Stack<HashMap<String, Object>>();
         env.push(new HashMap<String, Object>());
         funcs = new HashMap<String, Function>();
-        //parms = new HashMap<Integer, Object>();
-        parms = new Stack<Object>();
+        parms = new Stack<Object>();        //parms = new HashMap<Integer, Object>();
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
         retMode = false;
@@ -54,7 +53,6 @@ public class InterpretVisitor extends Visitor {
         for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
             // entry.getValue().toString() mostra a função completa
             // entry.getValue().getId() mostra o nome da função somente
-            System.out.println("getvalueType: " + entry.getValue().getClass().getSimpleName());
             System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
         }
         System.out.println("\n---- DADOS DE parms ----\n");
@@ -114,7 +112,6 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Declaration d) {
-        // System.out.println("117 --- " + d.toString());
 
     }
 
@@ -134,7 +131,6 @@ public class InterpretVisitor extends Visitor {
         if (f.getParameters() != null) {
             Parameters params = f.getParameters();
             params.accept(this);    // Empilha os valores dos parametros no operands
-            System.out.println("136 --- " + params.toString());
 
             // Adiciona as variaveis do parametro no escopo local
             for (int i = 0; i < f.getParameters().size(); i++) {
@@ -169,21 +165,13 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(p.toString());
                 System.out.println("\n");
             }
-            System.out.println("--- Parameters --- " + p.getClass().getName());
-            System.out.println("170 -- TESTE -- " + p.getId() + " -- " + p.getType().toString());
+            // System.out.println("--- Parameters --- " + p.getClass().getName());
+
             // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
                 // Aceita o tipo do parametro e empilha o valor do parametro no operands
-                System.out.println(type.toString());
                 type.accept(this);  
             }
-            System.out.println("175 -- TESTE -- " + p.getId());
-            // salva a variável no escopo da funcao, de acordo com valor do parametro passado
-            // Dado que os valores dos parametros foram empilhados no operands, a ideia é adicionar
-            // a variavel no ambiente e escopo da função
-            /*for(int i = 0; i < p.getId().size(); i++){
-                env.peek().put(p.getId().get(i), operands.pop());
-            }*/
         } catch (Exception x) {
             throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
         }
@@ -195,21 +183,12 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeArray t) {
         try {
             boolean ehParametro = false;
-            System.out.println(" 194 ---- " + "typeArray");
-            // debugMode();
             // Empilha os parametros de função
             if(parms.size() != 0){          // Se há parametros
                 // Desempilha o parametro da função e adiciona nos operands
                 operands.push(parms.pop());  // Empilha somente o tipo que está no topo
                 ehParametro = true;
             }
-            System.out.println(" 200 ---- " + "typeArray");
-            /*operands.push();
-            for (Integer key : parms.keySet()) {    // Adiciona todos os parametros na pilha de operandos
-                // Adiciona na listagem de operandos
-                operands.push(parms.get(key));
-                ehParametro = true;
-            }*/
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
@@ -230,12 +209,6 @@ public class InterpretVisitor extends Visitor {
                 operands.push(parms.pop());  // Empilha somente o tipo que está no topo
                 ehParametro = true;
             }
-            /*operands.push();
-            for (Integer key : parms.keySet()) {    // Adiciona todos os parametros na pilha de operandos
-                // Adiciona na listagem de operandos
-                operands.push(parms.get(key));
-                ehParametro = true;
-            }*/
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
@@ -303,14 +276,24 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(n.toString());
                 System.out.println("\n");
             }
-            Object r = env.peek().get(n.getID());
-            if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
+
+            boolean ehParametro = false;
+            if(parms.size() != 0){          // Se há parametros
+                // Desempilha o parametro da função e adiciona nos operands
+                operands.push(parms.pop());  // Empilha somente o tipo que está no topo
+                ehParametro = true;
+            }
+            if(ehParametro == false){  // Não é função, é um instanciamento de tipo
+                operands.push(n);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
+            }
+
+            /*if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
                 System.out.println("LINHA 282 --- " + r);
                 operands.push(r);
             } else {
                 // throw new RuntimeException("Erro!");
                 throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + " : Erro !!");
-            }
+            }*/
         } catch (Exception x) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
@@ -499,16 +482,14 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(a.toString());
                 System.out.println("\n");
             }
-            // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue() + " -- " + a.getExp() + " --- " + a.toString() );
-            a.getExp().accept(this);
-
-            // debugMode();
+            // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue().getClass().getSimpleName() + " -- " + a.getExp() + " --- " + a.toString() );
+            a.getExp().accept(this);            
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
             // System.out.println("Linha 488 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + lvalue.toString() );
-            // System.out.println("Linha 488 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + a.toString() );
+            // System.out.println("Linha 498 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + a.toString() );
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
                 
@@ -543,9 +524,17 @@ public class InterpretVisitor extends Visitor {
                     }
                 }
                 else{   // Somente o DATA 
-                    // System.out.println("LINHA --- 443 --- " + a.getExp() + " --- " + lvalue.toString() + " --- " + arrayElement.toString());
                     String nomeAtributo = ((DataAccess)lvalue).getId();
                     String nomeObjeto = ((DataAccess)lvalue).getDataId();
+
+                    // if(((DataAccess)lvalue).getLValue() != null){       // Se o data tem um tipo data como atributo
+                    //     // nomeObjeto
+                    //     //((DataAccess)lvalue).getLValue().accept(this);
+                    //     ((DataAccess)lvalue).accept(this);
+                    //     //debugMode();
+                    //     //System.out.println("551 --- " + ((HashMap<String, Object>)operands.pop()).get("x"));
+                    // }
+                    
                     // System.out.println("448 ---- " + nomeAtributo + " -- " + nomeObjeto);
     
                     // Atributo do lado do '=' 
@@ -578,7 +567,6 @@ public class InterpretVisitor extends Visitor {
                 List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                 Integer tamanhoArray = ((List)objetoArray).size();
 
-                //debugMode();
                 
                 if((position >= 0) && (position <= tamanhoArray - 1)){
                     /**
@@ -619,10 +607,6 @@ public class InterpretVisitor extends Visitor {
 
             // Garante a existencia da função
             if (f != null) {
-                // Aceita cada expressão
-                for (Expression exp : f.getExps()) {
-                    exp.accept(this);
-                }
 
                 // Passa do operand para o params
                 // monta o parametro da função
@@ -630,14 +614,14 @@ public class InterpretVisitor extends Visitor {
                     int tempID = 0;
                     //System.out.println("Teste -- 455");
                     // Verifica os parametros da função
+                    
+                    // System.out.println("Teste -- 458 -- " + f.getFCallParams());
                     for (Expression exp : f.getFCallParams().getExps()) {
-                        //System.out.println("Teste -- 458 -- " + exp.toString());
+                        //System.out.println("Teste -- 458 -- " + exp.toString() + " --- " + f.getFCallParams());
+
                         exp.accept(this);
                         Object obj = (Object) operands.pop();
-                        //System.out.println("Teste -- 461 -- " + obj.toString());
 
-                        // Adiciona o parametro no ambiente da função
-                        // parms.put(tempID, obj);
                         // Adiciona no topo da pilha de parametros
                         parms.push(obj);
                         tempID++;
@@ -987,8 +971,8 @@ public class InterpretVisitor extends Visitor {
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
-                t.getType().accept(this);           // Empilha o tipo no operand
                 if (t.getExp() != null) {
+                    t.getType().accept(this);           // Empilha o tipo no operand
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
                     // System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
                     // Trata a condição de ser array do tipo DATA
@@ -1019,14 +1003,17 @@ public class InterpretVisitor extends Visitor {
                     }
                 }
                 else{   // É um tipo de dado comum: Int, Float, Char
-                    System.out.println("TTTTTTT");
-                    t.getExpression().accept(this);                
+
+                    // Cria um objeto especial para destacar quais variaveis e seu tipo
+                    Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
+                    operands.push(valorPadrao);
                 }
             }
             else{   // Tipo data que no qual o atributo Type é null
                 if (t.getExp() == null) {                   // Tipo normal de data
                     // Pega o nome do objeto do Data
                     String dataID = t.getDataName();   
+
                     // Cria um Hashmap pra servir de alocação variaveis para o objeto
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
                     
@@ -1095,7 +1082,6 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(f.toString());
                 System.out.println("\n");
             }
-            // debugMode();
 
             // Pega a função correspondente
             Function function = funcs.get(f.getId());
@@ -1187,7 +1173,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(r);
             } else {
                 // throw new RuntimeException("Erro!");
-                throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Erro!!");
+                throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Erro no Identifier !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());

@@ -26,9 +26,8 @@ public class FunctionCall extends Command{
      * Exemplo: divmod(5, 2)<q, r>;     // Será retornada 2 valores e armazenados na variavel q e r
     */
     private String id;
-    private FCallParams functionCallParams;             //'exps?'
+    private FCallParams functionCallParams;             //'exps' => Parâmetros da função
     private List<LValue> lvalues = new ArrayList<>();       // Variaveis que serão retornadas
-    private List<Expression> exps = new ArrayList<>();      // Atributo que pega da classe Function, basicamente o corpo da função
 
     public FunctionCall (int line, int column, String id){
         super(line, column);
@@ -65,18 +64,6 @@ public class FunctionCall extends Command{
         this.lvalues = lvalues;
     }
 
-    public List<Expression> getExps() {
-        return exps;
-    }
-
-    public void setExps(List<Expression> exps) {
-        this.exps = exps;
-    }
-
-    public void addExp(Expression exp){
-        exps.add(exp);
-    }
-
     public void addLValue(LValue lvalue){
         lvalues.add(lvalue);
     }
@@ -85,14 +72,14 @@ public class FunctionCall extends Command{
     public String toString(){
         StringBuilder bld = new StringBuilder("");
         for (LValue lvalue : lvalues) {
-            bld.append(lvalue + ", ");
+            bld.append(lvalue.toString() + ", ");
         }
-        if(exps != null){
+        if(functionCallParams != null){
             if(bld.length() > 0){
-                return id.toString() + " ( " +  exps.toString() + " ) " + 
+                return id.toString() + " ( " +  functionCallParams.toString() + " ) " + 
                 " < " + bld.substring(0, bld.length() - 2) + " > ; ";
             }
-            return id.toString() + " ( " +  exps.toString() + " ) ; ";
+            return id.toString() + " ( " +  functionCallParams.toString() + " ) ; ";
         }
         else{
             if(bld.length() > 0){

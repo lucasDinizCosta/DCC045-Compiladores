@@ -155,7 +155,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
     public Node visitTypeDeclaration(TypeDeclarationContext ctx) {
         // ----- Regra --- TIPO DE ARRAY NOS PARAMETROS DE FUNCAO
         // type: type OPEN_BRACKET CLOSE_BRACKET   # TypeDeclaration
-        System.out.println("158 --- TypeArray -- VisitorAdapter -- " + ctx.getText());
         Type type = (Type) ctx.type().accept(this);
         return new TypeArray(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), type);
     }
@@ -288,11 +287,6 @@ public class VisitorAdapter extends LangBaseVisitor<Node> {
         for (int i = 0; i < ctx.exp().size(); i++) {
             exps.add((Expression) ctx.exp().get(i).accept(this));
         }
-
-        // System.out.println("LISTA DE EXPRESSION");
-        // for(int i = 0; i < exps.size(); i++){
-        //     System.out.println("\""+exps.get(i)+"\"");
-        // }
 
         return new Return(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), exps);
     }

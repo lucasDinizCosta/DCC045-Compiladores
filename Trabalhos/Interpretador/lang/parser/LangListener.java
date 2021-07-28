@@ -606,18 +606,6 @@ public interface LangListener extends ParseTreeListener {
 	 */
 	void exitIdentifier(LangParser.IdentifierContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NameType}
-	 * labeled alternative in {@link LangParser#lvalue}.
-	 * @param ctx the parse tree
-	 */
-	void enterNameType(LangParser.NameTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code NameType}
-	 * labeled alternative in {@link LangParser#lvalue}.
-	 * @param ctx the parse tree
-	 */
-	void exitNameType(LangParser.NameTypeContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code DataAccess}
 	 * labeled alternative in {@link LangParser#lvalue}.
 	 * @param ctx the parse tree

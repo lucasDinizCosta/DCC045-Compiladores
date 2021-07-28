@@ -1,0 +1,240 @@
+data Ponto {
+   x :: Int;
+   y :: Int;
+}
+
+
+-- Talvez nao precisa - Mas é bom verificar
+data Reta {
+   p1 :: Ponto;
+   p2 :: Ponto;
+}
+
+{-
+somarCalc(x :: Int, y :: Int): Int{
+	return x + y;
+}
+
+ajustaPonto(p1 :: Ponto, p2 :: Ponto){
+	--p3 = new Ponto;
+	--p3.x = p1.x + p2.x;
+	--p3.y = p1.y + p2.y;
+	--print p3.x;
+	--return p3;
+}
+
+retornaPonto(x :: Int, y :: Int): Ponto, Ponto{
+	p3 = new Ponto;
+	p3.x = x;
+	p3.y = y;
+	p4 = new Ponto;
+	p4.x = y;
+	p4.y = x;
+	--print p3.x;
+	return p3, p4;
+}
+
+retornaArrayPontos(x :: Int, y :: Int) : Ponto[]{
+	p3 = new Ponto;
+	p3.x = 7;
+	p3.y = y;
+	p4 = new Ponto;
+	p4.x = y;
+	p4.y = x;
+	
+	-- Cria array de data(Ponto)
+	p5 = new Ponto[2];
+	p5[0] = p3;
+	p5[1] = p4;
+	--print p5[0].x;	-- 7
+	print 'F'; print 'u'; print 'n'; print 'c'; print '\n'; 
+	print p3.x; print '\n';
+	return p5;
+}
+
+imprimePonto(x :: Int, y :: Int){
+	p3 = new Ponto;
+	p3.x = x;
+	p3.y = y;
+	print '\n'; 
+	print 'P'; print 'x'; print ':'; 
+	print p3.x;
+	print '\t'; 
+	print 'P'; print 'y'; print ':';
+	print p3.y;
+	print '\n';
+	print '\n';
+	print somarCalc(2, 3)[0];
+}
+
+-}
+
+-- F3 
+
+somaArrays(t1 :: Int[], t2 :: Int[], size :: Int) : Ponto[]{
+	t3 = new Int[size];
+	indice = 0;
+	print 'I'; print 'T'; print 'E'; print 'R'; print 'A'; print '\n'; 
+	iterate(indice < size){ -- indice < size
+		print 'X';
+		print indice; print '\n';
+		t3[indice] = t1[indice] + t2[indice];
+		indice = indice + 1;
+	}
+	print 'F'; print '3'; print '\n'; 
+	return t3;
+}
+
+main(){
+{-
+	
+	n = 13;
+   --q = 5;
+   print n;
+   --p = new Ponto;
+   vetor = new Ponto;
+   vetor.x = 10;
+   vetor.y = 2;
+   print 'R';
+   print vetor.x;
+   objeto = new Ponto;
+	objeto.x = 1200;
+	print objeto.x + objeto.x;
+	print '\n';
+   
+-}
+	print 5 + 0.157;
+	tipoComum = new Int;
+	tipoComum = 5;
+	tipoComum2 = new Float;
+	tipoComum2 = .157;
+	
+	print tipoComum + tipoComum2;
+	--tipoComum = 5;
+	
+{-
+	reta = new Reta;
+	reta.p1 = new Ponto;
+	reta.p2 = new Ponto;
+	print 'A';print 'q';print 'u';print 'i';print ' ';print 'f'; print 'o'; print 'i'; print '\n';
+	reta.p1.x = 5;
+	reta.p1.y = 6;
+	reta.p2.x = 7;
+	reta.p2.y = 8;
+	print reta.p1.x;
+	
+-}
+{-
+
+	k = new Int[1];
+	k[0] = 15;
+	size = 1;
+	--vet = somaArrays(k, k, size)[0];
+	somaArrays(k, k, size)<vet>;
+	print 'V'; print ':'; print ' '; 
+	print vet[0];
+	print '\n';
+
+
+	if(true != false){
+		print('s');
+	}  
+	if(true < 2){
+		print('s');
+	}
+
+-}
+
+
+{-
+	 
+	k[0] = 50;
+	print 'k';print 'A';print 'r';print 'r';print 'a';print 'y'; print ':'; print ' ';
+	print k[0]; print '\n';
+	u = retornaArrayPontos(3, 4)[0];
+	print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' '; print 'u'; print ':'; print ' ';
+    print u[0].x + u[0].y;	-- 7 + 4 = 11
+	print '\n';
+   --pontos = new Ponto[3];
+   --pontos2 = new Ponto[][2];			-- FAZER MATRIZ
+   --pontos[0].x = 2;
+   --pontos[1].x = 3;
+-}  
+   --print retornaPonto(3, 4)[0].x; -- NAO FUNCIONA ASSIM
+   --print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   --print pontos[0].x + pontos[1].x * 50 + 10 - 12 / 5 + 90;
+   --print pontos[0].x;
+   --numeros[0].x = 2;
+   --print '\n';
+   
+   --numeros[1].x = 7;
+   
+{-
+   -- FUNCIONA
+   
+   numeros = new Int[3];
+   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   print numeros[2];
+   print '\n';
+   numeros[0] = 2;
+   numeros[1] = 7;
+   print 'a';print 'r';print 'r';print 'a';print 'y';print ':'; print ' ';
+   --print numeros[0];
+   --print numeros[0] + numeros[1];		-- 9
+   --print '\n';
+   -- a = null + null; -- NAO FUNCIONA
+   -- a = null;
+   --print a;
+-}
+   --array = new Ponto[3];
+   
+   --imprimePonto(2,3);
+{-
+	-- Read funciona com vetor
+      
+	   print 'R';
+	   vetor = new Ponto[3];
+	   read vetor[2].x;
+	   print vetor[2].x;
+-}
+{-
+   -- Read funciona com tipo Data
+   
+   print 'R';
+   read vetor.x;
+   print vetor.x;
+   -}
+   --imprimePonto(2,3);
+   -- print retornaPonto(2,3)[0].x; -- ASSIM NAO VAI
+   
+{-
+   -- Teste de retorno de ponto na função
+   
+   pontoAux1 = retornaPonto(2,6)[0];	-- 2 e 6
+   pontoAux2 = retornaPonto(2,6)[1];	-- 6 e 2
+   print pontoAux1.x;
+   if(pontoAux1.x < pontoAux2.x){
+	print 'F';
+   }
+   
+-}
+   --ajustaPonto(vetor, vetor);
+{-
+   
+   --vetor.z = 3;
+   print vetor.x;
+   --print vetor.z;	-- ATRIBUTO NAO EXISTE
+   -- print tela.x;	-- OBJETO NAO EXISTE
+   print '\n';
+   --print (somarCalc(vetor.x, vetor.y)[0] + 5);
+   vetor.x = (somarCalc(vetor.x, vetor.y)[0] + 5);
+   print vetor.x;
+   print '\n';
+   --print vetor.x;
+   --	k = null;    -- TRATAR O NULL TYPE
+   -- print k;
+   print '\n';
+   
+-}
+   
+}
