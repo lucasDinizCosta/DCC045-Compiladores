@@ -42,6 +42,19 @@ public class InterpreterAdaptorImplementation implements InterpreterAdaptor {
             // dos tokens
             LangParser parser = new LangParser(tokens);
 
+            // Remove os detectores de erros léxicos padrão gerado pela ferramenta
+            // A ideia é que quando ocorrer um erro execução no lexer, pare tudo
+            // e retorne uma excessão em Runtime
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(new BaseErrorListener()  {
+                // Sobreescreve o método base de identificação de erros
+                @Override
+                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                    System.out.println("line "+ line + ":" + charPositionInLine + " -- " + msg);
+                    throw new RuntimeException(e.getCause());
+                }
+            });
+
             // Cria a árvore da sintaxe padrão (PARSETREE)
             ParseTree tree = parser.prog();
 

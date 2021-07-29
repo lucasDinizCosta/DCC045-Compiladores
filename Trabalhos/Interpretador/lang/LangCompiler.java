@@ -37,14 +37,7 @@ public class LangCompiler {
         try {
             ParseAdaptor langParser = new ParseAdaptorImplementation();
             InterpreterAdaptorImplementation interpreterImplementation = new InterpreterAdaptorImplementation();
-            Interpreter interp = new Interpreter();
-
-            if (args[0].equals("-interp")) {
-                System.out.println("\nInterpretando a linguagem...\n");
-                interp.interpret();
-                System.out.println("\nFim da execucao.\n");
-                return;
-            }
+            
             if (args[0].equals("-bs")) {
                 System.out.println("Executando bateria de testes sintáticos:");
                 TestParser tp = new TestParser(langParser);

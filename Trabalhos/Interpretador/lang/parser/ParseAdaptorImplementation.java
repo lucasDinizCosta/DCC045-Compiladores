@@ -17,7 +17,6 @@ import org.antlr.v4.runtime.tree.*;
 
 import java.io.IOException;
 
-// import lang.parser.LexerErrors;
 
 // Adaptador para classe de parser. a Função parseFile deve retornar null caso o parser resulte em erro. 
 public class ParseAdaptorImplementation implements ParseAdaptor {
@@ -32,7 +31,6 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
 
             // Cria um analisador léxico que é carregado com os dados do arquivo
             LangLexer lexer = new LangLexer(stream);
-            // LangLexer lexer = new LexerErrors(stream);
 
             // Cria um buffer de tokens com base no analisador léxico
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -40,6 +38,19 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
             // Utiliza o analisador sintático criado e será alimentado com os buffers
             // dos tokens
             LangParser parser = new LangParser(tokens);
+
+            // Remove os detectores de erros léxicos padrão gerado pela ferramenta
+            // A ideia é que quando ocorrer um erro execução no lexer, pare tudo
+            // e retorne uma excessão em Runtime
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(new BaseErrorListener()  {
+                // Sobreescreve o método base de identificação de erros
+                @Override
+                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                    System.out.println("line "+ line + ":" + charPositionInLine + " -- " + msg);
+                    throw new RuntimeException(e.getCause());
+                }
+            });
 
             // Cria uma árvore da sintaxe
             ParseTree tree = parser.prog();
@@ -62,7 +73,7 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
             Node node = ast.visit(tree);    
 
             return node;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
             // compilador
