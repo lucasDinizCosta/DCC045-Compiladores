@@ -1,0 +1,4 @@
+main(){
+   p = new Ponto;
+   print p.x;
+}

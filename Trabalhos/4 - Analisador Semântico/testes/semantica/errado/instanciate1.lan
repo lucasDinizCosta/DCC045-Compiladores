@@ -1,0 +1,11 @@
+data Ponto {
+   x :: Float;
+   y :: Float;
+}
+
+main(){
+   p = new Ponto;
+   z = new Int[][2*l];
+   z[0] = new Ponto;
+   print p.x;
+}

@@ -1,0 +1,25 @@
+-- Saída esperada
+--Z:7
+---- The marvelous env Debugger ------ 
+--q  :  5
+--w  :  3
+---z  :  7
+--n  :  13
+
+
+main(){
+    n = 13;
+    q = 5;
+    w = divMod(n,q)[1];
+    z = 2*w +1;
+    
+    
+    print 'Z';
+    print ':';
+    print z;
+    print '\n';
+}
+
+divMod(n :: Int, q :: Int ) : Int, Int{
+    return n / q, n % q;
+}

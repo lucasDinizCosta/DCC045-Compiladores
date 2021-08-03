@@ -1,0 +1,140 @@
+data Ponto {
+   x :: Int;
+   y :: Int;
+}
+
+somarCalc(x :: Int, y :: Int): Int{
+	return x + y;
+}
+
+testeIf(){
+   print '\n';
+   print 't';
+   print 'e';
+   print 's';
+   print 't';
+   print 'e';
+   print 'I';
+   print 'f';
+   print ':';
+   if(somarCalc(3 + 3, 3)[0] < somarCalc((3 * 3) + 3, (5 - 7))[0]){	-- 9 < 11
+		--print somarCalc(((3 * 3) + 3), (5 - 7))[0];		-- 10
+		--print (3+3%3*3);	-- 15
+   }
+   print '\n';
+   --teste = 3;
+   --print 95 + x;
+}
+
+
+fun(x :: Int){
+   teste = 3;
+   print 95 + x;
+}
+
+fun2(x :: Int, y :: Bool) : Int, Int{
+   k = 9 + 1;
+   print '\n';
+   print 'x';
+   print ':';
+   print x;
+   print '\n';
+   return x, 2;
+}
+
+divMod(n :: Int, q :: Int ) : Int, Int{
+    return n / q, n % q;
+}
+
+-- Saída esperada:
+--Q:2
+--R:3
+---- The marvelous env Debugger ------ 
+--q  :  5
+--res  :  3
+--quo  :  2
+--n  :  13
+
+main(){
+   n = 13;
+   q = 5;
+   
+   k = divMod(n, q)[0];
+   print 'k';
+   print ':';
+   print k;
+   print '\n';
+   
+   k = fun2(n, q)[1];
+   print 'k';
+   print ':';
+   print k;
+   print '\n';
+   
+   -- fun2(n, q)[0] => retorna 13
+   -- fun2(n, q)[1] => retorna 2
+   -- divMod(n, q)[0] => retorna 2
+   -- divMod(n, q)[1] => retorna 3
+   soma = fun2(n, q)[0] + divMod(n, q)[1];
+   --soma = fun2(n, q)[0] * divMod(n, q)[1];
+  --soma = fun2(n, q)[0] / divMod(n, q)[1];
+  -- soma = fun(fun2(n, q)[1]) / divMod(n, q)[0];
+  -- fun é uma função sem retorno
+  -- FUNCIONA
+  -- soma = ((fun2(n, q)[0] * divMod(n, q)[1]) + (5 *(4 + 1))) + 1;
+  -- soma = fun2((3 * 5 + n), q)[0];
+  
+   --soma = );
+   print 's';
+   print 'o';
+   print 'm';
+   print 'a';
+   print ':';
+   print soma;
+   print '\n';
+   print 'f';
+   print 'u';
+   print 'n';
+   print ':';
+   fun(fun2(n, q)[1] + 5);
+   print '\n';
+   
+   testeIf();
+   
+  
+    print 'n';
+    print ':';
+    print n;
+    print '\n';
+    print 'q';
+    print ':';
+    print q;
+    print '\n';
+	
+	print '\n';
+    print '\n';
+    divMod(n,q)< quo,res >; -- Function Call
+    print 'Q';
+    print ':';
+    print quo;
+    print '\n';
+    
+    print 'R';
+    print ':';
+    print res;
+    print '\n';
+   
+   print '\n';
+   fun(3);
+   fun2(1, false)<a,b>;			-- a = 1, b = 2
+   print '\n';
+   print 'a';
+    print ':';
+    print a;
+    print '\n';
+    
+    print 'b';
+    print ':';
+    print b;
+    print '\n';
+}
