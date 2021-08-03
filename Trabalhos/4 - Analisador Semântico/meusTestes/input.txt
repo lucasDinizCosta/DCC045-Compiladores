@@ -103,13 +103,15 @@ main(){
 	print '\n';
    
 -}
-	print 5 + 0.157;
+	print 5 % 0.157;
+	print '\n';
 	tipoComum = new Int;
 	tipoComum = 5;
 	tipoComum2 = new Float;
 	tipoComum2 = .157;
 	
 	print tipoComum + tipoComum2;
+	print '\n';
 	--tipoComum = 5;
 	
 {-
