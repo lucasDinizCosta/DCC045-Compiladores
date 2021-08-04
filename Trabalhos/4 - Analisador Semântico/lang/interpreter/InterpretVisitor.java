@@ -20,16 +20,16 @@ import lang.interpreter.Visitor;
 public class InterpretVisitor extends Visitor {
 
     private Stack<HashMap<String, Object>> env; // Escopo de variaveis de objetos
-    private HashMap<String, Function> funcs; // Funções da linguagem lang
-    private HashMap<String, Data> datas; // Tipos de dados novos
-    private Stack<Object> operands; // Operandos
-    // public HashMap<Integer, Object> parms; // Parametros de funções
-    private Stack<Object> parms; // Parametros de funções
+    private HashMap<String, Function> funcs;    // Funções da linguagem lang
+    private HashMap<String, Data> datas;        // Tipos de dados novos
+    private Stack<Object> operands;             // Operandos
+    // public HashMap<Integer, Object> parms;   // Parametros de funções
+    private Stack<Object> parms;                // Parametros de funções
     private boolean retMode, debug;
 
     public InterpretVisitor() {
         env = new Stack<HashMap<String, Object>>();
-        env.push(new HashMap<String, Object>());
+        // env.push(new HashMap<String, Object>());
         funcs = new HashMap<String, Function>();
         parms = new Stack<Object>();        //parms = new HashMap<Integer, Object>();
         datas = new HashMap<String, Data>();

@@ -85,16 +85,10 @@ somaArrays(t1 :: Int[], t2 :: Int[], size :: Int) : Ponto[]{
 	return t3;
 }
 
+
+-- FUNCAO RECURSIVA
+
 fat(n :: Int): Int{
-	{-
-	if(n == 1){
-		return 1;
-	}
-	else{
-	return n * fat(n - 1)[0];
-	}
-	-}
-	
 	if(n == 1){
 		return 1;
 	}
