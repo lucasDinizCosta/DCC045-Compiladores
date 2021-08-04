@@ -85,6 +85,22 @@ somaArrays(t1 :: Int[], t2 :: Int[], size :: Int) : Ponto[]{
 	return t3;
 }
 
+fat(n :: Int): Int{
+	{-
+	if(n == 1){
+		return 1;
+	}
+	else{
+	return n * fat(n - 1)[0];
+	}
+	-}
+	
+	if(n == 1){
+		return 1;
+	}
+	return n * fat(n - 1)[0];
+}
+
 main(){
 {-
 	
@@ -103,7 +119,17 @@ main(){
 	print '\n';
    
 -}
-	print 5 % 0.157;
+	k = fat(5)[0];
+	print k;
+	print '\n';
+	print fat(3)[0];
+	{-
+	teste = 2;
+	if(teste == 2){	-- Funciona
+		print ':'; print ')'; print '\n';
+	}
+	-}
+	--print 5 % 0.157;
 	print '\n';
 	tipoComum = new Int;
 	tipoComum = 5;

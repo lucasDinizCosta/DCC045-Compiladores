@@ -132,6 +132,11 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Function f) {
+        /**
+         * ---- Regra
+         * func: ID OPEN_PARENT params? CLOSE_PARENT (COLON type (COMMA type)*)? 
+         * OPEN_BRACES cmd* CLOSE_BRACES    # Function
+        */
         if (debug) {
             // Imprime a função
             System.out.println("\n ---- Function -- " + f.getClass().getName());
@@ -156,14 +161,15 @@ public class InterpretVisitor extends Visitor {
         // Corpo da função
         // Verifica os commandos que compoem o corpo da função
         for (Command command : f.getCommands()) {
-            command.accept(this);
+            command.accept(this);       // Executa os comandos que compoem o corpo da função
+            if(retMode)     // Se encontrou um return, para de expandir outros comandos
+                break;
         }
 
         // Remove o escopo local criado pra função
         env.pop();
 
-        // Qualquer retorno possivel da função estará no operands, portanto não tem problema 
-        // remover o ambiente local
+        // Certifica que foi computado o return, voltando para false a opção
         retMode = false;
     }
 
@@ -479,7 +485,7 @@ public class InterpretVisitor extends Visitor {
     public void visit(Print i) {
         try {
             if (debug) {
-                System.out.println("\n");
+                System.out.println("\n --- PRINT -- ");
                 System.out.println(i.toString());
                 System.out.println("\n");
             }
@@ -495,6 +501,11 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Return r) {
+        if (debug) {
+            System.out.println("\n --- RETUNR -- ");
+            System.out.println(r.toString());
+            System.out.println("\n");
+        }
         for (Expression exp : r.getExps()) {    // Processa a expressões de retorno da função
             exp.accept(this);   // Aceita a expressão e empilha no operands
         }
@@ -1187,14 +1198,20 @@ public class InterpretVisitor extends Visitor {
                         Object obj = (Object) operands.pop();
 
                         // Adiciona o parametro na listagem
-                        // parms.put(tempID, obj);
                         parms.push(obj);    // Adiciona no topo da pilha de parametros
                         tempID++;
                     }
                 }
 
+                // System.out.println(getLineNumber() + " ------- " + function);
+                // debugMode();
+
                 // Executa a função e coloca o retorno dos parametros em operands
                 function.accept(this);
+
+                // System.out.println(getLineNumber() + " -------");
+                // debugMode();
+                
 
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
