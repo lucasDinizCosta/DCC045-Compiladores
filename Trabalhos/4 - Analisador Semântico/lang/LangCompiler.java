@@ -70,7 +70,9 @@ public class LangCompiler {
                 ((Node)result).accept(interpreter);               // Passa o node criado e testa o interpretador
 
                 // Imprime o ambiente criado pelo interpretador
+                System.out.println("\n\n---------- Ambiente de execucao ------------");
                 interpreter.debugMode();            // ((InterpreterVisitor)iv).printEnv();
+                System.out.println("\n-----------------------------\n");
             } else if (args[0].equals("-ii")) {
                 // iv = new InteractiveInterpreterVisitor();
                 // result.accept(iv);

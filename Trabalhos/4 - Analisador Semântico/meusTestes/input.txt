@@ -113,26 +113,38 @@ main(){
 	print '\n';
    
 -}
-	k = fat(5)[0];
-	print k;
-	print '\n';
-	print fat(3)[0];
-	{-
-	teste = 2;
-	if(teste == 2){	-- Funciona
-		print ':'; print ')'; print '\n';
+	sizeMatriz_1 = 2;
+	matriz_1 = new Int[][sizeMatriz_1];
+	valor = 2;
+	contador = 0;
+	print matriz_1; print '\n';
+	iterate (contador < sizeMatriz_1){
+		matriz_1[contador] = new Int[sizeMatriz_1];
+		contador = contador + 1;
 	}
-	-}
-	--print 5 % 0.157;
-	print '\n';
-	tipoComum = new Int;
-	tipoComum = 5;
-	tipoComum2 = new Float;
-	tipoComum2 = .157;
+	contador = 0;
+	iterate (contador < sizeMatriz_1){
+		contadorColuna = 0;
+		iterate(contadorColuna < sizeMatriz_1){
+			matriz_1[contador][contadorColuna] = valor;
+			contadorColuna = contadorColuna + 1;
+			valor = valor * 2;
+		}
+		contador = contador + 1;
+	}
 	
-	print tipoComum + tipoComum2;
-	print '\n';
-	--tipoComum = 5;
+	print matriz_1[0][0]; print '\n';
+	print matriz_1[0][1]; print '\n';
+	print matriz_1[1][0]; print '\n';
+	print matriz_1[1][1]; print '\n';
+	print matriz_1;
+	
+{-
+	iterate(contadorColuna < sizeMatriz_1){
+		matriz_1[contador] = new Int[sizeMatriz_1];
+		contadorColuna = contadorColuna + 1;
+	}
+-}
 	
 {-
 	reta = new Reta;

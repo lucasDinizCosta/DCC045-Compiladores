@@ -7,6 +7,7 @@
 *********************************************************/
 package lang.interpreter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -523,7 +524,10 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("=> Expressao que sera armazenada na variavel: " + a.getExp());
                 System.out.println("\n------------------------------------\n");
             }
+
             // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue().getClass().getSimpleName() + " -- " + a.getExp() + " --- " + a.toString() );
+
+            // Empilha a expressão que será atribuida
             a.getExp().accept(this);            
 
             // Variavel que vai ter os dados atribuidos nela
@@ -599,26 +603,65 @@ public class InterpretVisitor extends Visitor {
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
 
-                // o array é um list de elementos
-                String nomeArray = ((ArrayAccess)lvalue).getId();
-                ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
-                Integer position = (Integer)operands.pop();         // Posicao do array
+                if(((ArrayAccess)lvalue).getLValue() instanceof ArrayAccess){   // Matriz
+                    // Array da matriz
+                    ArrayAccess arrayObjeto = (ArrayAccess)lvalue;
 
-                // Busca o array no env
-                List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
-                Integer tamanhoArray = ((List)objetoArray).size();
+                    // Pega a matriz na lista de variaveis
+                    Object obj = env.peek().get(arrayObjeto.getLValue().getId());
 
-                
-                if((position >= 0) && (position <= tamanhoArray - 1)){
-                    /**
-                     * NAO FAZ A VERIFICAÇÃO DE TIPOS, SE FOR UM TIPO INT, ELE VAI ACEITAR
-                     */
+                    // System.out.println(getLineNumber() + " --- " + obj + " --- " + arrayObjeto);
 
-                    // Pega o elemento do topo de operands e adiciona na posição do vetor
-                    ((List)objetoArray).set(position, operands.pop());  
+                    // Empilha o numero da linha no operands
+                    ((ArrayAccess)arrayObjeto.getLValue()).getExp().accept(this);  
+
+                    // Empilha o numero da coluna no operands
+                    arrayObjeto.getExp().accept(this);  
+
+                    Integer posicaoColuna = (Integer) operands.pop();
+                    Integer posicaoLinha = (Integer) operands.pop();
+                    Integer tamanhoLinhas = ((List)obj).size();
+                    Object valor = operands.pop();              // Valor a ser atribuido na matriz
+
+                    // Checa consistencia no numero de linha e coluna
+                    if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
+                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();//.size();
+                        if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
+                            Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
+                            
+                            // Atribui o valor na posicao da matriz na variavel
+                            ((List)elementoMatriz).set(posicaoColuna, valor);
+                        }
+                        else{
+                            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                        }
+                    }
+                    else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                    }
                 }
-                else{
-                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                else{   // Array normal
+                    // o array é um list de elementos
+                    String nomeArray = ((ArrayAccess)lvalue).getId();
+                    ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
+                    Integer position = (Integer)operands.pop();         // Posicao do array
+
+                    // Busca o array no env
+                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                    Integer tamanhoArray = ((List)objetoArray).size();
+
+                    
+                    if((position >= 0) && (position <= tamanhoArray - 1)){
+                        /**
+                         * NAO FAZ A VERIFICAÇÃO DE TIPOS, SE FOR UM TIPO INT, ELE VAI ACEITAR
+                         */
+
+                        // Pega o elemento do topo de operands e adiciona na posição do vetor
+                        ((List)objetoArray).set(position, operands.pop());  
+                    }
+                    else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                    }
                 }
             }
         } catch (Exception x) {
@@ -1057,10 +1100,6 @@ public class InterpretVisitor extends Visitor {
     public void visit(TypeInstanciate t) {
         try {
             if (debug) {
-                // Imprime a função
-                // System.out.println("\n -- TypeInstanciate");
-                // System.out.println(t.toString());
-                // System.out.println("\n");
                 System.out.println("\n---------- TypeInstanciate ------------\n");
                 System.out.println("=> Comando completo do TypeInstanciate: " + t.toString());
                 System.out.println("=> Tipo que sera instanciado(Comum): " + t.getType());
@@ -1355,21 +1394,62 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("=> Expressao ou posicao que sera buscada no Array: " + a.getExp());
                 System.out.println("\n------------------------------------\n");
             }
-            // obj é uma lista => lista de elementos do array
-            Object obj = env.peek().get(a.getLValue().getId());
-            if (obj != null) {
-                a.getExp().accept(this);        // Adiciona a posicao no vetor nos operands
-                Integer position = (Integer) operands.pop();
-                Integer tamanhoArray = ((List)obj).size();
-                if((position >= 0) && (position <= tamanhoArray - 1)){
-                    operands.push(((List)obj).get(position));
+
+            if(a.getLValue() instanceof ArrayAccess){   // Trata a condição de ser uma matriz
+
+                // Pega a matriz na lista de variaveis
+                Object obj = env.peek().get(a.getLValue().getId());
+
+                if(obj != null){
+                    // Empilha o numero da linha no operands
+                    ((ArrayAccess)a.getLValue()).getExp().accept(this);  
+
+                    // Empilha o numero da coluna no operands
+                    a.getExp().accept(this);  
+
+                    Integer posicaoColuna = (Integer) operands.pop();
+                    Integer posicaoLinha = (Integer) operands.pop();
+                    Integer tamanhoLinhas = ((List)obj).size();
+
+                    // Checa consistencia no numero de linha e coluna
+                    if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
+                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();//.size();
+                        if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
+                            Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
+
+                            // Empilha no operands o elemento da matriz
+                            operands.push(((List)elementoMatriz).get(posicaoColuna));
+                        }
+                        else{
+                            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                        }
+                    }
+                    else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                    }
                 }
                 else{
-                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+a.getLValue().getId()+"\'  !!!");
+                    // Matriz não existe
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: A matriz "+ "\""+a.getLValue().getId()+"\" nao existe!!!");
                 }
-            } else {
-                // Array não existe
-                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O array "+ "\""+a.getLValue().getId()+"\" nao existe!!!");
+            }
+            else{
+                // obj é uma lista => lista de elementos do array
+                Object obj = env.peek().get(a.getLValue().getId());
+                if (obj != null) {
+                    a.getExp().accept(this);        // Adiciona a posicao no vetor nos operands
+                    Integer position = (Integer) operands.pop();
+                    Integer tamanhoArray = ((List)obj).size();
+                    if((position >= 0) && (position <= tamanhoArray - 1)){
+                        operands.push(((List)obj).get(position));
+                    }
+                    else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+a.getLValue().getId()+"\'  !!!");
+                    }
+                } else {
+                    // Array não existe
+                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O array "+ "\""+a.getLValue().getId()+"\" nao existe!!!");
+                }
             }
         }
         catch (Exception x) {
