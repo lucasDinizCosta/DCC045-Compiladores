@@ -1152,7 +1152,11 @@ public class InterpretVisitor extends Visitor {
             else{   // Tipo data que no qual o atributo Type é null
                 if (t.getExp() == null) {                   // Tipo normal de data
                     // Pega o nome do objeto do Data
-                    String dataID = t.getDataName();   
+                    String dataID = t.getDataName();
+                    
+                    if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
+                        throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
+                    }
 
                     // Cria um Hashmap pra servir de alocação variaveis para o objeto
                     HashMap<String, Object> newVar = new HashMap<String, Object>();
@@ -1176,8 +1180,13 @@ public class InterpretVisitor extends Visitor {
                 }
                 else{   // Trata a condição de ser array do tipo DATA
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
+
                     // Pega o nome do objeto do Data
-                    String dataID = t.getDataName();   
+                    String dataID = t.getDataName();
+                    
+                    if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
+                        throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
+                    }
 
                     // Pega o tamanho do vetor na pilha de operandos
                     Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
@@ -1193,12 +1202,16 @@ public class InterpretVisitor extends Visitor {
                             Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
                             d.getId(), d.getType());
 
+                            System.out.println(getLineNumber() + " ---- " + valorPadrao);
                             // Adiciona o objeto com as variaveis vazias
                             newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
                         }
+                        System.out.println(getLineNumber() + " ---- " + lista);
                         lista.add(newVar);
                     }
                     operands.push(lista);
+                    System.out.println(getLineNumber() + " ---- " + t.getExp());
+                    debugMode();
                 }
             }
         } catch (Exception x) {

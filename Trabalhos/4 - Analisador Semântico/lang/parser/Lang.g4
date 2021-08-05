@@ -38,7 +38,7 @@ btype: INT_TYPE     # BTypeInt
     | FLOAT_TYPE    # BTypeFloat
     | NAME_TYPE     # BTypeNameType
     ;
-cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
+cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList      // Cria um escopo
     | IF OPEN_PARENT exp CLOSE_PARENT cmd   # If
     | IF OPEN_PARENT exp CLOSE_PARENT cmd ELSE cmd  # IfElse
     | ITERATE OPEN_PARENT exp CLOSE_PARENT cmd  # Iterate
