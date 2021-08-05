@@ -115,13 +115,13 @@ main(){
 -}
 	sizeMatriz_1 = 2;
 	matriz_1 = new Int[][sizeMatriz_1];
-	--mapa = new Point[][sizeMatriz_1];
+	mapa = new Point[][sizeMatriz_1];
 	valor = 2;
 	contador = 0;
-	--print mapa; print '\n';
+	print mapa; print '\n';
 	iterate (contador < sizeMatriz_1){
 		matriz_1[contador] = new Int[sizeMatriz_1];
-		--mapa[contador] = new Ponto[sizeMatriz_1];
+		mapa[contador] = new Ponto[sizeMatriz_1];
 		contador = contador + 1;
 	}
 	contador = 0;
@@ -129,14 +129,18 @@ main(){
 		contadorColuna = 0;
 		iterate(contadorColuna < sizeMatriz_1){
 			matriz_1[contador][contadorColuna] = valor;
-			--mapa[contador][contadorColuna].x = valor / 2;
-			--mapa[contador][contadorColuna].y = valor * 2;
+			mapa[contador][contadorColuna].x = valor / 2;
+			mapa[contador][contadorColuna].y = valor * 2;
 			contadorColuna = contadorColuna + 1;
 			valor = valor * 2;
 		}
 		contador = contador + 1;
 	}
-	
+	print mapa[0][0]; print '\n';
+	print mapa[0][1]; print '\n';
+	print mapa[1][0]; print '\n';
+	print mapa[1][1]; print '\n';
+	print '\n';
 	print matriz_1[0][0]; print '\n';
 	print matriz_1[0][1]; print '\n';
 	print matriz_1[1][0]; print '\n';

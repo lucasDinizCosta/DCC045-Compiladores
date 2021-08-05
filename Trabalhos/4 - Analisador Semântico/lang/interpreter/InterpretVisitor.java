@@ -542,31 +542,71 @@ public class InterpretVisitor extends Visitor {
                 // Significa que é um ARRAY DE DATA
                 if(((DataAccess)lvalue).getLValue() instanceof ArrayAccess){
                     ArrayAccess arrayElement = ((ArrayAccess)((DataAccess)lvalue).getLValue());
-                    arrayElement.getExp().accept(this); // Aceita e adiciona a posicao do array no operandos
 
-                    String nomeAtributo = ((DataAccess)lvalue).getId();
-                    String nomeObjeto = ((DataAccess)lvalue).getDataId();
-                    Integer position = (Integer)operands.pop();
-                    // a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
-                    Integer valorAtribuicao = (Integer) operands.pop();
+                    if(arrayElement.getLValue() instanceof ArrayAccess){    // Matriz de data
+                        // Pega a matriz na lista de variaveis
+                        Object obj = env.peek().get(arrayElement.getLValue().getId());
 
-                    // o array é um list de elementos
-                    String nomeArray = arrayElement.getId();
+                        // Empilha o numero da linha no operands
+                        ((ArrayAccess)arrayElement.getLValue()).getExp().accept(this);  
 
-                    // Busca o array no env
-                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
-                    Integer tamanhoArray = ((List)objetoArray).size();
+                        // Empilha o numero da coluna no operands
+                        arrayElement.getExp().accept(this);  
 
-                    // System.out.println("461 --- " + objetoArray.toString() + " -- " + nomeAtributo +" -- "+ valorAtribuicao);
-                    
-                    if((position >= 0) && (position <= tamanhoArray - 1)){
-                        Object elemento = objetoArray.get(position);    // pega o elemento na posicao
-                        ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
+                        Integer posicaoColuna = (Integer) operands.pop();
+                        Integer posicaoLinha = (Integer) operands.pop();
+                        Integer tamanhoLinhas = ((List)obj).size();
+                        String nomeAtributo = ((DataAccess)lvalue).getId(); // Atributo do data
+                        Object valor = operands.pop();              // Valor a ser atribuido na matriz
 
+                        // Checa consistencia no numero de linha e coluna
+                        if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
+                            Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();
+                            if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
+                                Object elementoLinhaMatriz = ((List)((List)obj).get(posicaoLinha));
+                                Object elementoMatriz = ((List)elementoLinhaMatriz).get(posicaoColuna);
+                                
+                                // Atribui o valor na posicao da matriz no atributo do data na matriz
+                                ((HashMap)elementoMatriz).put(nomeAtributo, valor);
+                            }
+                            else{
+                                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                            }
+                        }
+                        else{
+                            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
+                        }
                     }
-                    else{
-                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                    else /*if(arrayElement.getLValue() == null)*/{  // Tipo array
+                        arrayElement.getExp().accept(this); // Aceita e adiciona a posicao do array no operandos
+
+                        String nomeAtributo = ((DataAccess)lvalue).getId();
+                        String nomeObjeto = ((DataAccess)lvalue).getDataId();
+                        Integer position = (Integer)operands.pop();
+                        // a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
+                        Integer valorAtribuicao = (Integer) operands.pop();
+
+                        // o array é um list de elementos
+                        String nomeArray = arrayElement.getId();
+
+                        // Busca o array no env
+                        List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                        Integer tamanhoArray = ((List)objetoArray).size();
+
+                        // System.out.println("461 --- " + objetoArray.toString() + " -- " + nomeAtributo +" -- "+ valorAtribuicao);
+                        
+                        if((position >= 0) && (position <= tamanhoArray - 1)){
+                            Object elemento = objetoArray.get(position);    // pega o elemento na posicao
+                            ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
+
+                        }
+                        else{
+                            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
+                        }
                     }
+                    /*else{
+                        throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Array ou matriz declarado de forma incorreta !!!");
+                    }*/
                 }
                 else{   // Somente o DATA 
                     String nomeAtributo = ((DataAccess)lvalue).getId();
@@ -610,7 +650,7 @@ public class InterpretVisitor extends Visitor {
                     // Pega a matriz na lista de variaveis
                     Object obj = env.peek().get(arrayObjeto.getLValue().getId());
 
-                    // System.out.println(getLineNumber() + " --- " + obj + " --- " + arrayObjeto);
+                    //System.out.println(getLineNumber() + " --- " + obj + " --- " + arrayObjeto);
 
                     // Empilha o numero da linha no operands
                     ((ArrayAccess)arrayObjeto.getLValue()).getExp().accept(this);  
