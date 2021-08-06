@@ -60,8 +60,8 @@ public class CharLitteral extends LValue{
         this.value = value;
     }
 
-    public String getValue(){
-        return value + "";
+    public char getValue(){
+        return value;
     }
 
     @Override

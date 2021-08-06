@@ -22,7 +22,7 @@ public class ObjectDefault extends LValue{
         tipo = null;
     }
 
-    // Construtor para os tipos de dados comuns: Int, Char, Boolean e Float
+    // Construtor para os tipos de dados comuns: Int, Char, Bool e Float
     public ObjectDefault(int line, int column, Type tipo) {
         super(line, column);
         this.id = null;
@@ -51,6 +51,22 @@ public class ObjectDefault extends LValue{
         this.tipo = tipo;
     }
 
+    public Boolean coincideTipo(Object exp){
+        if((exp.getClass() == Integer.class) && (tipo instanceof TypeInt)){
+            return true;
+        }
+        if((exp.getClass() == Float.class) && (tipo instanceof TypeFloat)){
+            return true;
+        }
+        if((exp.getClass() == Boolean.class) && (tipo instanceof TypeBool)){
+            return true;
+        }
+        if((exp instanceof Character) && (tipo instanceof TypeChar)){
+            return true;
+        }
+        return false;
+    }
+
     public Object getContent() {
         return this.content;
     }
@@ -61,6 +77,7 @@ public class ObjectDefault extends LValue{
 
     @Override
     public String toString(){
-        return "" + content + " (" + tipo.toString() + ")";
+        //return "" + content + " (" + tipo.toString() + ")";
+        return content + "";
     }
 }

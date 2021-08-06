@@ -193,7 +193,7 @@ public class InterpretVisitor extends Visitor {
                 type.accept(this);  
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + p.getLine() + ", " + p.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -213,7 +213,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -233,7 +233,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -250,7 +250,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -267,7 +267,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -284,7 +284,7 @@ public class InterpretVisitor extends Visitor {
                 operands.push(t);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -315,7 +315,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + " : Erro !!");
             }*/
         } catch (Exception x) {
-            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -336,7 +336,7 @@ public class InterpretVisitor extends Visitor {
             }
             c.accept(this); // Executa o comando 
         } catch (Exception x) {
-            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -368,7 +368,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -382,7 +382,7 @@ public class InterpretVisitor extends Visitor {
                 i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -398,7 +398,7 @@ public class InterpretVisitor extends Visitor {
                 i.getElseCmd().accept(this);
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -427,7 +427,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -478,7 +478,7 @@ public class InterpretVisitor extends Visitor {
             }
             sc.close();     // Fecha o scanner
         } catch (Exception x) {
-            throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + r.getLine() + ", " + r.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -496,7 +496,7 @@ public class InterpretVisitor extends Visitor {
             Object obj = operands.pop();
             System.out.print(obj);
         } catch (Exception e) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + e.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -611,14 +611,6 @@ public class InterpretVisitor extends Visitor {
                 else{   // Somente o DATA 
                     String nomeAtributo = ((DataAccess)lvalue).getId();
                     String nomeObjeto = ((DataAccess)lvalue).getDataId();
-
-                    // if(((DataAccess)lvalue).getLValue() != null){       // Se o data tem um tipo data como atributo
-                    //     // nomeObjeto
-                    //     //((DataAccess)lvalue).getLValue().accept(this);
-                    //     ((DataAccess)lvalue).accept(this);
-                    //     //debugMode();
-                    //     //System.out.println("551 --- " + ((HashMap<String, Object>)operands.pop()).get("x"));
-                    // }
                     
                     // System.out.println("448 ---- " + nomeAtributo + " -- " + nomeObjeto);
     
@@ -636,10 +628,40 @@ public class InterpretVisitor extends Visitor {
                         throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Atributo "+ "\'"+nomeAtributo+"\'"+" eh inexistente no objeto " + "\""+nomeObjeto+"\"");
                     }
                 }
-            } else if (lvalue instanceof Identifier) { 
+            } else if (lvalue instanceof Identifier) {  // Adicionar o valor em uma variavel
                 // Se é um Identificador literal, variavel ou resultados de funções
-                // System.out.println("Linha 398 - ATTRIBUTION -- " + lvalue.getId() + " -- " + a.getExp());
-                env.peek().put(((Identifier) lvalue).getId(), operands.pop());
+                System.out.println(getLineNumber() + " --- " + lvalue.getId() + " -- " + a.getExp());
+                Object valorVariavel = env.peek().get(((Identifier) lvalue).getId());
+                Object expressao = operands.pop();
+                System.out.println(getLineNumber() + " --- " + valorVariavel + " --- " + expressao);
+
+                if(valorVariavel != null){  // Variavel Existe
+
+                    // Variavel com tipo fixo: new Int, Float, Char, Bool ou Data
+                    if(valorVariavel instanceof ObjectDefault){
+                        // valorVariavel.set
+                        Type tipo = ((ObjectDefault)valorVariavel).getType();
+                        Boolean verificaTipo = ((ObjectDefault)valorVariavel).coincideTipo(expressao);
+                        if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
+                            // Adiciona a expressão empilhada no operands na variavel
+                            //env.peek().put(((Identifier) lvalue).getId(), expressao);
+                            ((ObjectDefault)valorVariavel).setContent(expressao);
+                        }
+                        else{
+                            // Lançar excessão de tipo diferente
+                            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel \'" + a.getLValue().getId() + "\' !!!");
+                        }
+                    }
+                    else{   // Variavel sem tipo definido simplesmente reatribui o tipo
+                        // Adiciona a expressão empilhada no operands na variavel
+                        env.peek().put(((Identifier) lvalue).getId(), expressao);
+                    }
+                }
+                else{   // Varivel esta sendo criada
+
+                    // Adiciona a expressão empilhada no operands na variavel
+                    env.peek().put(((Identifier) lvalue).getId(), expressao);
+                }
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
 
@@ -705,7 +727,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -767,7 +789,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -778,11 +800,16 @@ public class InterpretVisitor extends Visitor {
         try {
             a.getLeft().accept(this);
             a.getRight().accept(this);
-            boolean right = (Boolean) operands.pop();
-            boolean left = (Boolean) operands.pop();
-            operands.push(left && right);
+            Object right = operands.pop();
+            Object left = operands.pop();
+            if (left instanceof Boolean && right instanceof Boolean) {
+                operands.push((Boolean)left && (Boolean)right);
+            }
+            else{
+                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + " : Expressoes nao sao booleanos na operacao de comparacao And logico com \'&&\' !!");
+            }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -808,10 +835,10 @@ public class InterpretVisitor extends Visitor {
                     operands.push(false);
                 }
             } else{
-                throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de comparacao menor com \'<\' !!");
+                throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + " : Expressoes invalidas na operacao de comparacao menor com \'<\' !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + l.getLine() + ", " + l.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -823,7 +850,7 @@ public class InterpretVisitor extends Visitor {
             Object right = operands.pop();
             Object left = operands.pop();
             if(left instanceof Boolean && right instanceof Boolean){
-                if (left == right) {
+                if ((Boolean)left == (Boolean)right) {
                     operands.push(true);
                 } else {
                     operands.push(false);
@@ -842,12 +869,19 @@ public class InterpretVisitor extends Visitor {
                     } else {
                         operands.push(false);
                     }
-                } else{
-                    throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de igualdade de comparacao usando \'==\' !!");
+                } else if (left instanceof Character && right instanceof Character) {
+                    if (((Character) left) == ((Character) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                }
+                else{
+                    throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") " + " : Expressoes invalidas na operacao de igualdade de comparacao usando \'==\' !!");
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + e.getLine() + ", " + e.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -859,7 +893,7 @@ public class InterpretVisitor extends Visitor {
             Object right = operands.pop();
             Object left = operands.pop();
             if(left instanceof Boolean && right instanceof Boolean){
-                if (left != right) {
+                if ((Boolean)left != (Boolean)right) {
                     operands.push(true);
                 } else {
                     operands.push(false);
@@ -878,12 +912,19 @@ public class InterpretVisitor extends Visitor {
                     } else {
                         operands.push(false);
                     }
-                } else{
+                } else if (left instanceof Character && right instanceof Character) {
+                    if (((Character) left) != ((Character) right)) {
+                        operands.push(true);
+                    } else {
+                        operands.push(false);
+                    }
+                }
+                else{
                     throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de diferencao na comparacao usando \'!=\' !!");
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -896,7 +937,6 @@ public class InterpretVisitor extends Visitor {
             a.getRight().accept(this);
             Object right = operands.pop();
             Object left = operands.pop();
-            // System.out.println(getErrorLine(getLineNumber()) + " -- left: " + left + " class: " + left.getClass().getSimpleName() + " -- right: " + right + " class: " + right.getClass().getSimpleName());
             if(left.getClass() == Integer.class && right.getClass() == Integer.class){
                 operands.push((Integer) left + (Integer) right);
             }
@@ -920,7 +960,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de adicao \'+\' !!");
             }*/
         } catch (Exception e) {
-            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + e.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -956,7 +996,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de subtracao \'-\' !!");
             }*/
         } catch (Exception x) {
-            throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -985,7 +1025,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de multiplicacao \'*\' !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1013,7 +1053,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de divisao \'/\' !!");
             }  
         } catch (Exception x) {
-            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1040,7 +1080,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Nao foi utilizado numeros inteiros na operacao !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1058,7 +1098,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressao invalida na operacao \'!\' em tipos logicos !!");
             }  
         } catch (Exception e) {
-            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + e.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -1075,7 +1115,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressao invalida na operacao de inversao de sinal numerico \'-\' !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1084,7 +1124,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(b.getValue());
         } catch (Exception e) {
-            throw new RuntimeException(" (" + b.getLine() + ", " + b.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + e.getMessage());
+            throw new RuntimeException(" (" + b.getLine() + ", " + b.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -1093,7 +1133,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(n.getValue());
         } catch (Exception x) {
-            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1102,7 +1142,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(i.getValue());
         } catch (Exception e) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + e.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + e.getMessage());
         }
     }
 
@@ -1120,7 +1160,7 @@ public class InterpretVisitor extends Visitor {
         try {
             operands.push(c.getValue());
         } catch (Exception x) {
-            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + c.getLine() + ", " + c.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1159,10 +1199,8 @@ public class InterpretVisitor extends Visitor {
                     if(t.getType() instanceof NameType){   
 
                         // Pega o tamanho do vetor na pilha de operandos
-                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                        //System.out.println(i);
+                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto 
                         Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
-                        //System.out.println(obj.toString());
                         List<Object> lista = new ArrayList<Object>(i); // Tipo array
                         for (int k = 0; k < i; k++) {
                             lista.add(obj);
@@ -1172,9 +1210,9 @@ public class InterpretVisitor extends Visitor {
                     else{       // Array generico 
                         // Pega o tamanho do vetor na pilha de operandos
                         Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-                        //System.out.println(i);
+
                         Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
-                        //System.out.println(obj.toString());
+
                         List<Object> lista = new ArrayList<Object>(i); // Tipo array
                         for (int k = 0; k < i; k++) {
                             lista.add(obj);
@@ -1242,20 +1280,16 @@ public class InterpretVisitor extends Visitor {
                             Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
                             d.getId(), d.getType());
 
-                            System.out.println(getLineNumber() + " ---- " + valorPadrao);
                             // Adiciona o objeto com as variaveis vazias
                             newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
                         }
-                        System.out.println(getLineNumber() + " ---- " + lista);
                         lista.add(newVar);
                     }
                     operands.push(lista);
-                    System.out.println(getLineNumber() + " ---- " + t.getExp());
-                    debugMode();
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1341,7 +1375,7 @@ public class InterpretVisitor extends Visitor {
                 }   
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
 
     }
@@ -1375,7 +1409,7 @@ public class InterpretVisitor extends Visitor {
                 throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Erro no Identifier !!");
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1424,7 +1458,7 @@ public class InterpretVisitor extends Visitor {
                 }
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1506,7 +1540,7 @@ public class InterpretVisitor extends Visitor {
             }
         }
         catch (Exception x) {
-            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + x.getMessage());
         }
     }
 
@@ -1519,7 +1553,7 @@ public class InterpretVisitor extends Visitor {
                 expression.accept(this);
             }
         } catch (Exception x) {
-            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + getErrorLine(getLineNumber()) + " Erro: " + x.getMessage());
+            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
         }
     }
 }
