@@ -52,16 +52,33 @@ public class ObjectDefault extends LValue{
     }
 
     public Boolean coincideTipo(Object exp){
-        if((exp.getClass() == Integer.class) && (tipo instanceof TypeInt)){
-            return true;
+        if(tipo instanceof TypeFloat){
+            if(exp.getClass() == Float.class){
+                return true;
+            }
+            if(exp.getClass() == Integer.class){    //Nesse caso o Integer será tratado como Float
+                return true;
+            }
         }
-        if((exp.getClass() == Float.class) && (tipo instanceof TypeFloat)){
+        if((exp.getClass() == Integer.class) && (tipo instanceof TypeInt)){
             return true;
         }
         if((exp.getClass() == Boolean.class) && (tipo instanceof TypeBool)){
             return true;
         }
-        if((exp instanceof Character) && (tipo instanceof TypeChar)){
+        if(exp instanceof ObjectDefault){           // Checa os objetos do tipo data 
+            System.out.println("TESTE " + tipo + " --- " + ((TypeArray)tipo).getType() + " --- " + ((ObjectDefault)exp).getType());
+            if(tipo instanceof TypeArray && ((TypeArray)tipo).getType().getClass() == ((ObjectDefault)exp).getType().getClass()){
+                System.out.println("TESTE");
+                return true;
+    
+            }
+            if(((ObjectDefault) exp).getType() == tipo){    // Ex: Ponto igual a Ponto
+                return true;
+            }
+        }
+        
+        if((exp.getClass() == Character.class) && (tipo instanceof TypeChar)){
             return true;
         }
         return false;
@@ -77,7 +94,7 @@ public class ObjectDefault extends LValue{
 
     @Override
     public String toString(){
-        //return "" + content + " (" + tipo.toString() + ")";
-        return content + "";
+        return "" + content + " (" + tipo.toString() + ")";
+        // return content + "";
     }
 }

@@ -639,8 +639,6 @@ public class InterpretVisitor extends Visitor {
 
                     // Variavel com tipo fixo: new Int, Float, Char, Bool ou Data
                     if(valorVariavel instanceof ObjectDefault){
-                        // valorVariavel.set
-                        Type tipo = ((ObjectDefault)valorVariavel).getType();
                         Boolean verificaTipo = ((ObjectDefault)valorVariavel).coincideTipo(expressao);
                         if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
                             // Adiciona a expressão empilhada no operands na variavel
@@ -672,8 +670,6 @@ public class InterpretVisitor extends Visitor {
                     // Pega a matriz na lista de variaveis
                     Object obj = env.peek().get(arrayObjeto.getLValue().getId());
 
-                    //System.out.println(getLineNumber() + " --- " + obj + " --- " + arrayObjeto);
-
                     // Empilha o numero da linha no operands
                     ((ArrayAccess)arrayObjeto.getLValue()).getExp().accept(this);  
 
@@ -691,8 +687,25 @@ public class InterpretVisitor extends Visitor {
                         if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
                             Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
                             
+                            
+                            System.out.println(getLineNumber() + " --- " + valor);
+
+                            // Variavel com tipo fixo: new Int, Float, Char, Bool ou Data
+                            if(((List)elementoMatriz).get(posicaoColuna) instanceof ObjectDefault){
+                                Boolean verificaTipo = ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).coincideTipo(valor);
+                                if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
+                                    
+                                    // Atribui o valor na posicao da matriz na variavel
+                                    ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
+                                }
+                                else{
+                                    // Lançar excessão de tipo diferente
+                                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
+                                }
+                            }
+
                             // Atribui o valor na posicao da matriz na variavel
-                            ((List)elementoMatriz).set(posicaoColuna, valor);
+                            //((List)elementoMatriz).set(posicaoColuna, valor);
                         }
                         else{
                             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
@@ -711,15 +724,34 @@ public class InterpretVisitor extends Visitor {
                     // Busca o array no env
                     List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                     Integer tamanhoArray = ((List)objetoArray).size();
+                    Object valor = operands.pop();
 
+                    System.out.println(getLineNumber() + " --- " + valor);
                     
                     if((position >= 0) && (position <= tamanhoArray - 1)){
                         /**
                          * NAO FAZ A VERIFICAÇÃO DE TIPOS, SE FOR UM TIPO INT, ELE VAI ACEITAR
                          */
 
-                        // Pega o elemento do topo de operands e adiciona na posição do vetor
-                        ((List)objetoArray).set(position, operands.pop());  
+                        if(((List)objetoArray).get(position) instanceof ObjectDefault){
+                            System.out.println(getLineNumber() + " --- " + ((ObjectDefault)((List)objetoArray).get(position)) + " --- " + ((List<Object>)valor).get(0));
+
+                            Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(((List<Object>)valor).get(0));    // Passa um objeto do array e verifica
+                            if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
+                                
+                                // Atribui o valor na posicao da matriz na variavel
+                                // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
+                                ((List)objetoArray).set(position, valor);
+                            }
+                            else{
+                                // Lançar excessão de tipo diferente
+                                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
+                            }
+                        }else{
+                            // Pega o elemento do topo de operands e adiciona na posição do vetor
+                            // ((List)objetoArray).set(position, operands.pop());  
+                            ((List)objetoArray).set(position, valor); 
+                        }
                     }
                     else{
                         throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+nomeArray+"\'  !!!");
@@ -1211,11 +1243,12 @@ public class InterpretVisitor extends Visitor {
                         // Pega o tamanho do vetor na pilha de operandos
                         Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
 
-                        Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        Type type = (Type)operands.pop();                // Tipo do array -> Int, Float, Char ....
 
                         List<Object> lista = new ArrayList<Object>(i); // Tipo array
                         for (int k = 0; k < i; k++) {
-                            lista.add(obj);
+                            Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), type);
+                            lista.add(valorPadrao);
                         }
                         operands.push(lista);
                     }
@@ -1243,7 +1276,7 @@ public class InterpretVisitor extends Visitor {
                         // Verifica as declarações das variaveis e tipos no data
                         d.getType().accept(this);
 
-                        // Desempilha os tipos que estão presenta no operands
+                        // Desempilha os tipos que esta presenta no operands
                         operands.pop();
 
                         // Cria um objeto especial para destacar quais variaveis e seu tipo
