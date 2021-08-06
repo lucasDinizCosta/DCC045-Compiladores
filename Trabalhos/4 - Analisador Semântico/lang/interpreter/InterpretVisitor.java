@@ -641,9 +641,13 @@ public class InterpretVisitor extends Visitor {
                     if(valorVariavel instanceof ObjectDefault){
                         Boolean verificaTipo = ((ObjectDefault)valorVariavel).coincideTipo(expressao);
                         if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
-                            // Adiciona a expressão empilhada no operands na variavel
-                            //env.peek().put(((Identifier) lvalue).getId(), expressao);
-                            ((ObjectDefault)valorVariavel).setContent(expressao);
+                            if(expressao instanceof ObjectDefault){ // New Int/Float/Char
+                                // Adiciona a expressão empilhada no operands na variavel
+                                env.peek().put(((Identifier) lvalue).getId(), expressao);
+                            }
+                            else{
+                                ((ObjectDefault)valorVariavel).setContent(expressao);
+                            }
                         }
                         else{
                             // Lançar excessão de tipo diferente
@@ -726,7 +730,7 @@ public class InterpretVisitor extends Visitor {
                     Integer tamanhoArray = ((List)objetoArray).size();
                     Object valor = operands.pop();
 
-                    System.out.println(getLineNumber() + " --- " + valor);
+                    System.out.println(getLineNumber() + " --- " + valor + " --- " + objetoArray);
                     
                     if((position >= 0) && (position <= tamanhoArray - 1)){
                         /**
@@ -734,19 +738,35 @@ public class InterpretVisitor extends Visitor {
                          */
 
                         if(((List)objetoArray).get(position) instanceof ObjectDefault){
-                            System.out.println(getLineNumber() + " --- " + ((ObjectDefault)((List)objetoArray).get(position)) + " --- " + ((List<Object>)valor).get(0));
-
-                            Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(((List<Object>)valor).get(0));    // Passa um objeto do array e verifica
-                            if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
-                                
-                                // Atribui o valor na posicao da matriz na variavel
-                                // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
-                                ((List)objetoArray).set(position, valor);
+                            // System.out.println(getLineNumber() + " --- " + ((ObjectDefault)((List)objetoArray).get(position)) + " --- " + ((List<Object>)valor).get(0));
+                            if(valor instanceof ObjectDefault){ // (content, tipo)
+                                Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(valor);    // Passa um objeto do array e verifica
+                                if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
+                                    
+                                    // Atribui o valor na posicao da matriz na variavel
+                                    // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
+                                    ((List)objetoArray).set(position, valor);
+                                }
+                                else{
+                                    // Lançar excessão de tipo diferente
+                                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
+                                }
                             }
                             else{
-                                // Lançar excessão de tipo diferente
-                                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
+                                Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(valor);    
+                                if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
+                                    
+                                    // Atribui o valor na posicao da matriz na variavel
+                                    // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
+                                    // ((List)objetoArray).set(position, valor);
+                                    ((ObjectDefault)((List)objetoArray).get(position)).setContent(valor);
+                                }
+                                else{
+                                    // Lançar excessão de tipo diferente
+                                    throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
+                                }
                             }
+                            
                         }else{
                             // Pega o elemento do topo de operands e adiciona na posição do vetor
                             // ((List)objetoArray).set(position, operands.pop());  

@@ -66,18 +66,18 @@ public class ObjectDefault extends LValue{
         if((exp.getClass() == Boolean.class) && (tipo instanceof TypeBool)){
             return true;
         }
-        if(exp instanceof ObjectDefault){           // Checa os objetos do tipo data 
-            System.out.println("TESTE " + tipo + " --- " + ((TypeArray)tipo).getType() + " --- " + ((ObjectDefault)exp).getType());
+        if(exp instanceof ObjectDefault){           // Checa os objetos do tipo data e tipo array
+            // Compara o tipo do array com o tipo do objeto
             if(tipo instanceof TypeArray && ((TypeArray)tipo).getType().getClass() == ((ObjectDefault)exp).getType().getClass()){
-                System.out.println("TESTE");
                 return true;
     
             }
-            if(((ObjectDefault) exp).getType() == tipo){    // Ex: Ponto igual a Ponto
+            // Trata o tipo data
+            // Ex: Ponto igual a Ponto
+            if(((ObjectDefault) exp).getType().getClass() == tipo.getClass()){    
                 return true;
             }
         }
-        
         if((exp.getClass() == Character.class) && (tipo instanceof TypeChar)){
             return true;
         }

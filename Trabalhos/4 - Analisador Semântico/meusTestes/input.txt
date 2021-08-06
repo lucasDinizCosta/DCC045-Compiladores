@@ -8,10 +8,18 @@
 
 main(){
     k = 5;
-    x = new Int[][k];
+    x = new Float[k];--x = new Float[][k];
     i = 0;
-    iterate(k){
-       x[i] = new Int[k];
+	iterate(k){
+		aux = new Float;
+		aux = i + 2 * i * .6255;
+		print aux; print '\n';
+       x[i] = aux;
+       i = i + 1;
+    }
+    {-
+	iterate(k){
+       x[i] = new Float[k];
        i = i + 1;
     }
     i = 0;
@@ -24,8 +32,8 @@ main(){
     }
     
     z = x[3][3];
-	print x; print '\n';
 	print z; print '\n';
-    
+	-}
+    print x; print '\n';
 }
 
