@@ -1394,38 +1394,44 @@ public class InterpretVisitor extends Visitor {
 
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
-                IntegerNumber valueReturnedPos = (IntegerNumber) f.getExpIndex();
+                Object valueObj = f.getExpIndex();
+                // IntegerNumber valueReturnedPos = (IntegerNumber) f.getExpIndex();
 
-                // Desempilha e pega somente a posicao da variavel identificada pelo usuario
-                // Verifica se a função tem dois retornos
-                if(function.getReturnTypes().size() == 2){
-                    if ((Integer) valueReturnedPos.getValue() == 0 ||
-                        (Integer) valueReturnedPos.getValue() == 1
-                    ) {
-                        // Remove os retorno[1] caso o valor informado for [0]
-                        if ((Integer) valueReturnedPos.getValue() == 0) {
-                            operands.pop();
+                if(valueObj instanceof IntegerNumber){  // A posicao retornada é um numero inteiro
+                    IntegerNumber valueReturnedPos = (IntegerNumber) valueObj;
+
+                    // Desempilha e pega somente a posicao da variavel identificada pelo usuario
+                    // Verifica se a função tem dois retornos
+                    if(function.getReturnTypes().size() == 2){
+                        if ((Integer) valueReturnedPos.getValue() == 0 ||
+                            (Integer) valueReturnedPos.getValue() == 1
+                        ) {
+                            // Remove os retorno[1] caso o valor informado for [0]
+                            if ((Integer) valueReturnedPos.getValue() == 0) {
+                                operands.pop();
+                            }
+
+                        } else {
+                            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                    + ") Acesso a posicao invalida de elemento no retorno da funcao");
                         }
-
-                    } else {
-                        throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
-                                + ") Acesso a posicao invalida de elemento no retorno da funcao");
                     }
-                }
-                else if(function.getReturnTypes().size() == 1){ // Quando tiver somente 1 retorno
-                    if ((Integer) valueReturnedPos.getValue() == 0) {
-                        
-                        // Não faz nada pois o valor de retorno já está no operands
-
-                    } else {
-                        throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
-                                + ") Acesso a posicao invalida de elemento no retorno da funcao");
+                    else if(function.getReturnTypes().size() == 1){ // Quando tiver somente 1 retorno
+                        // Qualquer elemento diferente da posicao zero é um erro
+                        if ((Integer) valueReturnedPos.getValue() != 0) {
+                            throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                    + ") Acesso a posicao invalida de elemento no retorno da funcao");
+                        } 
                     }
+                    else{
+                        throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
+                                    + ") A funcao nao apresenta tipos de retorno");
+                    } 
                 }
                 else{
                     throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
-                                + ") A funcao nao apresenta tipos de retorno");
-                }   
+                    + ") Acesso a posicao invalida de elemento no retorno da funcao pois o parametro nao eh um valor Inteiro");
+                }  
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn() + ") " + x.getMessage());
@@ -1458,8 +1464,7 @@ public class InterpretVisitor extends Visitor {
             if (r != null || (r == null && env.peek().containsKey(i.getId()))) {
                 operands.push(r);
             } else {
-                // throw new RuntimeException("Erro!");
-                throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Erro no Identifier !!");
+                throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + ": Variavel \'" + i.getId() + "\' nao existe !!");
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
