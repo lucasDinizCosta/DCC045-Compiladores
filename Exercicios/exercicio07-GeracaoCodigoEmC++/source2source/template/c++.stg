@@ -20,7 +20,7 @@ func(type, name, params, decl, stmt) ::= <<
 
 param(type, name) ::= "<type> <name>"
 
-array_type(type) ::= "<type>[]"
+array_type(type) ::= "<type>*"
 int_type() ::= "int"
 float_type() ::= "float"
 boolean_type() ::= "bool"
@@ -56,7 +56,7 @@ boolean_expr(value) ::= "<value>"
 float_expr(value) ::= "<value>"
 int_expr(value) ::= "<value>"
 
-new_array(var, type, expr) ::= "<var> = new <type>[<expr>];"
+new_array(var, type, expr) ::= "<type> <var>[<expr>];"
 
 call(name, args) ::= <<<name>(<args; separator=", ">)>>
 

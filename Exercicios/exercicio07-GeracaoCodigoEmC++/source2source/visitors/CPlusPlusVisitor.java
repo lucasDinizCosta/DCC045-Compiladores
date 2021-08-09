@@ -142,9 +142,12 @@ public class CPlusPlusVisitor extends Visitor {
 
     public void visit(Var e) {
         ST lvalue = groupTemplate.getInstanceOf("lvalue");
+        ST arrayAccess = groupTemplate.getInstanceOf("array_access");
         lvalue.add("name", e.getName());
         for (Expr exp : e.getIdx()) {
-            exp.accept(this);
+            exp.accept(this);               // Empilha o indice de posicao do array
+            arrayAccess.add("expr", expr);  // Adiciona o indice em um arrayaccess: [<expr>]
+            expr = arrayAccess;             // Atualiza que a posição do array vira a expressão
             lvalue.add("array", expr);
         }
         expr = lvalue;
@@ -228,12 +231,14 @@ public class CPlusPlusVisitor extends Visitor {
         fun.add("params", params);
 
         for (String key : keys) {
-            ST decl = groupTemplate.getInstanceOf("param");
-            decl.add("name", key);
             SType t = local.get(key);
-            processSType(t);
-            decl.add("type", type);
-            fun.add("decl", decl);
+            if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
+                ST decl = groupTemplate.getInstanceOf("param");
+                decl.add("name", key);
+                processSType(t);       
+                decl.add("type", type);
+                fun.add("decl", decl);
+            }
         }
 
         f.getBody().accept(this);
@@ -293,12 +298,6 @@ public class CPlusPlusVisitor extends Visitor {
             type = groupTemplate.getInstanceOf("boolean_type");
         else if (t instanceof STyFloat)
             type = groupTemplate.getInstanceOf("float_type");
-        else if (t instanceof STyArr) {
-            ST aux = groupTemplate.getInstanceOf("array_type");
-            processSType(((STyArr) t).getArg());
-            aux.add("type", type);
-            type = aux;
-        }
     }
 
 }
