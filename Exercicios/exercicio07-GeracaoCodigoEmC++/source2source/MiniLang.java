@@ -55,7 +55,7 @@ public class MiniLang{
                 }
                 if (args[1].equals("-Python")) {
                     System.out.println("Executando a geracao de codigo da minilang para Python:\n");
-                    result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
+                    result.accept(new PythonVisitor(args[0].substring(0, args[0].length()-4), env));
                     return;
                 }
             }else{

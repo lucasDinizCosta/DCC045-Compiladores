@@ -1,0 +1,58 @@
+group python;
+
+program(name, funcs) ::= <<
+<funcs; separator="\n\n">
+
+inicio()
+>>
+
+func(name, params, stmt) ::= <<
+def <name> (<params; separator=", ">):
+    <stmt>
+>>
+
+param(name) ::= "<name>"
+
+print(expr) ::= "print( <expr> )"
+return(expr) ::= "return (<expr>)"
+
+while(expr, stmt) ::= <<
+while(<expr>):
+    <stmt>
+>>
+
+if(expr, thn, els) ::= <<
+if(<expr>):
+    <thn>
+<if(els)>else:
+    <els>
+<endif>
+>>
+
+stmt_list(stmt1, stmt2) ::= <<
+<stmt1>
+<stmt2>
+>>
+
+attr(var, expr) ::= "<var> = <expr>"
+lvalue(name, array) ::= "<name><array>"
+array_access(expr) ::= "[<expr>]"
+
+boolean_expr(value) ::= "<value>"
+float_expr(value) ::= "<value>"
+int_expr(value) ::= "<value>"
+
+new_array(var, expr) ::= "<var> = [None] * <expr>"
+
+call(name, args) ::= <<<name>(<args; separator=", ">)>>
+
+mul_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
+div_expr(left_expr, right_expr) ::= "(<left_expr> / <right_expr>)"
+mod_expr(left_expr, right_expr) ::= "(<left_expr> % <right_expr>)"
+add_expr(left_expr, right_expr) ::= "(<left_expr> + <right_expr>)"
+sub_expr(left_expr, right_expr) ::= "(<left_expr> - <right_expr>)"
+
+lt_expr(left_expr, right_expr) ::= "(<left_expr> \< <right_expr>)"
+equals_expr(left_expr, right_expr) ::= "(<left_expr> == <right_expr>)"
+and_expr(left_expr, right_expr) ::= "(<left_expr> && <right_expr>)"
+not_expr(expr) ::= "!<expr>"
