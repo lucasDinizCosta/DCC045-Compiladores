@@ -1,0 +1,34 @@
+
+fat(Int : n) : Int{
+    ?(0 < n){
+       @ n * fat(n-1);
+    }:{
+      @1;
+    }
+} 
+
+gcd(Int: m, Int :n) : Int{
+   ?[0 < n]{
+     q <- n;
+     n <- m % n;
+     m <- q;
+   }
+   @ m;
+}
+
+f() : Int{
+   @ 1;
+   @ 2;
+   @ 3;
+}
+
+dumy(Int: x, Int : y) : Int{
+   
+   w <- 10;
+}
+
+inicio(): Int{
+  x <- 1 + 2 * f(10) ;  
+  # x ;
+}
+ 

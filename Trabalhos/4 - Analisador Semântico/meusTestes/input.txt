@@ -5,16 +5,26 @@
 --z  :  7
 --k  :  5
 
+data Ponto{
+	x :: Int;
+	y :: Int;
+}
+
 
 main(){
     k = 5;
-    x = new Float[k];--x = new Float[][k];
+	pontos = new Ponto[k];
+    x = new Float[k]; -- x = new Float[][k];
     i = 0;
 	iterate(k){
-		aux = new Float;
-		aux = i + 2 * i * .6255;
-		print aux; print '\n';
-       x[i] = aux;
+		--aux = new Float;
+		--aux = i + 2 * i * .6255;
+		--print aux; print '\n';
+		pontoAux = new Ponto;
+		pontoAux.x = i;
+		pontoAux.y = i + 2 * i;
+		pontos[i] = pontoAux;
+       --x[i] = aux;
        i = i + 1;
     }
     {-
@@ -31,9 +41,10 @@ main(){
        i = i + 1;
     }
     
-    z = x[3][3];
+    z = pontos[3];
 	print z; print '\n';
 	-}
+	print pontos; print '\n';
     print x; print '\n';
 }
 

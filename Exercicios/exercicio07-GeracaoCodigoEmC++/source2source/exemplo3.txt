@@ -1,0 +1,14 @@
+f() : Int{
+   @ 1;
+   @ 2;
+}
+
+dumy(Int: x, Int : y) : Int{
+   w <- 10;
+}
+
+inicio(): Int{
+  x <- 1 + 2 * f(10) ;  
+  # x ;
+}
+ 

@@ -1,0 +1,29 @@
+digraph G {
+node0 [ label ="Program"] ;
+node1 [ label ="Func inicio"] ;
+node2 [ label ="Int"] ;
+node1 -> node2;
+node3 [ label ="Params"] ;
+node1 -> node3;
+node4 [ label ="StmtList"] ;
+node5 [ label ="x"] ;
+node6 [ label ="2"] ;
+node7 [ label ="3"] ;
+node8 [ label ="*"] ;
+node8 -> node6;
+node8 -> node7;
+node9 [ label ="4"] ;
+node10 [ label ="+"] ;
+node10 -> node8;
+node10 -> node9;
+node11 [ label ="<-"] ;
+node11 -> node10;
+node11 -> node5;
+node4 -> node11;
+node12 [ label ="#"] ;
+node13 [ label ="x"] ;
+node12 -> node13;
+node4 -> node12;
+node1 -> node4;
+node0 -> node1;
+}

@@ -1395,7 +1395,6 @@ public class InterpretVisitor extends Visitor {
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
                 Object valueObj = f.getExpIndex();
-                // IntegerNumber valueReturnedPos = (IntegerNumber) f.getExpIndex();
 
                 if(valueObj instanceof IntegerNumber){  // A posicao retornada é um numero inteiro
                     IntegerNumber valueReturnedPos = (IntegerNumber) valueObj;
@@ -1430,7 +1429,7 @@ public class InterpretVisitor extends Visitor {
                 }
                 else{
                     throw new RuntimeException(" (" + f.getLine() + ", " + f.getColumn()
-                    + ") Acesso a posicao invalida de elemento no retorno da funcao pois o parametro nao eh um valor Inteiro");
+                    + ") Acesso a posicao invalida de elemento no retorno da funcao pois o parametro nao eh um valor Inteiro !!!");
                 }  
             }
         } catch (Exception x) {

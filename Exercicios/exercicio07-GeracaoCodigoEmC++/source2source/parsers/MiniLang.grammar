@@ -1,0 +1,121 @@
+%package "parsers";
+%import "ast.*";
+%import "java.io.IOException";
+
+%class "MiniLangParser";
+
+%terminals INT, FLOAT, ID, TRUE, FALSE,  
+           MULT, PLUS, MINUS, DIV, LT, AND, MOD, EQ, NOT,
+           ATTR, IF, PRINT, WHILE, INST, RET,
+           TYINT, TYFLOAT, TYBOOL,TYARR,
+           RB, LB, AP, FP, LBRACE, RBRACE, COLON, SEMI, COMMA;
+
+%left FP;
+%right NOT;
+%left MULT, DIV, MOD;
+%left PLUS, MINUS;
+%left AND;
+%nonassoc EQ;
+%nonassoc LT;
+
+
+
+%embed {: private boolean good;
+          
+          public boolean isGood(){ return good;}
+          
+          protected void recoverFromError(Symbol token, TokenStream in) throws IOException, Parser.Exception{
+              super.recoverFromError(token, in);
+              good = false;
+          }
+:} ;
+
+%init {: good = true; :} ;
+
+%typeof INT      = "Integer";
+%typeof FLOAT    = "Float";
+%typeof Expr     = "Expr";
+%typeof CExpr    = "Expr";
+%typeof Var      = "Var";
+%typeof ID       = "String";
+%typeof Stmt     = "Node";
+%typeof StmtList = "Node";
+%typeof Els      = "Node";
+%typeof Block    = "Node";
+%typeof Prog     = "Node";
+%typeof index    = "Expr";
+%typeof func     = "Func";
+%typeof Type     = "Tipo";
+%typeof param    = "Param";
+
+%goal Prog;
+
+Prog = func.s+                      {:  return new Program(s);     :}  
+     ;     
+
+func = ID.fn AP PList.p? FP COLON Type.t Block.b {: return new Func(fn,p,t,b); :} 
+        ;
+
+PList = param
+      | PList COMMA param
+      ;
+
+param = Type.t COLON ID.v              {: return new Param(v,t); :}            
+      ;
+
+Type = TYINT                  {: return new TyInt();    :}   
+     | TYFLOAT                {: return new TyFloat();  :}    
+     | TYBOOL                 {: return new TyBool();   :}   
+     | Type.t  TYARR           {: return new TyArr(t);   :}   
+     ;
+
+StmtList = Stmt.s StmtList.l           {: return new StmtList(s,l); :}
+         | Stmt.s                      {: return s; :}  
+         ;
+
+Block =  LBRACE StmtList.s RBRACE      {: return s; :}
+      ;
+         
+Stmt = Var.v ATTR CExpr.e SEMI         {: return new Attr(v, e); :}
+     | IF AP CExpr.e FP Block.s Els.a? {: return new If(e,s,a);          :}
+     | WHILE CExpr.e RB Block.s        {: return new While(e,s);         :}
+     | PRINT Expr.e SEMI               {: return new Print(e);           :}
+     | INST Var.v Expr.e SEMI          {: return new Inst(v,null,e);     :}
+     | RET Expr.e SEMI                 {: return new Return(e);          :}
+     ;
+     
+Els = COLON Block.a                    {: return a; :}
+    ;
+
+CExpr = Expr.a EQ Expr.b               {: return new Eq(a,b);   :}
+      | CExpr.a AND CExpr.b            {: return new And(a,b);  :}
+      | Expr.a LT Expr.b               {: return new Lt(a,b);   :}
+      | Expr.e                         {: return e;             :}
+      ;
+      
+Expr = Expr.a MULT  Expr.b             {: return new Mul(a,b);  :}
+     | Expr.a PLUS  Expr.b             {: return new Add(a, b); :}
+     | Expr.a MINUS  Expr.b            {: return new Sub(a, b); :}
+     | Expr.a DIV  Expr.b              {: return new Div(a, b); :}
+     | Expr.a MOD  Expr.b              {: return new Mod(a, b); :}
+     | NOT CExpr.e                     {: return new Not(e);    :}
+     | Var.v                           {: return v;             :}
+     | ID.v AP argList.e? FP            {: return new Call(v,e); :}
+     | INT.n                           {: return new NInt(n);   :}
+     | FLOAT.f                         {: return new NFloat(f); :}
+     | TRUE                            {: return new True();    :}
+     | FALSE                           {: return new False();   :}
+     | AP CExpr.e FP                   {: return e;             :}
+     ;
+
+ 
+
+argList = CExpr
+        | argList COMMA CExpr
+        ;
+
+Var = ID.v index.i*                    {: return new Var(v,i);  :}
+    ;
+    
+index = LB Expr.e RB                   {: return e; :}
+    ;
