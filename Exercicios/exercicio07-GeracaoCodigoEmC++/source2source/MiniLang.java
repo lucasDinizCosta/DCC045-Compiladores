@@ -12,7 +12,15 @@ import langUtil.*;
 
 public class MiniLang{
       public static void main(String[] args){
-        HashMap<String,Integer> h = new HashMap<String,Integer>();
+        if (args.length < 2) {
+            System.out.println("------ Geracao de codigo para linguagem de alto nivel em um compilador -----");
+            System.out.println("Use java -cp . Lang ação <Caminho para código Fonte> ");
+            System.out.println("Ação (uma das seguintes possibilidades): ");
+            System.out.println(" -C++ : Executa a geraçao de codigo da minilang para C++");
+            System.out.println(" -Java : Executa a geraçao de codigo da minilang para Java");
+            System.out.println(" -Python : Executa a geraçao de codigo da minilang para Python");
+            System.out.println("-------------------------------------------------------------------");
+        }
         try{
             MiniLangLex input = new MiniLangLex(new FileReader(args[0]));
             MiniLangParser p = new MiniLangParser();
@@ -30,14 +38,26 @@ public class MiniLang{
                 result.accept(v);
 
                 if(v.getNumErrors() != 0) {
-                    System.out.println( " Erros ocorreram durante a análise semântica.\nAbortando");
+                    System.out.println(" Erros ocorreram durante a análise semântica.\nAbortando");
                     v.printErrors();
                     System.exit(1);
                 }
                 TyEnv<LocalEnv<SType>> env = v.getEnv();
-
-                result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
-                
+                if (args[1].equals("-Java")) {
+                    System.out.println("Executando a geracao de codigo da minilang para Java:\n");
+                    result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
+                    return;
+                }
+                if (args[1].equals("-C++")) {
+                    System.out.println("Executando a geracao de codigo da minilang para C++:\n");
+                    result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
+                    return;
+                }
+                if (args[1].equals("-Python")) {
+                    System.out.println("Executando a geracao de codigo da minilang para Python:\n");
+                    result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
+                    return;
+                }
             }else{
                 System.out.println( " Erros ocorreram durante o parser.\nAbortando");
             }
