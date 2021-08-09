@@ -13,24 +13,24 @@ import java.util.ArrayList;
 public class MiniLangParser extends Parser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pTbCbpL5KKnh$R7PAGXaxI8GF691X3qeaa6aDm0aLmn15nm5bPk7FdpYhBSkVEXLMwSbX" +
-		"OfUL6YoqR5rfbeH1HSK9H7554H0HKzFXxzvsGcwRv1tXLtnc$Tz#vvvrxfR1E8xfGGvhG#R" +
-		"f0azga1ZjXNzH4xz9ctQspj4o3zhlELh$zgmPTeUjKr8swHRVNvVTeJKtypFCsvLtHegmhU" +
-		"jYz1T6hgg2RrQJBLBBjMXdxrUdzodcNH5wpsdMRHnR6IAiMwqwFjCJ8iBerxP7xO#GXrchN" +
-		"4bNKgBBEqpqQvRssoEo8iilvkSmYoxKwwd6DwIAjYlPKb5T6UJtv#E$iSyyl1RsW3mo0Sy2" +
-		"vu5A#lW9zkTRfAlj7dNPOLnFRGEmci17SGQKF4BkFVLwiUxMMBgq7r#XQP4atqBrRoJseGA" +
-		"UAJDG2zjA45yYMQg9BMAcBNYsa8nNUNop1w6RAgkombvxKuo#ZujhLppmlxqfhx4hLlKBq2" +
-		"anf6xrSoiHCexD#bRrVEQyZyjgPa3QF3CV863Cr6raU8uFy#Q5vd57MojuRu3nKE1UJJ7ds" +
-		"NivC#RdC8oEkIqpG#3pkR3x$TtFvqw7CN6Qwn6aiuLMOvZ9xJJd3xArCfHsisqS$MjbDAx5" +
-		"CzYC3h0wajEL9nQS9zBhzgfdzXtu5l06wmBDPplClW1ct6nd82lejq09sUdpGTJQn4#1jCE" +
-		"snrU07i1xi1niylj7rvkHRhrEBeG$bVbOoPqUXPvQJS1y1hpdFlny6FFSeU3xXFWPsa9z2F" +
-		"uxk12EWEiS9eyvz2hiCLhZ$D7ZHEMiGpu2jxeyZdWFRJgqlT2EEkDqFrjRPmnDizrZYRqti" +
-		"bxD#9FvBYRqjiTz9x7SJ#u3hWwwzfphisclJKTUxadTdm9irjUwkhT$ZUqwDXKMUErx3FP7" +
-		"OUvrRcQt9$KxFxtE$ntLZmka3pSbQN#EtrAlF#SsdpsbBhk8PEFdOt$P7r8UIs6$WU$iMoJ" +
-		"pRFl0DuDks5tm5lhGzjZDoFujobtrgdzXk#pXw7zc7zhxji9delMSV8ByxkVf1Es2$edzq$" +
-		"vSeVtPllw$xansrF#r8j8z7USp#YcTc9VTW00LkmH1FuGIwobcVH4zocuw2OUmv5BZ9CWHk" +
-		"YIBtMWEtZ430Rep#cCSpFGLt23s7mErJh8C225IKLPLn6g8$7qLkqm2At84159ITfl5uMnM" +
-		"uoOfQzJzns2L6");
+		"U9pDbabm55KOn$zlUf8GXamc92On99Xbif85Of15GKL1H5nmZIikb3TlthnOUkBcpVAY9wt" +
+		"ouD6BPLaUF8aODMx8veRYYX4HHSpprw#$IPfEp9cf#dtR#$VhVgzVVpMIswa1NQvUZMcjrc" +
+		"bSa$vVvVtXJFKktQrxj4fTwb517RfC$MhpCxf6D#fctQPxC$eBi$LsPNEuSYbblrhLf4krT" +
+		"KdLnPjDsagZiDAzbZqQikjqbQfrAxlmG5XdIsht4bq#w9BuJjlbLbsX#wrM5MerAlZpgjDZ" +
+		"MgbX6BAtarD9HMZm1qoVs7YEFcq9VbIrsgWD8Pu8TbkmksoEBOdtNmHLimPr2UFji1eweHl" +
+		"Askp$qGZHbN2rjgFirotQWRs3LT#4lqyFwK7EoZ8jrmergjx$heUr1cMpDccphjNrhA5EDs" +
+		"WdTZSxjqUtKtz4ZfL4x4KLkrL39YXagYkPiOcvQvczoFnrhBIR7MtbxBInxlO5iwIpWbrP7" +
+		"wvSIXdFsiEUTowfkfYpPANzOQLbomP2Lk1DZAY1NLXhwvpVlKJdWYw96#PskOSugULidYAK" +
+		"k4SNtq0NtqFoTiOuFKE12TCdDfcZptoPCp5iSTecS$IPBmHLFNTi2EDPYg4hLR9HbB4V3xR" +
+		"CEcC$WAB8UUubNyrPQI4keApdBaLcxcKDfJ1U0iSrPUhn#TltjCBl7LXcyJHCmK6EPrjIqe" +
+		"5apAqopSl4xHPN4tT04t4tp5fzqFmGR80ws6grNV0rx84JC6drlUOVZxtTSuNdXrzZOyHwW" +
+		"doWefdNwadei#li$cxOnfw2brBQP#1TnZVXzyEhn2CmbBhtg6cV8sw4TPO$3w#OPXjc1fR3" +
+		"6mkVoMt4l0XlMrx2dB6u4tOiiexNuTbKlZyLytvS8QD$CnM$bOfxK$4BbPZjF6UrK#Pdp9y" +
+		"sRy#di#QdKlDmBlHQvlxJsJLO$T32cckqiVCPxMmgFcBQbiepMLuvVySjxp2VIsbwe0kg$k" +
+		"UPlcIiDlDC#SMqfj#NE3#hrC#VWzCX#YrLFGKd$3VOxu0Jxhy2xkYFmp4uwe$ugQ0z5En7$" +
+		"dF$cV$KVnAoZ$sqF#ZVzn#4x3t$8VRRkTb$zJ$xN$3VM$vJi3$EZV$W$$Hd$1ys$ybW$mhs" +
+		"hFyx$eReLsDyzsFqX0ayfnqS$Qs6JkaWefT4T0UN8k8Bpe6ZTqHqlJnTIE28gqC#6EfLmO#" +
+		"ZZVybpEFe2j4YvC3HKmMn9X$o2udekmuYkgI37BrI4FUm7Dqjqlh$01cS91m=");
  private boolean good;
           
           public boolean isGood(){ return good;}
@@ -113,7 +113,7 @@ public class MiniLangParser extends Parser {
 					 return new TyBool();
 				}
 			},
-			new Action() {	// [12] Type = Type.t TYARR
+			new Action() {	// [12] Type = Type.t LB RB
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_t = _symbols[offset + 1];
 					final Tipo t = (Tipo) _symbol_t.value;
@@ -181,13 +181,15 @@ public class MiniLangParser extends Parser {
 					 return new Print(e);
 				}
 			},
-			new Action() {	// [22] Stmt = INST Var.v Expr.e SEMI
+			new Action() {	// [22] Stmt = INST Var.v Type.t Expr.e SEMI
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_v = _symbols[offset + 2];
 					final Var v = (Var) _symbol_v.value;
-					final Symbol _symbol_e = _symbols[offset + 3];
+					final Symbol _symbol_t = _symbols[offset + 3];
+					final Tipo t = (Tipo) _symbol_t.value;
+					final Symbol _symbol_e = _symbols[offset + 4];
 					final Expr e = (Expr) _symbol_e.value;
-					 return new Inst(v,null,e);
+					 return new Inst(v,t,e);
 				}
 			},
 			new Action() {	// [23] Stmt = RET Expr.e SEMI

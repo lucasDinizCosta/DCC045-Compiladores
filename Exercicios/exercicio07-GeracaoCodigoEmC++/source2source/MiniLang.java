@@ -50,7 +50,7 @@ public class MiniLang{
                 }
                 if (args[1].equals("-C++")) {
                     System.out.println("Executando a geracao de codigo da minilang para C++:\n");
-                    result.accept(new JavaVisitor(args[0].substring(0, args[0].length()-4), env));
+                    result.accept(new CPlusPlusVisitor(args[0].substring(0, args[0].length()-4), env));
                     return;
                 }
                 if (args[1].equals("-Python")) {

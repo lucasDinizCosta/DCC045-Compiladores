@@ -7,7 +7,7 @@
 %terminals INT, FLOAT, ID, TRUE, FALSE,  
            MULT, PLUS, MINUS, DIV, LT, AND, MOD, EQ, NOT,
            ATTR, IF, PRINT, WHILE, INST, RET,
-           TYINT, TYFLOAT, TYBOOL,TYARR,
+           TYINT, TYFLOAT, TYBOOL,
            RB, LB, AP, FP, LBRACE, RBRACE, COLON, SEMI, COMMA;
 
 %left FP;
@@ -66,7 +66,7 @@ param = Type.t COLON ID.v              {: return new Param(v,t); :}
 Type = TYINT                  {: return new TyInt();    :}   
      | TYFLOAT                {: return new TyFloat();  :}    
      | TYBOOL                 {: return new TyBool();   :}   
-     | Type.t  TYARR           {: return new TyArr(t);   :}   
+     | Type.t  LB RB          {: return new TyArr(t);   :}   
      ;
 
 StmtList = Stmt.s StmtList.l           {: return new StmtList(s,l); :}
@@ -76,11 +76,11 @@ StmtList = Stmt.s StmtList.l           {: return new StmtList(s,l); :}
 Block =  LBRACE StmtList.s RBRACE      {: return s; :}
       ;
          
-Stmt = Var.v ATTR CExpr.e SEMI         {: return new Attr(v, e); :}
+Stmt = Var.v ATTR CExpr.e SEMI         {: return new Attr(v, e);         :}
      | IF AP CExpr.e FP Block.s Els.a? {: return new If(e,s,a);          :}
      | WHILE CExpr.e RB Block.s        {: return new While(e,s);         :}
      | PRINT Expr.e SEMI               {: return new Print(e);           :}
-     | INST Var.v Expr.e SEMI          {: return new Inst(v,null,e);     :}
+     | INST Var.v Type.t Expr.e SEMI   {: return new Inst(v,t,e);     :}
      | RET Expr.e SEMI                 {: return new Return(e);          :}
      ;
      
