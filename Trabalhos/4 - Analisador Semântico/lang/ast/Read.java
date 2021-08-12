@@ -18,7 +18,7 @@ public class Read extends Command {
      * cmd: READ lvalue SEMI  # Read
     */
     
-    private LValue lvalue;
+    private LValue lvalue;      // Variavel que vai armazenar o valor
 
     public Read (int line, int column, LValue lvalue){
         super(line, column);

@@ -503,7 +503,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Return r) {
         if (debug) {
-            System.out.println("\n --- RETUNR -- ");
+            System.out.println("\n --- RETURN -- ");
             System.out.println(r.toString());
             System.out.println("\n");
         }

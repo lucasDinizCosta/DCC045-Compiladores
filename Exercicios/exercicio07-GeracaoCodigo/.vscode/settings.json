@@ -7,6 +7,7 @@
     ],
     "java.project.sourcePaths": [
         "Exercicios/exercicio05-ANTLR-Teste-01-simples",
-        "Exercicios/exercicio06-ANTLR-Teste-02-Mais-Complexo"
+        "Exercicios/exercicio06-ANTLR-Teste-02-Mais-Complexo",
+        "."
     ],
 }

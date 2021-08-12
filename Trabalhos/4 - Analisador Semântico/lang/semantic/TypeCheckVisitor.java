@@ -1,6 +1,8 @@
 package lang.semantic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 import lang.interpreter.Visitor;
@@ -13,14 +15,15 @@ public class TypeCheckVisitor extends Visitor {
     private STyCharacter tyChar = STyCharacter.newSTyCharacter();
     private STyBool tyBool = STyBool.newSTyBool();
     private STyNull tyNull = STyNull.newSTyNull();
-    private STyErr tyerr = STyErr.newSTyErr();
+    private STyErr tyErr = STyErr.newSTyErr();
 
     // Armazena as mensagens de erro
     private ArrayList<String> logError;
 
+    // Armazena o ambiente das funções
     private TyEnv<LocalAmbiente<SType>> env;
 
-    //
+    // Ambiente temporario da função para executar os comandos
     private LocalAmbiente<SType> temp;
 
     // Pilha de tipos da linguagem lang
@@ -29,6 +32,9 @@ public class TypeCheckVisitor extends Visitor {
     // Retorno de função => Se o retorno for acionado não deve ser feito os outros
     // comandos da função
     private boolean retChk;
+
+    // armazena os dados do tipo data
+    private HashMap<String, DataAttributes> datas; // (Nome do tipo, Atributos e seus tipos)
 
     public TypeCheckVisitor() {
         stk = new Stack<SType>();
@@ -50,213 +56,781 @@ public class TypeCheckVisitor extends Visitor {
     }
 
     // Partem do prog
-    public void visit(Program p){
+    @Override
+    public void visit(Program p) {
 
+        // Aceita os tipos data para fazer a verificação de tipo
+        for (Data d : p.getDatas()) {
+            d.accept(this);
+        }
+
+        // Checa as funções
+        for (Function f : p.getFunctions()) {
+            f.accept(this);
+        }
     }
 
     // Partem do data
-    public void visit(Data d){
+    @Override
+    public void visit(Data d) {
+        if (datas.get(d.getId()) != null) { // Tentativa de adicionar dois datas com mesmo nome
+            logError.add(d.getLine() + ", " + d.getColumn() + ": O tipo data \'" + d.getId() + "\' ja existe.");
+            stk.push(tyErr);
+        } else {
+            ArrayList<String> variaveis = new ArrayList<String>();
+            ArrayList<SType> tipos = new ArrayList<SType>();
+            for (Declaration declaration : d.getDeclarations()) {
 
+                // verificando campos com mesmo nome
+                for (int i = 0; i < variaveis.size(); i++) {
+                    if (variaveis.get(i).equals(declaration.getId())) {
+                        logError.add(d.getLine() + ", " + d.getColumn() + ": O campo \'" + declaration.getId()
+                                + "\' do tipo de data \'" + d.getId() + "\' ja foi definido.");
+                        stk.push(tyErr);
+                    }
+                }
+                variaveis.add(declaration.getId());
+                declaration.getType().accept(this); // Coloca o tipo na pilha
+                SType tipoVariavel = stk.pop();
+                tipos.add(tipoVariavel);
+
+            }
+
+            // Adiciona o tipo data no hashmap
+            datas.put((String) d.getId(), new DataAttributes(d.getId(), variaveis, tipos));
+        }
     }
 
     // Partem do decl
-    public void visit(Declaration d){
-
+    @Override
+    public void visit(Declaration d) {
+        // Nao faz nada, é tratado em outra funcao
     }
 
     // Partem do func
-    public void visit(Function f){
+    @Override
+    public void visit(Function f) {
+        retChk = false;
+        temp = env.get(f.getId()); // Pega o ambiente da função
+        if (f.getParameters() != null) {
+            Parameters params = f.getParameters();
 
+            // Adiciona as variaveis do parametro no escopo local
+            for (int i = 0; i < params.size(); i++) {
+                params.getSingleType(i).accept(this);
+                temp.set(params.getSingleId(i), stk.pop());
+            }
+        }
+
+        for (Command command : f.getCommands()) {
+            command.accept(this); // Executa os comandos que compoem o corpo da função
+            if (retChk) // Se encontrou um return, para de expandir outros comandos
+                break;
+        }
+
+        if (!retChk && f.getReturnTypes().size() > 0) {
+            logError.add(f.getLine() + ", " + f.getColumn() + ": Função " + f.getId() + " deve retornar algum valor.");
+        }
     }
 
     // Partem do params
-    public void visit(Parameters p){
-
+    @Override
+    public void visit(Parameters p) {
+        // Nao faz nada pois já foi tratado em outra funcao
     }
 
     // Partem do Type
-    public void visit(TypeArray t){
-
+    @Override
+    public void visit(TypeArray t) {
+        t.getType().accept(this); // Empilha o tipo do array
+        SType tipo = stk.pop();
+        STyArr array = new STyArr(tipo);
+        stk.push(array);
     }
 
     // Partem do btype
-    public void visit(TypeInt t){
-
+    @Override
+    public void visit(TypeInt t) {
+        stk.push(tyInt);
     }
 
-    public void visit(TypeChar t){
-
+    @Override
+    public void visit(TypeChar t) {
+        stk.push(tyChar);
     }
 
-    public void visit(TypeBool t){
-
+    @Override
+    public void visit(TypeBool t) {
+        stk.push(tyBool);
     }
 
-    public void visit(TypeFloat t){
-
+    @Override
+    public void visit(TypeFloat t) {
+        stk.push(tyFloat);
     }
 
-    public void visit(Type t){
-
+    @Override
+    public void visit(Type t) {
+        // Nao faz nada pois já foi tratado em outra funcao
     }
 
-    public void visit(NameType i){  // TypeData
-
+    @Override
+    public void visit(NameType i) { // TypeData
+        // Nao faz nada pois já foi tratado em outra funcao
     }
 
     // Partem do cmd
-    public void visit(Command c){
+    @Override
+    public void visit(Command c) {
+        c.accept(this); // Executa o comando
+    }
+
+    @Override
+    public void visit(CommandsList c) {
+        for (Command command : c.getCommands()) { // Executa os comandos
+            command.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(If i) {
+        i.getExp().accept(this); // Empilha a expressao de verificacao do If
+        SType expressao = stk.pop();
+        if (stk.pop().match(tyBool)) {
+            retChk = false; // a variavel de retorno de função é falsa até encontrar um commando return
+            i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
+        } else {
+            logError.add(i.getLine() + ", " + i.getColumn()
+                    + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+            stk.push(tyErr);
+        }
+    }
+
+    @Override
+    public void visit(IfElse i) {
+        boolean begin;
+        boolean end = true;// end = true;
+
+        i.getExp().accept(this); // Empilha a expressao de verificacao do If e Else
+        SType expressao = stk.pop();
+        if (expressao.match(tyBool)) {
+            retChk = false; // a variavel de retorno de função é falsa até encontrar um commando return
+            i.getCmd().accept(this); // Verifica o corpo do If
+            begin = retChk; // Pega o resultado do corpo do if em relação a comandos de return
+
+            if (i.getElseCmd() != null) {
+                retChk = false;
+                i.getElseCmd().accept(this); // Executa a verificação de tipos nos comandos do else
+                end = retChk; // Pega o resultado do corpo do else em relação a comandos de return
+            }
+            // Garante que os dois tenham retorno
+            retChk = begin && end;
+        } else {
+            logError.add(i.getLine() + ", " + i.getColumn()
+                    + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+            stk.push(tyErr);
+        }
+    }
+
+    @Override
+    public void visit(Iterate i) {
+        i.getExp().accept(this); // Empilha o valor lógico da expressão
+        SType expressao = stk.pop();
+        if (expressao.match(tyBool)) {
+            i.getCmd().accept(this);
+        } else if (expressao.match(tyInt)) {
+            i.getCmd().accept(this);
+        } else {
+            logError.add(i.getLine() + ", " + i.getColumn()
+                    + ": Expressão de teste do Iterate so aceita tipo Bool ou Int e nao \'" + expressao.toString()
+                    + "\' ");
+            stk.push(tyErr);
+        }
 
     }
 
-    public void visit(CommandsList c){
-    
-    }    
-
-    public void visit(If i){
-
-    }
-
-    public void visit(IfElse i){
-
-    }
-
-    public void visit(Iterate i){
+    @Override
+    public void visit(Read r) {
+        r.getLValue().accept(this);
+        /*
+         * if(){
+         * 
+         * } else{ logError.add(r.getLine() + ", " + r.getColumn() +
+         * ": O comando read so grava informacoes em variaveis do tipo Int, Float ou Char"
+         * ); stk.push(tyErr); }
+         */
 
     }
 
-    public void visit(Read r){
+    @Override
+    public void visit(Print i) {
+        i.getExpression().accept(this);
+        if (stk.size() != 0) { // Verifica se a pilha está vazia
+            stk.pop();
+        }
+    }
+
+    @Override
+    public void visit(Return r) {
+        /*
+         * for (Expression exp : r.getExps()) { // Processa a expressões de retorno da
+         * função exp.accept(this); // Aceita a expressão e empilha no operands }
+         */
+        if (temp.getFuncType() instanceof STyFun) {
+            SType[] tipos = ((STyFun) temp.getFuncType()).getTypes();
+            tipos[tipos.length - 1].match(stk.pop());
+        } else {
+            stk.pop().match(temp.getFuncType());
+        }
+        retChk = true;
 
     }
 
-    public void visit(Print i){
+    @Override
+    public void visit(Attribution a) {
+        // a = 2 + b + ponto.x + array[1];
 
+        // Variavel que vai ter os dados atribuidos nela
+        LValue lvalue = a.getLValue();
+
+        if (lvalue instanceof Identifier) {
+            // Empilha o tipo da expressao que sera atribuida
+            a.getExp().accept(this);
+            SType tipoExpressao = stk.pop();
+
+            if (tipoExpressao instanceof STyData) {
+                if ((temp.get(lvalue.getId()) == null)) { // Variavel de data nao existe
+                    String name = ((TypeInstanciate) a.getExp()).getDataName();
+                    STyData newData = new STyData(name);
+
+                    if (datas.get(name) == null) {
+                        logError.add("Erro em (" + a.getLine() + ", " + a.getColumn() + "). O tipo de dado heterogêneo "
+                                + name + " ainda não foi declarado.");
+                    }
+
+                    else {
+                        temp.set(lvalue.getId(), newData); // empilha a nova variavel de data
+                    }
+                } else {
+                    SType current = temp.get(lvalue.getId());
+                    // a.getExp().accept(this);
+
+                    SType tpilha = stk.pop();
+
+                    if (!tpilha.match(current)) {
+                        logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
+                            + "). Erro em atribuição de variável. Os tipos não casam: " + tpilha + " <-> "
+                            + "Data");
+                        stk.push(tyErr);
+                    }
+                }
+            } else { // Nao é tipo data
+                // ver a parte de indices - por enquanto so ve se n foi declarada ainda
+                // se a var n foi declarada, atribui o novo tipo pra ela
+                if ((temp.get(lvalue.getId()) == null)) {
+                    // a.getExp().accept(this);
+                    // SType st = stk.pop();
+                    temp.set(lvalue.getId(), tipoExpressao);
+                } else { // se ja foi declarada, verifica se o tipo casa com o tipo dela
+                    SType current = temp.get(lvalue.getId());
+                    // a.getExp().accept(this);
+
+                    // SType tpilha = stk.pop();
+                    SType tpilha = tipoExpressao;
+
+                    if (!tpilha.match(current)) {
+                        logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
+                                + "). Erro em atribuição de variável. Os tipos não casam: " + tpilha + " <-> "
+                                + current);
+                        stk.push(tyErr);
+                    }
+
+                }
+            }
+
+        } else if (lvalue instanceof ArrayAccess) {
+            // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
+            // dentro do ArrayAccess se casa
+
+            lvalue.accept(this);
+
+            // ver a parte de indices - por enquanto so ve se n foi declarada ainda
+            // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
+            if ((temp.get(lvalue.getId()) == null)) {
+
+                a.getExp().accept(this);
+
+                SType st = stk.pop();
+                STyArr arr = new STyArr(st);
+
+                // adiciona o array no contexto, com o tipo dado pela expressão
+                temp.set(lvalue.getId(), arr);
+            }
+
+            // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
+            else {
+
+                a.getExp().accept(this);
+
+                // se nao for variavel, confere o valor
+                if (!(a.getExp() instanceof Identifier)) {
+
+                    STyArr arr = (STyArr) temp.get(lvalue.getId());
+
+                    SType pilha = stk.pop();
+
+                    if (!pilha.match(arr.getArg())) {
+                        logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
+                                + "). Erro em atribuição de variável. Os tipos não casam: " + pilha + " <-> "
+                                + arr.getArg());
+                        stk.push(tyErr);
+                    }
+                }
+
+            }
+
+        } else if (lvalue instanceof DataAccess) {
+            // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
+            // dentro do dataAccess se casa
+            a.getExp().accept(this);
+
+            lvalue.accept(this);
+        }
     }
 
-    public void visit(Return r){
+    @Override
+    public void visit(FunctionCall f) {
+        // Trata chamadas de função do tipo: fat(10)<q>
+        /**
+         * ---- Regra cmd: ID OPEN_PARENT exps? CLOSE_PARENT (LESS_THAN lvalue (COMMA
+         * lvalue)* GREATER_THAN)? SEMI # FunctionCall
+         * 
+         * Exemplo: divmod(5, 2)<q, r>; // Será retornada 2 valores e armazenados na
+         * variavel q e r
+         */
 
+        // Pega a função correspondente
+        LocalAmbiente<SType> function = env.get(f.getId());
+
+        // Garante a existencia da função
+        if (function != null) {
+
+            // Passa do operand para o params
+            // monta o parametro da função
+            if (f.getFCallParams() != null) {
+
+                STyFun tipoFuncao = (STyFun) function.getFuncType();
+
+                int tempID = 0;
+
+                // Verifica os tipos dos parametros passado
+                for (Expression exp : f.getFCallParams().getExps()) {
+                    // Empilha a expressao do parametro
+                    exp.accept(this);
+                    SType tipoParametro = tipoFuncao.getTypes()[tempID];    // Tipo do parametro do campo da função
+                    SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
+
+                    // Se o parametro passado não casar com o da função, emite um erro
+                    if (!tipoParametro.match(parametroPassado)) {
+                        logError.add(f.getLine() + ", " + f.getColumn()
+                            + ": Argumentos com tipos incompatíveis com o da função \'" + f.getId()+"\'");
+                        stk.push(tyErr);
+                    }
+
+                    tempID++;
+                }
+                // Empilha o ultimo tipo da função
+                stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
+            }
+
+            // Retorno da função para as duas variaveis determinadas
+            /*if (f.getLValues() != null) {
+                List<LValue> ret = f.getLValues();
+                int it = ret.size() - 1;
+
+                // Inverte a ordem quando empilha os operadores, logo, deve ser
+                // Desempilhado do direita pra esquerda
+                for (LValue l : ret) {
+                    env.peek().put(ret.get(it).getId(), operands.pop());
+                    it--;
+                }
+            }*/
+        }
     }
 
-    public void visit(Attribution a){
+    private void typeArithmeticBinOp(Node n, String opName) {
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if ((tyr.match(tyInt))) {
+            if (tyl.match(tyInt) || tyl.match(tyFloat)) {
+                stk.push(tyl);
+            } else {
+                logError.add(n.getLine() + ", " + n.getColumn() + ": Operador " + opName + " nao se aplica aos tipos "
+                        + tyl.toString() + " e " + tyr.toString());
+                stk.push(tyErr);
+            }
 
+        } else if (tyr.match(tyFloat)) {
+            if (tyl.match(tyInt) || tyl.match(tyFloat)) {
+                stk.push(tyr); // Independente do tipo tyl, empilho Float
+            } else {
+                logError.add(n.getLine() + ", " + n.getColumn() + ": Operador " + opName + " não se aplica aos tipos "
+                        + tyl.toString() + " e " + tyr.toString());
+                stk.push(tyErr);
+            }
+        } else {
+            logError.add(n.getLine() + ", " + n.getColumn() + ": Operador " + opName + " não se aplica aos tipos "
+                    + tyl.toString() + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
-    public void visit(FunctionCall f){
-
-    }
-    
     // Partem do exp
-    public void visit(And a){
-
+    @Override
+    public void visit(And a) {
+        a.getLeft().accept(this);
+        a.getRight().accept(this);
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if (tyr.match(tyBool) && tyl.match(tyBool)) {
+            stk.push(tyBool);
+        } else {
+            logError.add(a.getLine() + ", " + a.getColumn() + ": Operador && não se aplica aos tipos " + tyl.toString()
+                    + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
     // Partem do rexp
-    public void visit(LessThan l){
-
+    @Override
+    public void visit(LessThan l) {
+        l.getLeft().accept(this);
+        l.getRight().accept(this);
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if ((tyr.match(tyInt) || tyr.match(tyFloat)) && (tyl.match(tyInt) || tyr.match(tyFloat))) {
+            stk.push(tyBool);
+        } else {
+            logError.add(l.getLine() + ", " + l.getColumn() + ": Operador < não se aplica aos tipos " + tyl.toString()
+                    + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
-    public void visit(Equality e){
-
+    @Override
+    public void visit(Equality e) {
+        e.getLeft().accept(this);
+        e.getRight().accept(this);
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if ((tyr.match(tyInt) || tyr.match(tyFloat)) && (tyl.match(tyInt) || tyr.match(tyFloat))) {
+            stk.push(tyBool);
+        } else if (tyl.match(tyChar) && tyr.match(tyChar)) {
+            stk.push(tyBool);
+        } else {
+            logError.add(e.getLine() + ", " + e.getColumn() + ": Operador == não se aplica aos tipos " + tyl.toString()
+                    + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
-    public void visit(Difference n){
-
+    @Override
+    public void visit(Difference n) {
+        n.getLeft().accept(this);
+        n.getRight().accept(this);
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if ((tyr.match(tyInt) || tyr.match(tyFloat)) && (tyl.match(tyInt) || tyr.match(tyFloat))) {
+            stk.push(tyBool);
+        } else if (tyl.match(tyChar) && tyr.match(tyChar)) {
+            stk.push(tyBool);
+        } else {
+            logError.add(n.getLine() + ", " + n.getColumn() + ": Operador != não se aplica aos tipos " + tyl.toString()
+                    + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
     // Partem do aexp
-    public void visit(Addition a){
-
+    @Override
+    public void visit(Addition a) {
+        a.getLeft().accept(this);
+        a.getRight().accept(this);
+        typeArithmeticBinOp(a, "+");
     }
 
-    public void visit(Subtraction s){
-
+    @Override
+    public void visit(Subtraction s) {
+        s.getLeft().accept(this);
+        s.getRight().accept(this);
+        typeArithmeticBinOp(s, "-");
     }
 
     // Partem do mexp
-    public void visit(Multiplication m){
-
+    @Override
+    public void visit(Multiplication m) {
+        m.getLeft().accept(this);
+        m.getRight().accept(this);
+        typeArithmeticBinOp(m, "*");
     }
 
-    public void visit(Division d){
-
+    @Override
+    public void visit(Division d) {
+        d.getLeft().accept(this);
+        d.getRight().accept(this);
+        typeArithmeticBinOp(d, "/");
     }
 
-    public void visit(Modular m){
-
+    @Override
+    public void visit(Modular m) {
+        m.getLeft().accept(this);
+        m.getRight().accept(this);
+        SType tyr = stk.pop();
+        SType tyl = stk.pop();
+        if (tyr.match(tyInt) && tyl.match(tyInt)) {
+            stk.push(tyInt);
+        } else {
+            logError.add(m.getLine() + ", " + m.getColumn() + ": Operador % não se aplica aos tipos " + tyl.toString()
+                    + " e " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
-
 
     // Partem do sexp
-    public void visit(Not n){
+    @Override
+    public void visit(Not n) {
+        n.getExpression().accept(this);
+        SType tyr = stk.pop();
+        if (tyr.match(tyBool)) {
+            stk.push(tyBool);
+        } else {
+            logError.add(n.getLine() + ", " + n.getColumn() + ": Operador ! não se aplica ao tipo " + tyr.toString());
+            stk.push(tyErr);
+        }
 
     }
 
-    public void visit(Minus n){
-
+    @Override
+    public void visit(Minus n) {
+        n.getExpression().accept(this);
+        SType tyr = stk.pop();
+        if (tyr.match(tyInt)) {
+            stk.push(tyInt);
+        } else if (tyr.match(tyFloat)) {
+            stk.push(tyFloat);
+        } else {
+            logError.add(n.getLine() + ", " + n.getColumn() + ": Operador - não se aplica ao tipo " + tyr.toString());
+            stk.push(tyErr);
+        }
     }
 
-    public void visit(BooleanValue b){ // True e False
-
-    } 
-
-    public void visit(Null n){
-
+    // True e False
+    @Override
+    public void visit(BooleanValue b) {
+        stk.push(tyBool);
     }
 
-    public void visit(IntegerNumber i){
-
+    @Override
+    public void visit(Null n) {
+        stk.push(tyNull);
     }
 
-    public void visit(FloatNumber p){
-
+    @Override
+    public void visit(IntegerNumber i) {
+        stk.push(tyInt);
     }
 
-    public void visit(CharLitteral c){
+    @Override
+    public void visit(FloatNumber p) {
+        stk.push(tyFloat);
+    }
 
+    @Override
+    public void visit(CharLitteral c) {
+        stk.push(tyChar);
     }
 
     // Partem do pexp
-    public void visit(PexpIdentifier i){
+    @Override
+    public void visit(PexpIdentifier i) {
+        // Nao faz nada
+    }
+
+    @Override
+    public void visit(ExpParenthesis e) {
+        // Nao faz nada
+    }
+
+    @Override
+    public void visit(TypeInstanciate t) {
+        // a = new Int, a = new Ponto, a = new Ponto[8];
+
+        // Garante que não é um tipo Data
+        if (t.getType() != null) {
+            if (t.getExp() != null) { // Array comum
+                // Empilha o tipo do array
+                t.getType().accept(this);
+
+                // Empilha o tamanho do array
+                t.getExp().accept(this);
+                SType tamanhoArray = stk.pop();
+                if (!tamanhoArray.match(tyInt)) { // Verifica tamanho int para o array
+                    logError.add(t.getLine() + ", " + t.getColumn()
+                        + ": o tamanho de um array so pode ser atribuido com o tipo int e nao \'" + tamanhoArray
+                        + "\' .");
+                    stk.push(tyErr);
+                }
+                SType tipoArray = stk.pop();
+                // Cria o tipo de array com referencia ao tipo primitivo informado
+                STyArr array = new STyArr(tipoArray);
+                stk.add(array);
+            } else { // new Int;
+                // Empilha o tipo da variavel e no attribution certifica se é valido
+                t.getType().accept(this);
+            }
+        } else {
+            if (t.getExp() == null) { // Tipo normal de data
+                STyData tyData = new STyData(t.getDataName());
+                // Empilha o tipo da variavel e no attribution certifica se é valido
+                stk.add(tyData);
+            } else { // Array de data
+                // Empilha o tamanho do array
+                t.getExp().accept(this);
+
+                SType tamanhoArray = stk.pop();
+                if (!tamanhoArray.match(tyInt)) { // Verifica tamanho int para o array
+                    logError.add(t.getLine() + ", " + t.getColumn()
+                        + ": o tamanho de um array so pode ser atribuido com o tipo int e nao \'" + tamanhoArray + "\' .");
+                    stk.push(tyErr);
+                }
+                // SType tipoArray = stk.pop();
+                STyData tyData = new STyData(t.getDataName());
+                // Cria o tipo de array com referencia ao tipo primitivo informado
+                STyArr array = new STyArr(tyData);
+                stk.add(array);
+            }
+        }
 
     }
 
-    public void visit(ExpParenthesis e){
+    @Override
+    public void visit(FunctionReturn f) {
+        /********************************************************************************
+         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0] *
+         * AGORA SEM RETORNO PODE SER SÓ: fat(num−1)                                    *
+         ********************************************************************************/
+        // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
+        // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
+        // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
+
+        // aceita a lista de expressoes, para futura verificação de tipos
+        f.getFCallParams().accept(this);
+
+        // verifica se o valor passado de posicao do array é inteiro
+        f.getExpression().accept(this);
+        if (!stk.pop().match(tyInt)) {
+            logError.add("Erro em (" + f.getLine() + ", " + f.getColumn()
+                + "). A posição de vetores só podem ser dadas por valores do tipo Int.");
+            stk.push(tyErr);
+        }
 
     }
-
-    public void visit(TypeInstanciate t){
-
-    }
-
-    public void visit(FunctionReturn f){
-
-    }
-
 
     // Partem do lvalue
-    public void visit(LValue l){
-
+    @Override
+    public void visit(LValue l) {
+        /* Nao faz nada */
     }
 
-    public void visit(ID i){
-
+    @Override
+    public void visit(ID i) {
+        /* Nao faz nada */
     }
 
-    public void visit(Identifier i){
-
+    @Override
+    public void visit(Identifier i) {
+        if (temp.get(i.getId()) == null) {
+            logError.add(i.getLine() + ", " + i.getColumn() + ": A variavel \'" + i.getId() + "\' nao existe!!!");
+            stk.push(tyErr);
+        } else {
+            stk.push(temp.get(i.getId()));
+        }
     }
 
-    public void visit(DataAccess d){
+    @Override
+    public void visit(DataAccess d) {
 
+        // Certifica a existencia do tipo data passado no escopo atual
+        if (temp.get(d.getDataId()) instanceof STyData) {
+
+            STyData dataType = (STyData) temp.get(d.getDataId());
+
+            if (datas.get(dataType.getName()) == null) {
+                logError.add(d.getLine() + ", " + d.getColumn() + "). Acesso à um tipo de data inexistente: "
+                        + dataType.getName());
+            }
+
+        } // verificando existencia do Data na base de dados
+        else if (datas.get(d.getDataId()) != null) {
+
+            // verificando se o campo acessado existe
+            ArrayList<String> variaveis = datas.get(d.getDataId()).getVariaveis();
+            ArrayList<SType> dataTypes = datas.get(d.getDataId()).getTipos();
+
+            boolean varEncontrada = false; // marca se encontrou
+
+            // Verifica se a variavel empilha está presente no Data e ainda verifica o tipo
+            // dela
+            for (int i = 0; i < variaveis.size(); i++) {
+
+                // Compara o nome do atributo com as variaveis(atributo) que estão dentro do
+                // data
+                if (variaveis.get(i).equals(d.getId())) {
+
+                    // O tipo da expressao está no topo da pilha
+                    // Agora compara-se o tipo do atributo(variavel)
+                    if (!stk.pop().match(dataTypes.get(i))) {
+                        logError.add(d.getLine() + ", " + d.getColumn()
+                                + ": Erro de tipo no acesso a um data. Verifique o tipo do atributo \'" + d.getId()
+                                + "\' do data \'" + d.getDataId() + "\' !!");
+                        stk.push(tyErr);
+                    }
+                    varEncontrada = true;
+                    break;
+                }
+            }
+
+            // Variavel inexistente no objeto, logo é um erro
+            if (!varEncontrada) {
+                logError.add(d.getLine() + ", " + d.getColumn() + ": \'" + d.getId()
+                        + "\' => Atributo inexistente no objeto \'" + d.getDataId() + "\'");
+                stk.push(tyErr);
+            }
+
+        }
+
+        else {
+            logError.add(d.getLine() + ", " + d.getColumn() + ": o tipo data \'" + d.getDataId() + "\' nao existe !!!");
+            stk.push(tyErr);
+        }
     }
 
-    public void visit(ArrayAccess a){
-
+    @Override
+    public void visit(ArrayAccess a) {
+        a.getExp().accept(this); // Verifica se a posicao foi passada
+        SType tipo = stk.pop();
+        if (!tipo.match(tyInt)) { // Verifica se o tipo da posicao do array é um valor inteiro
+            logError.add("" + a.getLine() + ", " + a.getColumn()
+                + ": Arrays so podem ter sua posicao acessada se o indice for um numero inteiro e nao \'" + tipo + "\' !!");
+            stk.push(tyErr);
+        }
     }
-
 
     // Partem do exps
-    public void visit(FCallParams f){
-
+    @Override
+    public void visit(FCallParams f) {
+        for (Expression exp : f.getExps()) {
+            exp.accept(this);
+        }
     }
 }
