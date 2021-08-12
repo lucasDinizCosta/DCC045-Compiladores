@@ -10,12 +10,22 @@ data Ponto{
 	y :: Int;
 }
 
+fat(n :: Int) : Int{
+  if(n == 0){
+      return 1;
+  }
+  return n*fat(n-1)[0];
+}
 
 main(){
     k = 5;
 	pontos = new Ponto[k];
     x = new Float[k]; -- x = new Float[][k];
 	x = 2;
+	print fat(2)[c];
+	chars = new Char[4];
+	chars[0] = 'a';
+	chars[1] = 75;
 	x[0] = 2;
     i = 0;
 	iterate(k){
@@ -29,6 +39,8 @@ main(){
        --x[i] = aux;
        i = i + 1;
     }
+	print pontos[0].x;
+	pontos[0].x = 'c';
     {-
 	iterate(k){
        x[i] = new Float[k];

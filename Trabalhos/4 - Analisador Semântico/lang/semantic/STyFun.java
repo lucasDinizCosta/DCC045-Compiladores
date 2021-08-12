@@ -31,6 +31,7 @@ public class STyFun extends SType {
         return r;
     }
 
+    @Override
     public String toString() {
         String s = "";
         if (ty.length > 0) {
