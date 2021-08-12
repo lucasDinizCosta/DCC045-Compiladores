@@ -11,6 +11,7 @@ import java.io.*;
 import lang.parser.*;
 import lang.ast.*;
 import lang.interpreter.*;
+import lang.semantic.*;
 
 public class LangCompiler {
     // Recupera o nome base (sem extensão) de um arquivo.
@@ -77,8 +78,19 @@ public class LangCompiler {
                 // iv = new InteractiveInterpreterVisitor();
                 // result.accept(iv);
             } else if (args[0].equals("-tp")) {
-                // iv = new TypeChecker();
-                // result.accept(iv);
+                // Checa o tipo e elabora o ambiente de desenvolvimento
+                TypeCheckVisitor typeCheck = new TypeCheckVisitor();  
+                
+                // Aceita o nó e caminha na árvore
+                ((Node)result).accept(typeCheck);               
+                
+                System.out.println("\n\n---------- Checagem de tipos ------------");
+                if(typeCheck.getNumErrors() > 0){
+                    typeCheck.printErrors();
+                 }else{
+                    System.out.println("typing  ... [ ok ]"); 
+                 }
+                System.out.println("\n-----------------------------\n");
             } else if (args[0].equals("-pp")) {
                 // iv = new PPrint();
                 // result.accept(iv);

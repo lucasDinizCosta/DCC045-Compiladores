@@ -13,9 +13,10 @@ public class LocalAmbiente<A> extends TyEnv<A>{
     
     public SType getFuncType(){ return t;}
 
-     public String toString(){
-         String s = "--------------- (" + id + "," + t.toString() + ") ---------------\n";
-         s += super.toString();
-         return s;
-     }
+    @Override
+    public String toString(){
+        String s = "--------------- (" + id + "," + t.toString() + ") ---------------\n";
+        s += super.toString();
+        return s;
+    }
 }

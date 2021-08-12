@@ -15,6 +15,8 @@ main(){
     k = 5;
 	pontos = new Ponto[k];
     x = new Float[k]; -- x = new Float[][k];
+	x = 2;
+	x[0] = 2;
     i = 0;
 	iterate(k){
 		--aux = new Float;

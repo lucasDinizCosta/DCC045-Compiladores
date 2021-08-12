@@ -45,7 +45,7 @@ public class Attribution extends Command{
 
     @Override
     public String toString(){
-        return this.lvalue.toString() + " = " + this.exp.toString();
+        return this.lvalue.toString() + " = " + this.exp.toString() + " ; ";
     }
     
     @Override

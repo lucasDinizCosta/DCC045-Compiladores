@@ -55,9 +55,9 @@ public class CommandsList extends Command{
 
     @Override
     public String toString(){
-        String text = " { ";
+        String text = " { \n";
         for (Command command : commands) {
-            text = text + command.toString();
+            text = text + command.toString() + "\n";
         }
         text = text + " } ";
         return text;

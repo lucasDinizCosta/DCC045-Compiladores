@@ -40,6 +40,7 @@ public class TypeCheckVisitor extends Visitor {
         stk = new Stack<SType>();
         env = new TyEnv<LocalAmbiente<SType>>();
         logError = new ArrayList<String>();
+        datas = new HashMap<String, DataAttributes>();
     }
 
     // Retorna a quantidade de erros
@@ -55,6 +56,13 @@ public class TypeCheckVisitor extends Visitor {
         System.out.println("--------------------------------------");
     }
 
+    // https://www.techiedelight.com/get-current-line-number-java/
+    // Retorna a linha do código fonte ao passar pela instrução
+    public int getLineNumber(){
+        // return new Throwable().getStackTrace()[0].getLineNumber();
+        return Thread.currentThread().getStackTrace()[2].getLineNumber();
+    }
+
     // Partem do prog
     @Override
     public void visit(Program p) {
@@ -64,8 +72,123 @@ public class TypeCheckVisitor extends Visitor {
             d.accept(this);
         }
 
+        // passa para funcoes
+
+        /*boolean shouldAddFunc = true;
+
+        for (Function f : p.getFunctions()) {
+
+            // valida as funcoes que deveriam ser aceitas
+            shouldAddFunc = true;
+
+            // garantindo sobrecarga - verificando pelo num de parametros
+            for (int i = 0; i < sobrecarga.size(); i++) {
+
+                // se encontrar uma funcao com mesmo nome na lista de sobrecarga, vai verficiar
+                // os params
+                if (f.getId().equals(sobrecarga.get(i).getId())) {
+
+                    // se esta funcao com mesmo nome for main, ja retorna o erro
+                    if (f.getId().equals("main")) {
+                        shouldAddFunc = false;
+                        logError.add("Erro em (" + f.getLine() + ", " + f.getColumn()
+                                + "). Só pode haver uma função denominada \"main\".");
+                    }
+
+                    // caso contrario, verifica a possibilidade de sobrecarga
+                    else {
+                        // se ja tiver sido declarada com mesmas mesmo num de param, retorna erro
+                        if (f.getParameters() != null
+                                && f.getParameters().size() == sobrecarga.get(i).getTypes().length) {
+                            shouldAddFunc = false;
+                            logError.add("Erro em (" + f.getLine() + ", " + f.getColumn()
+                                    + "). Sobrecarga inválida para função " + f.getId()
+                                    + "; já declarada uma função de mesmo ID e mesmo número de parâmetros.");
+                        }
+                    }
+
+                }
+            }
+
+            // se for func valida, continua normal, para incrementar o env e sobrecarga
+            if (shouldAddFunc) {
+                SType[] xs = new SType[0];
+                SType[] xt = new SType[0];
+
+                // instancia o vetor com tamanho do num de params, se nao for sem params
+                if (f.getParameters() != null) {
+                    xs = new SType[f.getParameters().getType().size()];
+                }
+
+                // instancia o vetor com tamanho do num de retornos, se nao for sem retornos
+                if (f.getReturnTypes() != null) {
+                    xt = new SType[f.getReturnTypes().size()];
+                }
+
+                // aceita os tipos de param e incrementa no xs pra ser salvo dps no env e
+                // sobrecarga. Aproveita pra conferir se os parametros tem id diferente
+                ArrayList<String> idPar = new ArrayList<String>();
+                for (int i = 0; i < f.getParameters().size(); i++) {
+
+                    // procura se o id do parametro ja existe
+                    for (int j = 0; j < idPar.size(); j++) {
+                        if (f.getParameters().getSingleId(i).equals(idPar.get(j))) {
+                            logError.add("Erro em (" + f.getLine() + ", " + f.getColumn() + "). Função " + f.getId()
+                                    + " possui parâmetros com mesmo id.");
+                        }
+                    }
+
+                    idPar.add(f.getParameters().getSingleId(i));
+
+                    f.getParameters().getSingleType(i).accept(this);
+                    xs[i] = stk.pop();
+                }
+
+                // aceita os tipos de retorno e incrementa no xs pra ser salvo dps no env e
+                // sobrecarga
+                for (int i = 0; i < f.getReturnTypes().size(); i++) {
+                    f.getReturnTypes().get(i).accept(this);
+                    xt[i] = stk.pop();
+                }
+
+                // adiciona no ambiente
+                env.set(f.getId(), new LocalEnv<SType>(f.getId(), new STyFun(xs, xt)));
+
+                // adiciona no arraylist de tdas as funcoes, para verificar sobrecarga
+                // posteriormente numa chamada de funçao
+                sobrecarga.add(new STyFun(f.getId(), xs, xt));
+            }
+
+        }*/
+        // Cria as funções no env
+        for(Function f : p.getFunctions()){
+            SType[] parameterType = new SType[0];
+            SType[] returnType = new SType[0];
+
+            // instancia o vetor com tamanho do num de params, se nao for sem params
+            if (f.getParameters() != null) {
+                parameterType = new SType[f.getParameters().getType().size()];
+                for (int i = 0; i < f.getParameters().size(); i++) {
+                    f.getParameters().getSingleType(i).accept(this);
+                    parameterType[i] = stk.pop();
+                }
+            }
+
+            // instancia o vetor com tamanho do num de retornos, se nao for sem retornos
+            if (f.getReturnTypes() != null) {
+                returnType = new SType[f.getReturnTypes().size()];
+                for (int i = 0; i < f.getReturnTypes().size(); i++) {
+                    f.getReturnTypes().get(i).accept(this);
+                    returnType[i] = stk.pop();
+                }
+            }
+            // adiciona no ambiente
+            env.set(f.getId(), new LocalAmbiente<SType>(f.getId(), new STyFun(parameterType, returnType)));
+        }
+
         // Checa as funções
         for (Function f : p.getFunctions()) {
+            // adiciona no ambiente
             f.accept(this);
         }
     }
@@ -201,7 +324,7 @@ public class TypeCheckVisitor extends Visitor {
             i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
         } else {
             logError.add(i.getLine() + ", " + i.getColumn()
-                    + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+                + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
             stk.push(tyErr);
         }
     }
@@ -227,7 +350,7 @@ public class TypeCheckVisitor extends Visitor {
             retChk = begin && end;
         } else {
             logError.add(i.getLine() + ", " + i.getColumn()
-                    + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+                + ": Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
             stk.push(tyErr);
         }
     }
@@ -242,8 +365,8 @@ public class TypeCheckVisitor extends Visitor {
             i.getCmd().accept(this);
         } else {
             logError.add(i.getLine() + ", " + i.getColumn()
-                    + ": Expressão de teste do Iterate so aceita tipo Bool ou Int e nao \'" + expressao.toString()
-                    + "\' ");
+                + ": Expressão de teste do Iterate so aceita tipo Bool ou Int e nao \'" + expressao.toString()
+                + "\' ");
             stk.push(tyErr);
         }
 
@@ -283,7 +406,6 @@ public class TypeCheckVisitor extends Visitor {
             stk.pop().match(temp.getFuncType());
         }
         retChk = true;
-
     }
 
     @Override
@@ -319,29 +441,27 @@ public class TypeCheckVisitor extends Visitor {
 
                     if (!tpilha.match(current)) {
                         logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
-                            + "). Erro em atribuição de variável. Os tipos não casam: " + tpilha + " <-> "
+                            + "). Erro em atribuicao de variável. Os tipos nao casam: " + tpilha + " <-> "
                             + "Data");
                         stk.push(tyErr);
                     }
                 }
             } else { // Nao é tipo data
+
                 // ver a parte de indices - por enquanto so ve se n foi declarada ainda
                 // se a var n foi declarada, atribui o novo tipo pra ela
                 if ((temp.get(lvalue.getId()) == null)) {
-                    // a.getExp().accept(this);
+                    //a.getExp().accept(this);
                     // SType st = stk.pop();
                     temp.set(lvalue.getId(), tipoExpressao);
                 } else { // se ja foi declarada, verifica se o tipo casa com o tipo dela
                     SType current = temp.get(lvalue.getId());
-                    // a.getExp().accept(this);
-
-                    // SType tpilha = stk.pop();
                     SType tpilha = tipoExpressao;
 
                     if (!tpilha.match(current)) {
                         logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
-                                + "). Erro em atribuição de variável. Os tipos não casam: " + tpilha + " <-> "
-                                + current);
+                            + "). Erro em atribuicao de variavel. Os tipos nao casam: " + tpilha + " <-> "
+                            + current);
                         stk.push(tyErr);
                     }
 
@@ -366,7 +486,6 @@ public class TypeCheckVisitor extends Visitor {
                 // adiciona o array no contexto, com o tipo dado pela expressão
                 temp.set(lvalue.getId(), arr);
             }
-
             // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
             else {
 
@@ -376,14 +495,18 @@ public class TypeCheckVisitor extends Visitor {
                 if (!(a.getExp() instanceof Identifier)) {
 
                     STyArr arr = (STyArr) temp.get(lvalue.getId());
-
                     SType pilha = stk.pop();
-
-                    if (!pilha.match(arr.getArg())) {
-                        logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
-                                + "). Erro em atribuição de variável. Os tipos não casam: " + pilha + " <-> "
-                                + arr.getArg());
-                        stk.push(tyErr);
+                    if(arr.getArg() instanceof STyFloat && pilha instanceof STyInt){
+                        // Array de float aceita o tipo inteiro mas desde que seja convertido
+                            
+                    }
+                    else{
+                        if (!pilha.match(arr.getArg())) {   
+                            logError.add("Erro em (" + a.getLine() + ", " + a.getColumn()
+                                    + "). Erro em atribuicao de variavel. Os tipos nao casam: " + pilha + " <-> "
+                                    + arr.getArg());
+                            stk.push(tyErr);
+                        }
                     }
                 }
 
