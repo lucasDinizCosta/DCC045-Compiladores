@@ -113,15 +113,20 @@ public class TypeCheckVisitor extends Visitor {
             // adiciona no ambiente
             //f.accept(this);
             if (f.getId().equals("main")) {     // Verifica se tem a função main
+                if(((Parameters)f.getParameters()).getType().size() != 0){
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A funcao \'main\' nao pode ter parametros na sua declaracao !");
+                    stk.push(tyErr);
+                }
                 main = f;
             }
         }
 
         if (main == null) {
-            throw new RuntimeException("Não há uma função chamada \'main\' ! abortando !");
+            throw new RuntimeException("Nao ha uma funcao chamada \'main\' ! Finalizando o programa !");
+        }{
+            
+            main.accept(this);
         }
-
-        main.accept(this);
     }
 
     // Partem do data
