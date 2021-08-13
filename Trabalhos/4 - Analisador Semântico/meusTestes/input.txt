@@ -20,19 +20,21 @@ fat(n :: Int, nC :: Char) : Int{
 }
 
 --testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool{
-testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool, Int{
+testaDatas(p1 :: Ponto, pts :: Ponto[][]) : Bool, Ponto[][]{
 	a = 2;
 	b = 3;
 	print a + b;
 	--return b;
 	--return p1;
-	return p1, 'c';
+	--return p1, 'c';
 	--return p1;
+	return true, pts;
 }
 
 main(){
     k = 5;
 	pontos = new Ponto[k];
+	malhaPontos = new Ponto[][k];
     x = new Float[k]; -- x = new Float[][k];
 	x = 2;
 	print fat(2)[c];
@@ -45,6 +47,7 @@ main(){
 		--aux = new Float;
 		--aux = i + 2 * i * .6255;
 		--print aux; print '\n';
+		malhaPontos[i] = new Ponto[k];
 		pontoAux = new Ponto;
 		pontoAux.x = i;
 		pontoAux.y = i + 2 * i;
@@ -55,6 +58,14 @@ main(){
 	print pontos[0].x + 'c';
 	print pontos[0].x + fat(2.5, 'k')[0];
 	pontos[0].x = 'c';
+	
+	i = 0;
+	iterate(k){
+       malhaPontos[i][i] = new Ponto;
+	   
+	   i = i + 1;
+    }
+	
 {-
 	iterate(k){
        x[i] = new Float[k];

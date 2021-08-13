@@ -449,8 +449,8 @@ public class TypeCheckVisitor extends Visitor {
         if (temp.getFuncType() instanceof STyFun) {
             // Padrao da documentação da função
             SType[] tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
-
             SType[] tiposRetornados = new SType[qtdExpRetorno];
+
             // Desempilha os tipos retornados
             for(int i = 0; i < qtdExpRetorno; i++){
                 tiposRetornados[i] = stk.pop();
@@ -471,7 +471,7 @@ public class TypeCheckVisitor extends Visitor {
             // O retorno deve ser desempilhado na ordem contraria
             for(int i = tiposRetornoPadrao.length - 1; i >= 0; i--){  // Verificação de tipo nos retornos
 
-                if(contRetornos > qtdExpRetorno){
+                if(contRetornos > qtdExpRetorno){   // Sai da função se a quantidade for diferente
                     break;
                 }
                 // SType tipoRetornado = stk.pop();
@@ -911,9 +911,16 @@ public class TypeCheckVisitor extends Visitor {
             }
         } else {
             if (t.getExp() == null) { // Tipo normal de data
-                STyData tyData = new STyData(t.getDataName());
-                // Empilha o tipo da variavel e no attribution certifica se é valido
-                stk.add(tyData);
+                if(datas.get(t.getDataName()) != null){ // Tipo data existe
+                    STyData tyData = new STyData(t.getDataName());
+                    // Empilha o tipo da variavel e no attribution certifica se é valido
+                    stk.add(tyData);
+                }
+                else{
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " + t.getColumn()
+                        + "): o tipo data \'" + t.getDataName() + "\' nao existe !");
+                    stk.push(tyErr);
+                }
             } else { // Array de data
                 // Empilha o tamanho do array
                 t.getExp().accept(this);
@@ -924,14 +931,23 @@ public class TypeCheckVisitor extends Visitor {
                         + "): o tamanho de um array so pode ser atribuido com o tipo int e nao \'" + tamanhoArray + "\' .");
                     stk.push(tyErr);
                 }
-                // SType tipoArray = stk.pop();
-                STyData tyData = new STyData(t.getDataName());
-                // Cria o tipo de array com referencia ao tipo primitivo informado
-                STyArr array = new STyArr(tyData);
-                stk.add(array);
-            }
-        }
 
+                if(datas.get(t.getDataName()) != null){ // Tipo data existe
+                    // SType tipoArray = stk.pop();
+                    System.out.println(getLineNumber() + " ---=====> " + t.getDataName() + " --- " + t);
+
+                    STyData tyData = new STyData(t.getDataName());
+                    // Cria o tipo de array com referencia ao tipo primitivo informado
+                    STyArr array = new STyArr(tyData);
+                    stk.add(array);
+                }
+                else{
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " + t.getColumn()
+                        + "): o tipo data \'" + t.getDataName() + "\' nao existe !");
+                    stk.push(tyErr);
+                }
+            }   
+        }
     }
 
     @Override
