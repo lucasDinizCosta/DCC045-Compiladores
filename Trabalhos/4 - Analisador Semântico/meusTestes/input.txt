@@ -52,9 +52,11 @@ main(){
 		pontoAux.x = i;
 		pontoAux.y = i + 2 * i;
 		pontos[i] = pontoAux;
+		print fat(2.5, 'k')[0];
        --x[i] = aux;
        i = i + 1;
     }
+	print pontos[0].x + 'c';
 	print pontos[0].x + 'c';
 	print pontos[0].x + fat(2.5, 'k')[0];
 	pontos[0].x = 'c';
