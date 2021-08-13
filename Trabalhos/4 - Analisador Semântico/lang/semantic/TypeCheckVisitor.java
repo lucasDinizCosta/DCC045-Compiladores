@@ -271,10 +271,11 @@ public class TypeCheckVisitor extends Visitor {
     // Partem do Type
     @Override
     public void visit(TypeArray t) {
-        if(datas.get(t.getType()) == null){ // Tipo data nao existe
+        //System.out.println(getLineNumber() + " --- " + t.getType() + " --- " + t + " ---- " + t.getType().getClass().getSimpleName());
+        if(t.getType() instanceof NameType && datas.get(((NameType)t.getType()).getID()) == null){ // Tipo data nao existe
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " 
             + t.getColumn() + "): O tipo data \'" + t.getType() 
-            + "\' nao existe para poder se criar um array.");
+            + "\' nao existe para poder ser criado um array.");
             stk.push(tyErr);
         }
         else{

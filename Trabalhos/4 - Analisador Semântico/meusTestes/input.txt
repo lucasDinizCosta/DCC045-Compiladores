@@ -20,7 +20,10 @@ fat(n :: Int, nC :: Char) : Int{
 }
 
 --testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool{
-testaDatas(p1 :: Ponto, pts :: Reta[]) : Bool{
+testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool{
+	a = 2;
+	b = 3;
+	print a + b;
 	return true;
 }
 
