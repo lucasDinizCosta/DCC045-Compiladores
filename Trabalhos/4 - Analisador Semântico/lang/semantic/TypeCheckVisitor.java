@@ -420,12 +420,15 @@ public class TypeCheckVisitor extends Visitor {
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
             System.out.println(getLineNumber() + " --- " + a.getExp() + " ---- " + a + " --- " + stk );
+            System.out.println(getLineNumber() + " --- " + lvalue);
             SType tipoExpressao = stk.pop();
 
             if (tipoExpressao instanceof STyData) {
                 if ((temp.get(lvalue.getId()) == null)) { // Variavel de data nao existe
-                    String name = ((TypeInstanciate) a.getExp()).getDataName();
+                    // String name = ((TypeInstanciate) a.getExp()).getDataName();
+                    String name = ((STyData)tipoExpressao).getName();
                     STyData newData = new STyData(name);
+                    System.out.println(getLineNumber() + " -- " + newData);
 
                     if (datas.get(name) == null) {
                         logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): O tipo de Data " + name + " ainda nao foi declarado.");
@@ -562,9 +565,9 @@ public class TypeCheckVisitor extends Visitor {
                 lvalue.accept(this);    // Empilha o Tipo do atributo do data ou o tipo data mesmo
             }
             
-            // System.out.println(getLineNumber() + " ---- " + stk );
-            SType tipoExpressao = stk.pop();
+            System.out.println(getLineNumber() + " ---- " + stk );
             SType tipoVariavel = stk.pop();
+            SType tipoExpressao = stk.pop();
             DataAccess d = (DataAccess)lvalue;
             if(!tipoExpressao.match(tipoVariavel)){  // Compara o tipo da expressao com o do atributo
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn()
@@ -1038,8 +1041,8 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
-        //System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
-        //+ d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
+        System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
+        + d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
 
         // Certifica a existencia do tipo data passado no escopo atual
         if (temp.get(d.getDataId()) instanceof STyData) {
@@ -1049,6 +1052,22 @@ public class TypeCheckVisitor extends Visitor {
             if (datas.get(dataType.getName()) == null) {
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: "+d.getLine() + ", coluna: " + d.getColumn() 
                 + "): Acesso a um tipo de data inexistente: " + dataType.getName());
+                stk.push(tyErr);
+            }
+            else{
+                DataAttributes data = datas.get(dataType.getName());
+                boolean atribEncontrado = false;
+                for(int i = 0; i < data.getVariaveis().size(); i++){
+                    if(data.getVariaveis().get(i).equals(d.getId())){
+                        stk.push(data.getTipos().get(i));
+                        atribEncontrado = true;
+                        break;
+                    }
+                }
+                if(!atribEncontrado){   // Atributo nao encontrado
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): Atributo \'" + d.getId() + "\' eh inexistente em \'"+ dataType.getName()+"\' !!");
+                    stk.push(tyErr);
+                }
             }
 
         } // verificando existencia do Data na base de dados
