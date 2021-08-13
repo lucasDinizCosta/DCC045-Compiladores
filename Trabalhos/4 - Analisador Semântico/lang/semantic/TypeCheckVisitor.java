@@ -284,7 +284,7 @@ public class TypeCheckVisitor extends Visitor {
             i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
         } else {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
-                + "): Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+                + "): Expressao de teste do IF deve ser tipo Bool e nao \'" + expressao.toString() + "\' !");
             stk.push(tyErr);
         }
     }
@@ -310,7 +310,7 @@ public class TypeCheckVisitor extends Visitor {
             retChk = begin && end;
         } else {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
-                + "): Expressão de teste do IF deve ser tipo Bool ou Int e nao \'" + expressao.toString() + "\' ");
+                + "): Expressao de teste do IF deve ser tipo Bool e nao \'" + expressao.toString() + "\' !");
             stk.push(tyErr);
         }
     }
@@ -326,7 +326,7 @@ public class TypeCheckVisitor extends Visitor {
         } else {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
                 + "): Expressão de teste do Iterate so aceita tipo Bool ou Int e nao \'" + expressao.toString()
-                + "\' ");
+                + "\' !");
             stk.push(tyErr);
         }
 
