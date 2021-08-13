@@ -72,6 +72,7 @@ public class TypeCheckVisitor extends Visitor {
     // Partem do prog
     @Override
     public void visit(Program p) {
+        Node main = null;
 
         // Aceita os tipos data para fazer a verificação de tipo
         for (Data d : p.getDatas()) {
@@ -110,8 +111,17 @@ public class TypeCheckVisitor extends Visitor {
         // Checa as funções
         for (Function f : p.getFunctions()) {
             // adiciona no ambiente
-            f.accept(this);
+            //f.accept(this);
+            if (f.getId().equals("main")) {     // Verifica se tem a função main
+                main = f;
+            }
         }
+
+        if (main == null) {
+            throw new RuntimeException("Não há uma função chamada \'main\' ! abortando !");
+        }
+
+        main.accept(this);
     }
 
     // Partem do data
