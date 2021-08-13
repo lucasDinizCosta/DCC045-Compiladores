@@ -12,10 +12,16 @@ data Ponto{
 
 fat(n :: Int, nC :: Char) : Int{
   k = 1 + 'c';
+  print n + nC;
   if(n == 0){
       return 1;
   }
   return n*fat(n-1)[0];
+}
+
+--testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool{
+testaDatas(p1 :: Ponto, pts :: Reta[]) : Bool{
+	return true;
 }
 
 main(){

@@ -168,9 +168,11 @@ public class TypeCheckVisitor extends Visitor {
 
             // instancia o vetor com tamanho do num de params, se nao for sem params
             if (f.getParameters() != null) {
+                System.out.println(getLineNumber() + " --- " + f.getParameters());
                 parameterType = new SType[f.getParameters().getType().size()];
                 namesParameter = new String[f.getParameters().getType().size()];
                 for (int i = 0; i < f.getParameters().size(); i++) {
+                    System.out.println(getLineNumber() + " --- " + f.getParameters().getSingleType(i) + " ---- " + f.getParameters().getSingleType(i).getClass().getSimpleName());
                     f.getParameters().getSingleType(i).accept(this);
                     parameterType[i] = stk.pop();
                     namesParameter[i] = f.getParameters().getSingleId(i);
@@ -256,6 +258,7 @@ public class TypeCheckVisitor extends Visitor {
 
         if (!retChk && f.getReturnTypes().size() > 0) {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Função " + f.getId() + " deve retornar algum valor.");
+            stk.push(tyErr);
         }
     }
 
@@ -268,10 +271,39 @@ public class TypeCheckVisitor extends Visitor {
     // Partem do Type
     @Override
     public void visit(TypeArray t) {
-        t.getType().accept(this); // Empilha o tipo do array
-        SType tipo = stk.pop();
-        STyArr array = new STyArr(tipo);
-        stk.push(array);
+        if(datas.get(t.getType()) == null){ // Tipo data nao existe
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " 
+            + t.getColumn() + "): O tipo data \'" + t.getType() 
+            + "\' nao existe para poder se criar um array.");
+            stk.push(tyErr);
+        }
+        else{
+            t.getType().accept(this); // Empilha o tipo do array
+            SType tipo = stk.pop();
+            System.out.println(getLineNumber() + " --- " + tipo + " --- " + t.getType());
+            if(tipo instanceof STyData){    // Array de data ==> Testar se o data existe
+                if(datas.get(((STyData)tipo).getName()) != null){   // Verifica se o tipo Data existe
+                    STyArr array = new STyArr(tipo);
+                    stk.push(array);
+                }
+                else{
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " 
+                    + t.getColumn() + "): O tipo data \'" + ((STyData)tipo).getName() 
+                    + "\' nao existe para poder se criar um array.");
+                    stk.push(tyErr);
+                }
+            }
+            else if(tipo instanceof STyErr){
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " 
+                + t.getColumn() + "): O tipo data \'" + t.getType() 
+                + "\' nao existe para poder se criar um array.");
+                stk.push(tyErr);
+            }
+            else{
+                STyArr array = new STyArr(tipo);
+                stk.push(array);
+            }
+        }
     }
 
     // Partem do btype
@@ -303,6 +335,15 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(NameType i) { // TypeData
         // Nao faz nada pois já foi tratado em outra funcao
+        if(datas.get(i.getID()) != null){   // Se o tipo data existe
+            STyData tipoData = new STyData(i.getID());
+            stk.push(tipoData);
+        }
+        else{
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
+                + "): Tipo data passado como parametro na funcao nao existe =>\'" + i.getID() + "\' ");
+            stk.push(tyErr);
+        }
     }
 
     // Partem do cmd
@@ -923,9 +964,6 @@ public class TypeCheckVisitor extends Visitor {
             }
         }
 
-        // aceita a lista de expressoes, para futura verificação de tipos
-        //f.getFCallParams().accept(this);    // Empilha os tipos dos parametros
-
         // verifica se o valor passado de posicao do array é inteiro
         f.getExpIndex().accept(this);
 
@@ -963,8 +1001,8 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
-        System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
-        + d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
+        //System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
+        //+ d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
 
         // Certifica a existencia do tipo data passado no escopo atual
         if (temp.get(d.getDataId()) instanceof STyData) {
@@ -973,7 +1011,7 @@ public class TypeCheckVisitor extends Visitor {
 
             if (datas.get(dataType.getName()) == null) {
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: "+d.getLine() + ", coluna: " + d.getColumn() 
-                + "): Acesso à um tipo de data inexistente: " + dataType.getName());
+                + "): Acesso a um tipo de data inexistente: " + dataType.getName());
             }
 
         } // verificando existencia do Data na base de dados
@@ -1016,16 +1054,8 @@ public class TypeCheckVisitor extends Visitor {
         }
         else if (temp.get(d.getLValue().getId()) instanceof STyArr) {    // Verifica se é array de data
 
-            System.out.println(getLineNumber() + " ---  "+ stk);
-            // Se chegou no dataAccess significa que a expressao de atribuição já está na pilha
-            // SType tipoExpressao = stk.pop();
-            
-            // STyData dataType = (STyData) temp.get(d.getDataId());
             STyArr arrayType = (STyArr) temp.get(d.getLValue().getId());
             STyData dataType = (STyData) arrayType.getArg();
-
-            System.out.println(getLineNumber()+ " --- " + arrayType + " --- " + arrayType.getArg());
-            
 
             // verificando se o campo acessado existe
             ArrayList<String> variaveis = datas.get(dataType.getName()).getVariaveis();
@@ -1040,27 +1070,7 @@ public class TypeCheckVisitor extends Visitor {
                 // Compara o nome do atributo com as variaveis(atributo) que estão dentro do
                 // data
                 if (variaveis.get(i).equals(d.getId())) {
-                    // SType tipoAtributo = stk.pop();
-
-                    System.out.println(getLineNumber() + " --- " + dataTypes.get(i));
                     stk.push(dataTypes.get(i)); // Empilha o tipo do atributo
-                    /*if(!dataTypes.get(i).match(tipoExpressao)){  // Compara o tipo da expressao com o do atributo
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn()
-                            + "): Tipos incompativeis. O tipo do atributo \'" + d.getId()
-                            + "\' do array de data \'" + d.getDataId() + "\' eh \'"+ dataTypes.get(i)+ "\' e nao \'"
-                            + tipoExpressao +"\' !!!"
-                        );
-                        stk.push(tyErr);
-                    }*/
-
-                    // O tipo da expressao está no topo da pilha
-                    // Agora compara-se o tipo do atributo(variavel)
-                    /*if (!tipoAtributo.match(dataTypes.get(i))) {
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn()
-                            + "): Erro de tipo no acesso a um data. Verifique o tipo do atributo \'" + d.getId()
-                            + "\' do data \'" + d.getDataId() + "\' !!");
-                        stk.push(tyErr);
-                    }*/
                     varEncontrada = true;
                     break;
                 }
@@ -1094,7 +1104,6 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(FCallParams f) {
         for (Expression exp : f.getExps()) {
-            System.out.println(getLineNumber() + " --- " + exp + " --- " + exp.getClass().getSimpleName());
             exp.accept(this);
         }
     }
