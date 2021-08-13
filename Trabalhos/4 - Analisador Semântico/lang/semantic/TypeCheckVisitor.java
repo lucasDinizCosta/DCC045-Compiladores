@@ -477,6 +477,8 @@ public class TypeCheckVisitor extends Visitor {
                         SType tipoExpAtribuicao = stk.pop();
                         SType tipoMatriz = stk.pop();
 
+                        System.out.println(getLineNumber() + " |---| " + tipoMatriz + " ---" + tipoExpAtribuicao);
+
                         if(tipoMatriz instanceof STyFloat && tipoExpAtribuicao instanceof STyInt){
                             // Array de float aceita o tipo inteiro mas desde que seja convertido
                         }
@@ -513,8 +515,8 @@ public class TypeCheckVisitor extends Visitor {
                 }
                 // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
                 else {
-
                     a.getExp().accept(this);        // Empilha o tipo da expressao que será atribuida
+                    System.out.println(getLineNumber() + " --- " + a + " -- " + a.getExp() + " -- " + lvalue + " -- " + stk); 
 
                     SType tipoExpAtribuicao = stk.pop();
                     SType tipoArray = stk.pop();
@@ -1100,22 +1102,41 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
-
-        if(a.getLValue() instanceof ArrayAccess){
-            a.getLValue().accept(this);     // Verifica a parte ao array de linha da matriz
+        if(a.getLValue() instanceof Identifier){    // Já for a variavel entao é um array
+            if(temp.get(a.getLValue().getId()) != null){
+                SType tipoAux = temp.get(a.getLValue().getId());
+                System.out.println(getLineNumber() + " -- " + tipoAux);
+                if(tipoAux instanceof STyArr){
+                    SType argumento = ((STyArr)tipoAux).getArg();
+                    stk.push(argumento);           // Empilha o tipo do array
+                }
+            }
+            else{
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): a variavel  \'" + a.getLValue().getId() + "\' nao existe !!");
+                stk.push(tyErr);
+            }
         }
-        else{   // a.getLValue() é o nome da variavel => Identifier
+        else if(a.getLValue() instanceof ArrayAccess){   // é matriz
             if(temp.get(a.getLValue().getId()) != null){
                 SType tipoAux = temp.get(a.getLValue().getId());
                 if(tipoAux instanceof STyArr){
                     SType argumento = ((STyArr)tipoAux).getArg();
-                    if(argumento instanceof STyArr){
+                    if(argumento instanceof STyArr ){
                         SType tipoMatriz = ((STyArr)argumento).getArg();
                         if(tipoMatriz instanceof STyArr){
                             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Nao eh possivel uma matriz no formato "+ tipoAux + "!!");
                             stk.push(tyErr);
                         }
                         else{
+                            // Verifica o indice da linha da matriz
+                            ((ArrayAccess)a.getLValue()).getExp().accept(this);
+                            SType tipoLinha = stk.pop();
+                            if (!tipoLinha.match(tyInt)) { // Verifica se o tipo da posicao da linha na matriz é um valor inteiro
+                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Arrays so podem ter sua posicao acessada se o indice for um numero inteiro e nao \'" + tipoLinha + "\' !!");
+                                stk.push(tyErr);
+                            }
+
+                            System.out.println(getLineNumber() + " --- " + tipoMatriz);
                             stk.push(tipoMatriz);       // Empilha o tipo da matriz
                         }
                     }
@@ -1129,6 +1150,8 @@ public class TypeCheckVisitor extends Visitor {
                 stk.push(tyErr);
             }
         }
+            
+        System.out.println(getLineNumber() + " -- " + a + " -- " + a.getLValue() + " -- " + a.getLValue().getClass().getSimpleName() + " -- " + temp.get(a.getLValue().getId()) + " -- " + stk);
         a.getExp().accept(this); // Verifica se a posicao foi passada
         SType tipo = stk.pop();
         if (!tipo.match(tyInt)) { // Verifica se o tipo da posicao do array é um valor inteiro
