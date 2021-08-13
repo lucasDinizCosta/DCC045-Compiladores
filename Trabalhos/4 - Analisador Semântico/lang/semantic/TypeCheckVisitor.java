@@ -385,12 +385,19 @@ public class TypeCheckVisitor extends Visitor {
                 }
                 // SType tipoRetornado = stk.pop();
                 // tiposRetornados[j] = stk.pop();
-                if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
-                    + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
-                    + tiposRetornoPadrao[i] +"\' !!!");
-                    stk.push(tyErr);
+                if(tiposRetornados[contRetornos] instanceof STyInt && tiposRetornoPadrao[i] instanceof STyFloat){
+                    // Retornado um valor inteiro mas o padrao é Float, nao dispara um erro mas
+                    // Deve lembrar de ser convertido pra Float durante a operação depois
                 }
+                else{
+                    if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
+                        + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
+                        + tiposRetornoPadrao[i] +"\' !!!");
+                        stk.push(tyErr);
+                    }
+                }
+                
                 contRetornos++;
             }
         } else {
@@ -611,21 +618,29 @@ public class TypeCheckVisitor extends Visitor {
                 }
                 
                 // Empilha o ultimo tipo da função
-                //stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
+                stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
             }
 
+            // Function function = env.get(f.getId());
+            // function.accept(this);
+
+            System.out.println(getLineNumber() + " --- " + stk);
+
             // Retorno da função para as duas variaveis determinadas
-            /*if (f.getLValues() != null) {
+            if (f.getLValues() != null) {
                 List<LValue> ret = f.getLValues();
                 int it = ret.size() - 1;
+                System.out.println(getLineNumber() + " --- " + ret);
 
                 // Inverte a ordem quando empilha os operadores, logo, deve ser
                 // Desempilhado do direita pra esquerda
                 for (LValue l : ret) {
-                    env.peek().put(ret.get(it).getId(), operands.pop());
+                    System.out.println(getLineNumber() + " -- " + ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                    temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
                     it--;
                 }
-            }*/
+                System.out.println(getLineNumber() + " --- " + temp);
+            }
         }
     }
 
