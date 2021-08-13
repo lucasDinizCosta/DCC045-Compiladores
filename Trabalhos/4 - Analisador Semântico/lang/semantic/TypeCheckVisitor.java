@@ -635,31 +635,39 @@ public class TypeCheckVisitor extends Visitor {
                     + "): Na chamada da funcao \'" + f.getId()+"\' foram passados " + qtdParametrosInformados + " parametros enquanto que a funcao deveria receber " + tipoFuncao.getTypes().length + " parametro !");
                     stk.push(tyErr);
                 }
-                // Empilha o ultimo tipo da função
-                // stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
             }
 
             // Retorno da função para as duas variaveis determinadas
             if (f.getLValues() != null) {
-                List<LValue> ret = f.getLValues();
-                int it = ret.size() - 1;
+                // Garante que a função tem retorno e seja a mesma quantidade solicitada pelo usuario
+                if(((STyFun)function.getFuncType()).getReturnTypes() != null &&
+                f.getLValues().size() == ((STyFun)function.getFuncType()).getReturnTypes().length){
+                    List<LValue> ret = f.getLValues();
+                    int it = ret.size() - 1;
 
-                // Inverte a ordem quando empilha os operadores, logo, deve ser
-                // Desempilhado do direita pra esquerda
-                for (LValue l : ret) {
-                    if(temp.get(ret.get(it).getId()) != null){  // Variavel existe, entao tem um tipo
-                        if(temp.get(ret.get(it).getId()).match(((STyFun)function.getFuncType()).getReturnTypes()[it])){     // Verifica se o tipo bate com o retorno da função
-                            temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                    // Inverte a ordem quando empilha os operadores, logo, deve ser
+                    // Desempilhado do direita pra esquerda
+                    for (LValue l : ret) {
+                        if(temp.get(ret.get(it).getId()) != null){  // Variavel existe, entao tem um tipo
+                            if(temp.get(ret.get(it).getId()).match(((STyFun)function.getFuncType()).getReturnTypes()[it])){     // Verifica se o tipo bate com o retorno da função
+                                temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                            }
+                            else{
+                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A variavel \'" + ret.get(it).getId() + "\' ja existe e seu tipo eh \'" + temp.get(ret.get(it).getId()) + "\' e portanto, nao pode receber o valor do tipo \'" + ((STyFun)function.getFuncType()).getReturnTypes()[it] + "\' retornado pela funcao \'" + f.getId() + "\'");
+                                stk.push(tyErr);
+                            }
                         }
                         else{
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A variavel \'" + ret.get(it).getId() + "\' ja existe e seu tipo eh \'" + temp.get(ret.get(it).getId()) + "\' e portanto, nao pode receber o valor do tipo \'" + ((STyFun)function.getFuncType()).getReturnTypes()[it] + "\' retornado pela funcao \'" + f.getId() + "\'");
-                            stk.push(tyErr);
+                            temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
                         }
+                        it--;
                     }
-                    else{
-                        temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+
                     }
-                    it--;
+                else{   // A função não tem retorno ou é menor que o numero de retornos solicitados pelo usuario
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                    + "): Na chamada da funcao foram solicitados \'" + f.getLValues().size()+"\' retorno(s) mas a funcao original apresenta " + ((STyFun)function.getFuncType()).getReturnTypes().length + " retorno(s) !");
+                    stk.push(tyErr);
                 }
             }
         }
