@@ -36,6 +36,10 @@ public class TypeCheckVisitor extends Visitor {
     // armazena os dados do tipo data
     private HashMap<String, DataAttributes> datas; // (Nome do tipo, Atributos e seus tipos)
 
+    // Objeto que pega valor numerico, usado pra saber qual retorno de função para checar os tipos
+    // tipo func(1, 2)[1];  // Qual será o tipo do indice 1
+    private Object positionReturnFunction;
+
     public TypeCheckVisitor() {
         stk = new Stack<SType>();
         env = new TyEnv<LocalAmbiente<SType>>();
@@ -383,8 +387,7 @@ public class TypeCheckVisitor extends Visitor {
                 if(contRetornos > qtdExpRetorno){   // Sai da função se a quantidade for diferente
                     break;
                 }
-                // SType tipoRetornado = stk.pop();
-                // tiposRetornados[j] = stk.pop();
+
                 if(tiposRetornados[contRetornos] instanceof STyInt && tiposRetornoPadrao[i] instanceof STyFloat){
                     // Retornado um valor inteiro mas o padrao é Float, nao dispara um erro mas
                     // Deve lembrar de ser convertido pra Float durante a operação depois
@@ -416,6 +419,7 @@ public class TypeCheckVisitor extends Visitor {
         if (lvalue instanceof Identifier) {
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
+            System.out.println(getLineNumber() + " --- " + a.getExp() + " ---- " + a + " --- " + stk );
             SType tipoExpressao = stk.pop();
 
             if (tipoExpressao instanceof STyData) {
@@ -621,25 +625,17 @@ public class TypeCheckVisitor extends Visitor {
                 stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
             }
 
-            // Function function = env.get(f.getId());
-            // function.accept(this);
-
-            System.out.println(getLineNumber() + " --- " + stk);
-
             // Retorno da função para as duas variaveis determinadas
             if (f.getLValues() != null) {
                 List<LValue> ret = f.getLValues();
                 int it = ret.size() - 1;
-                System.out.println(getLineNumber() + " --- " + ret);
 
                 // Inverte a ordem quando empilha os operadores, logo, deve ser
                 // Desempilhado do direita pra esquerda
                 for (LValue l : ret) {
-                    System.out.println(getLineNumber() + " -- " + ((STyFun)function.getFuncType()).getReturnTypes()[it]);
                     temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
                     it--;
                 }
-                System.out.println(getLineNumber() + " --- " + temp);
             }
         }
     }
@@ -823,6 +819,7 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(IntegerNumber i) {
+        positionReturnFunction = i;
         stk.push(tyInt);
     }
 
@@ -965,7 +962,7 @@ public class TypeCheckVisitor extends Visitor {
 
                         tempID++;
                     }
-                    // Empilha o ultimo tipo da função
+                    // // Empilha o ultimo tipo da função
                     // stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
                 }
                 else{
@@ -997,6 +994,25 @@ public class TypeCheckVisitor extends Visitor {
             stk.push(tyErr);
         }
 
+        // Certifica que o valor da posicao de retorno existe e é um inteiro
+        // Se uma variavel for passada como posicao, simplesmente essa checagem de retorno não é feita
+        if(!(f.getExpIndex() instanceof Identifier)){   // Se nao for variavel
+            if(positionReturnFunction != null && positionReturnFunction instanceof IntegerNumber){
+                STyFun tipoFuncao = (STyFun) function.getFuncType();
+                IntegerNumber posicao = (IntegerNumber)positionReturnFunction;
+                stk.push(tipoFuncao.getReturnTypes()[posicao.getValue()]);
+            }
+        }
+        else{   // Empilha os dois retornos ====> Problema pode ser corrigido no interpretador
+            // Como nao temos acesso ao valor numerico e olhamos só o tipo
+            // Ficaria complicado afirmar se o retorno está com o tipo certo caso fosse uma variavel
+            // Sendo que empilhamos somente o tipo e não o valor inteiro
+            STyFun tipoFuncao = (STyFun) function.getFuncType();
+            IntegerNumber posicao = (IntegerNumber)positionReturnFunction;
+            for(int i = 0; i < tipoFuncao.getReturnTypes().length; i++){
+                stk.push(tipoFuncao.getReturnTypes()[i]);
+            }
+        }
     }
 
     // Partem do lvalue
