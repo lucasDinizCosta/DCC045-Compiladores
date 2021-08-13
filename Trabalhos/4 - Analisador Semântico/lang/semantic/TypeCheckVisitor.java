@@ -281,7 +281,6 @@ public class TypeCheckVisitor extends Visitor {
         else{
             t.getType().accept(this); // Empilha o tipo do array
             SType tipo = stk.pop();
-            System.out.println(getLineNumber() + " --- " + tipo + " --- " + t.getType());
             if(tipo instanceof STyData){    // Array de data ==> Testar se o data existe
                 if(datas.get(((STyData)tipo).getName()) != null){   // Verifica se o tipo Data existe
                     STyArr array = new STyArr(tipo);
@@ -440,12 +439,51 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(Return r) {
+        System.out.println("======> " + getLineNumber() + " --- " + r + " ---- " + r.getExps());
+        int qtdExpRetorno = 0;
         for (Expression exp : r.getExps()) {    // Processa a expressões de retorno da função
+            System.out.println("======> " + getLineNumber() + " --- " + exp);
             exp.accept(this);   // Aceita a expressão e empilha no stk
+            qtdExpRetorno++;
         }
         if (temp.getFuncType() instanceof STyFun) {
-            SType[] tipos = ((STyFun) temp.getFuncType()).getTypes();
-            tipos[tipos.length - 1].match(stk.pop());
+            // Padrao da documentação da função
+            SType[] tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
+
+            SType[] tiposRetornados = new SType[qtdExpRetorno];
+            // Desempilha os tipos retornados
+            for(int i = 0; i < qtdExpRetorno; i++){
+                tiposRetornados[i] = stk.pop();
+            }
+            
+            // Quantidades de retorno para diferente em relação a quantidade descrita na função
+            if(qtdExpRetorno != tiposRetornoPadrao.length){
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
+                + r.getColumn() + "): Foram especificados " + tiposRetornoPadrao.length 
+                + " tipos de retorno na documentacao da funcao mas no comando \'return\' apresenta " 
+                + qtdExpRetorno + " retorno(s) !!");
+                stk.push(tyErr);
+            }
+            System.out.println(getLineNumber() + " --- " + tiposRetornoPadrao[0] + " ---- " + tiposRetornoPadrao.length);
+
+            int contRetornos = 0;
+
+            // O retorno deve ser desempilhado na ordem contraria
+            for(int i = tiposRetornoPadrao.length - 1; i >= 0; i--){  // Verificação de tipo nos retornos
+
+                if(contRetornos > qtdExpRetorno){
+                    break;
+                }
+                // SType tipoRetornado = stk.pop();
+                // tiposRetornados[j] = stk.pop();
+                if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
+                    + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
+                    + tiposRetornoPadrao[i] +"\' !!!");
+                    stk.push(tyErr);
+                }
+                contRetornos++;
+            }
         } else {
             stk.pop().match(temp.getFuncType());
         }
