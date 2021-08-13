@@ -540,11 +540,12 @@ public class TypeCheckVisitor extends Visitor {
                 } else { // se ja foi declarada, verifica se o tipo casa com o tipo dela
                     SType current = temp.get(lvalue.getId());
                     SType tpilha = tipoExpressao;
+                    System.out.println(getLineNumber() + " --- " + current + " --- " + tpilha);
 
                     if (!tpilha.match(current)) {
                         logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                            + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tpilha + " <-> "
-                            + current);
+                        + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tpilha + " <-> "
+                        + current);
                         stk.push(tyErr);
                     }
 
@@ -552,48 +553,98 @@ public class TypeCheckVisitor extends Visitor {
             }
 
         } else if (lvalue instanceof ArrayAccess) {
-            // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
-            // dentro do ArrayAccess se casa
+            if(((ArrayAccess)lvalue).getLValue() != null && ((ArrayAccess)lvalue).getLValue() instanceof ArrayAccess){   // Trata o caso de matriz
+                ArrayAccess matriz = (ArrayAccess)((ArrayAccess)lvalue).getLValue();
+                
+                // aceita a expressao e joga pro topo da pilha. vai verificar posteriormente
+                // dentro do ArrayAccess se casa
+                // lvalue.accept(this);
+                ((ArrayAccess)lvalue).getExp().accept(this);    //Empilha o indice da coluna
+                //matriz.accept(this);    // Empilha o tipo do array e o tipo da expressao da posicao
+                // ver a parte de indices - por enquanto so ve se n foi declarada ainda
+                // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
+                if ((temp.get(matriz.getId()) == null)) {
 
-            lvalue.accept(this);
+                    a.getExp().accept(this);       
 
-            // ver a parte de indices - por enquanto so ve se n foi declarada ainda
-            // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
-            if ((temp.get(lvalue.getId()) == null)) {
+                    SType st = stk.pop();
+                    STyArr arr = new STyArr(st);
 
-                a.getExp().accept(this);       
+                    // adiciona o array no contexto, com o tipo dado pela expressão
+                    temp.set(matriz.getId(), arr);
+                }
+                // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
+                else {
+                    matriz.getExp().accept(this);
+                    System.out.println(getLineNumber() + " -----> " + matriz + " ---- " + matriz.getId() + " --- " + stk + " --- " + matriz.getExp() +" --- " + matriz.getExp().getClass().getSimpleName());
+                    System.out.println(getLineNumber() + " -----> "+ a + " --- " + a.getExp() + " --- " + a.getExp().getClass().getSimpleName() + " --- " + ((STyArr) temp.get(matriz.getId())));
+                    a.getExp().accept(this);    // Empilha o objeto da expressao => new int, new Ponto ou somente uma variavel
 
-                SType st = stk.pop();
-                STyArr arr = new STyArr(st);
-
-                // adiciona o array no contexto, com o tipo dado pela expressão
-                temp.set(lvalue.getId(), arr);
-            }
-            // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
-            else {
-
-                a.getExp().accept(this);
-
-                // se nao for variavel, confere o valor
-                if (!(a.getExp() instanceof Identifier)) {
-                    STyArr arr = (STyArr) temp.get(lvalue.getId());
-                    SType pilha = stk.pop();
-                    if(arr.getArg() instanceof STyFloat && pilha instanceof STyInt){
-                        // Array de float aceita o tipo inteiro mas desde que seja convertido
-                            
-                    }
-                    else{
-                        if (!pilha.match(arr.getArg())) {   
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                                + "): Problema na atribuicao de variavel. Os tipos nao casam: " + pilha + " <-> "
-                                + arr.getArg());
-                            stk.push(tyErr);
+                    // se nao for variavel, confere o valor
+                    if (!(a.getExp() instanceof Identifier)) {
+                        
+                        // o temp vai retornar a matriz
+                        // o getArg pega o Array 
+                        STyArr arr = (STyArr)((STyArr) temp.get(matriz.getId())).getArg();  // Array
+                        SType tipoPosicaoArray = stk.pop(); // Tipo do objeto que sera adicionado
+                        if(arr.getArg() instanceof STyFloat && tipoPosicaoArray instanceof STyInt){
+                            // Array de float aceita o tipo inteiro mas desde que seja convertido
+                        }
+                        else{
+                            // Compara o tipo o objeto a ser adiciona com o tipo do array
+                            if (!tipoPosicaoArray.match(arr.getArg())) {   
+                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                                    + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoPosicaoArray + " <-> "
+                                    + arr.getArg());
+                                stk.push(tyErr);
+                            }
                         }
                     }
+
                 }
-
             }
+            else{   // Array 
+                // aceita a expressao e joga pro topo da pilha. vai verificar posteriormente
+                // dentro do ArrayAccess se casa
 
+                lvalue.accept(this);
+                // ver a parte de indices - por enquanto so ve se n foi declarada ainda
+                // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
+                if ((temp.get(lvalue.getId()) == null)) {
+
+                    a.getExp().accept(this);       
+
+                    SType st = stk.pop();
+                    STyArr arr = new STyArr(st);
+
+                    // adiciona o array no contexto, com o tipo dado pela expressão
+                    temp.set(lvalue.getId(), arr);
+                }
+                // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
+                else {
+
+                    a.getExp().accept(this);
+
+                    // se nao for variavel, confere o valor
+                    if (!(a.getExp() instanceof Identifier)) {
+                        STyArr arr = (STyArr) temp.get(lvalue.getId());
+                        SType pilha = stk.pop();
+                        if(arr.getArg() instanceof STyFloat && pilha instanceof STyInt){
+                            // Array de float aceita o tipo inteiro mas desde que seja convertido
+                                
+                        }
+                        else{
+                            if (!pilha.match(arr.getArg())) {   
+                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                                    + "): Problema na atribuicao de variavel. Os tipos nao casam: " + pilha + " <-> "
+                                    + arr.getArg());
+                                stk.push(tyErr);
+                            }
+                        }
+                    }
+
+                }
+            }
         } else if (lvalue instanceof DataAccess) {
             // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
             // dentro do dataAccess se casa

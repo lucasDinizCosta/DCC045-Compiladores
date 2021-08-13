@@ -62,9 +62,11 @@ main(){
 	i = 0;
 	iterate(k){
        malhaPontos[i][i] = new Ponto;
-	   
+	   malhaPontos[i][i].x = 2;
+	   malhaPontos[i][i].y = 3;
 	   i = i + 1;
     }
+	
 	
 {-
 	iterate(k){
