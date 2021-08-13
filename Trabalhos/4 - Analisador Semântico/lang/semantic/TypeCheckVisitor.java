@@ -591,6 +591,8 @@ public class TypeCheckVisitor extends Visitor {
          * 
          * Exemplo: divmod(5, 2)<q, r>; // Será retornada 2 valores e armazenados na
          * variavel q e r
+         * pode ser tbm
+         * divmod(5,2); SEM RETORNO
          */
 
         // Pega a função correspondente
@@ -605,25 +607,34 @@ public class TypeCheckVisitor extends Visitor {
 
                 STyFun tipoFuncao = (STyFun) function.getFuncType();
 
-                int tempID = 0;
+                int indiceParamPassado = 0;
+
 
                 // Verifica os tipos dos parametros passado
                 for (Expression exp : f.getFCallParams().getExps()) {
                     // Empilha a expressao do parametro
                     exp.accept(this);
-                    SType tipoParametro = tipoFuncao.getTypes()[tempID];    // Tipo do parametro do campo da função
-                    SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
+                    // Verifica se o tamanho dos parametros é o mesmo informado pelo usuario
+                    if(indiceParamPassado < tipoFuncao.getTypes().length){ 
+                        SType tipoParametro = tipoFuncao.getTypes()[indiceParamPassado];    // Tipo do parametro do campo da função
+                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
 
-                    // Se o parametro passado não casar com o da função, emite um erro
-                    if (!tipoParametro.match(parametroPassado)) {
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                            + "): Argumentos com tipos incompatíveis com o da função \'" + f.getId()+"\'");
-                        stk.push(tyErr);
+                        // Se o parametro passado não casar com o da função, emite um erro
+                        if (!tipoParametro.match(parametroPassado)) {
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                                + "): Argumentos com tipos incompativeis com o da funcao \'" + f.getId()+"\' => " + parametroPassado + " diferente de " + tipoParametro);
+                            stk.push(tyErr);
+                        } 
+                        
                     }
-
-                    tempID++;
+                    indiceParamPassado++;
                 }
-                
+                Integer qtdParametrosInformados = ((List)f.getFCallParams().getExps()).size();
+                if( qtdParametrosInformados > tipoFuncao.getTypes().length || qtdParametrosInformados < tipoFuncao.getTypes().length){
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                    + "): Na chamada da funcao \'" + f.getId()+"\' foram passados " + qtdParametrosInformados + " parametros enquanto que a funcao deveria receber " + tipoFuncao.getTypes().length + " parametro !");
+                    stk.push(tyErr);
+                }
                 // Empilha o ultimo tipo da função
                 // stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
             }
