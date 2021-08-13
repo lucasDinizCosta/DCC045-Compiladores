@@ -164,13 +164,16 @@ public class TypeCheckVisitor extends Visitor {
         for(Function f : p.getFunctions()){
             SType[] parameterType = new SType[0];
             SType[] returnType = new SType[0];
+            String[] namesParameter = new String[0];
 
             // instancia o vetor com tamanho do num de params, se nao for sem params
             if (f.getParameters() != null) {
                 parameterType = new SType[f.getParameters().getType().size()];
+                namesParameter = new String[f.getParameters().getType().size()];
                 for (int i = 0; i < f.getParameters().size(); i++) {
                     f.getParameters().getSingleType(i).accept(this);
                     parameterType[i] = stk.pop();
+                    namesParameter[i] = f.getParameters().getSingleId(i);
                 }
             }
 
@@ -183,7 +186,7 @@ public class TypeCheckVisitor extends Visitor {
                 }
             }
             // adiciona no ambiente
-            env.set(f.getId(), new LocalAmbiente<SType>(f.getId(), new STyFun(parameterType, returnType)));
+            env.set(f.getId(), new LocalAmbiente<SType>(f.getId(), new STyFun(parameterType, returnType, namesParameter)));
         }
 
         // Checa as funções
@@ -603,7 +606,7 @@ public class TypeCheckVisitor extends Visitor {
             if (tyl.match(tyInt) || tyl.match(tyFloat)) {
                 stk.push(tyl);
             } else {
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador " + opName + " nao se aplica aos tipos "
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica aos tipos "
                     + tyl.toString() + " e " + tyr.toString());
                 stk.push(tyErr);
             }
@@ -612,12 +615,12 @@ public class TypeCheckVisitor extends Visitor {
             if (tyl.match(tyInt) || tyl.match(tyFloat)) {
                 stk.push(tyr); // Independente do tipo tyl, empilho Float
             } else {
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador " + opName + " não se aplica aos tipos "
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica aos tipos "
                     + tyl.toString() + " e " + tyr.toString());
                 stk.push(tyErr);
             }
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador " + opName + " não se aplica aos tipos "
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica aos tipos "
                 + tyl.toString() + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -633,7 +636,7 @@ public class TypeCheckVisitor extends Visitor {
         if (tyr.match(tyBool) && tyl.match(tyBool)) {
             stk.push(tyBool);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Operador && não se aplica aos tipos " + tyl.toString()
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Operador \'&&\' nao se aplica aos tipos " + tyl.toString()
                 + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -649,7 +652,7 @@ public class TypeCheckVisitor extends Visitor {
         if ((tyr.match(tyInt) || tyr.match(tyFloat)) && (tyl.match(tyInt) || tyr.match(tyFloat))) {
             stk.push(tyBool);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + l.getLine() + ", coluna: " + l.getColumn() + "): Operador < não se aplica aos tipos " + tyl.toString()
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + l.getLine() + ", coluna: " + l.getColumn() + "): Operador \'<\' nao se aplica aos tipos " + tyl.toString()
                 + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -666,7 +669,7 @@ public class TypeCheckVisitor extends Visitor {
         } else if (tyl.match(tyChar) && tyr.match(tyChar)) {
             stk.push(tyBool);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + e.getLine() + ", coluna: " + e.getColumn() + "): Operador == não se aplica aos tipos " + tyl.toString()
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + e.getLine() + ", coluna: " + e.getColumn() + "): Operador \'==\' nao se aplica aos tipos " + tyl.toString()
                 + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -683,7 +686,7 @@ public class TypeCheckVisitor extends Visitor {
         } else if (tyl.match(tyChar) && tyr.match(tyChar)) {
             stk.push(tyBool);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador != não se aplica aos tipos " + tyl.toString()
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'!=\' nao se aplica aos tipos " + tyl.toString()
                 + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -728,7 +731,7 @@ public class TypeCheckVisitor extends Visitor {
         if (tyr.match(tyInt) && tyl.match(tyInt)) {
             stk.push(tyInt);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + m.getLine() + ", coluna: " + m.getColumn() + "): Operador % não se aplica aos tipos " + tyl.toString()
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + m.getLine() + ", coluna: " + m.getColumn() + "): Operador \'%\' nao se aplica aos tipos " + tyl.toString()
                 + " e " + tyr.toString());
             stk.push(tyErr);
         }
@@ -742,7 +745,7 @@ public class TypeCheckVisitor extends Visitor {
         if (tyr.match(tyBool)) {
             stk.push(tyBool);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador ! não se aplica ao tipo " + tyr.toString());
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'!\' nao se aplica ao tipo " + tyr.toString());
             stk.push(tyErr);
         }
 
@@ -757,7 +760,7 @@ public class TypeCheckVisitor extends Visitor {
         } else if (tyr.match(tyFloat)) {
             stk.push(tyFloat);
         } else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador - não se aplica ao tipo " + tyr.toString());
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'-\' nao se aplica ao tipo " + tyr.toString());
             stk.push(tyErr);
         }
     }
@@ -861,11 +864,72 @@ public class TypeCheckVisitor extends Visitor {
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
 
+        System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
+
+        // Pega a função correspondente
+        LocalAmbiente<SType> function = env.get(f.getId());
+
+        // Garante a existencia da função
+        if (function != null) {
+
+            // Passa do operand para o params
+            // monta o parametro da função
+            if (f.getFCallParams() != null) {
+
+                STyFun tipoFuncao = (STyFun) function.getFuncType();
+
+                int tempID = 0;
+
+                System.out.println(getLineNumber() + " --- " + f.getFCallParams().getExps());
+
+                // Verifica se a quantidade de parametros informados é o mesmo da função
+                if(f.getFCallParams().getExps().size() == tipoFuncao.getTypes().length){
+                    // Verifica os tipos dos parametros passado
+                    for (Expression exp : f.getFCallParams().getExps()) {
+                        // Empilha a expressao do parametro
+                        exp.accept(this);
+                        SType tipoParametro = tipoFuncao.getTypes()[tempID];    // Tipo do parametro do campo da função
+                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
+
+                        // Se o parametro passado não casar com o da função, emite um erro
+                        if (!tipoParametro.match(parametroPassado)) {
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                                + "): Argumentos com tipos incompativeis com os parametros da funcao \'" + f.getId()+"\'"
+                                + " => O parametro \'" + tipoFuncao.getTypesName()[tempID] + "\' deve apresentar o tipo \'"
+                                + tipoParametro + "\' e nao \'" + parametroPassado + "\' !!!"
+                            );
+                            stk.push(tyErr);
+                        }
+
+                        tempID++;
+                    }
+                    // Empilha o ultimo tipo da função
+                    stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
+                }
+                else{
+                    if(f.getFCallParams().getExps().size() > tipoFuncao.getTypes().length){
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                        + "): Foi passado mais argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
+                        + " apresenta !!!");
+                        stk.push(tyErr);
+                    }
+                    else{
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
+                        + "): Foi passado menos argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
+                        + " apresenta !!!");
+                        stk.push(tyErr);
+                    }
+                }
+            }
+        }
+
         // aceita a lista de expressoes, para futura verificação de tipos
-        f.getFCallParams().accept(this);
+        //f.getFCallParams().accept(this);    // Empilha os tipos dos parametros
 
         // verifica se o valor passado de posicao do array é inteiro
         f.getExpIndex().accept(this);
+
+        System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
         SType tipoPosicaoRetorno = stk.pop();
         if (!tipoPosicaoRetorno.match(tyInt)) {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna:" + f.getColumn()
@@ -1030,6 +1094,7 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(FCallParams f) {
         for (Expression exp : f.getExps()) {
+            System.out.println(getLineNumber() + " --- " + exp + " --- " + exp.getClass().getSimpleName());
             exp.accept(this);
         }
     }

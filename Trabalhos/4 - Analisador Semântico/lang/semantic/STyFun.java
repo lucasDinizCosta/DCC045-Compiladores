@@ -2,29 +2,40 @@ package lang.semantic;
 
 public class STyFun extends SType {
     private String id;          // Nome da função
-    private SType ty[];
-    private SType ret[];
+    private SType parameterType[];      // Tipos do parametro
+    private String nameParams[];         // Nome dos parametros
+    private SType returnType[];         // Tipos de retorno
 
     public STyFun(SType t[], SType retornos[]) {
-        ty = t;
-        ret = retornos;
+        parameterType = t;
+        returnType = retornos;
+    }
+
+    public STyFun(SType t[], SType retornos[], String[] names) {
+        parameterType = t;
+        returnType = retornos;
+        nameParams = names;
     }
 
     public SType[] getTypes() {
-        return ty;
+        return parameterType;
     }
 
     public SType[] getReturnTypes() {
-        return ret;
+        return returnType;
+    }
+
+    public String[] getTypesName() {
+        return nameParams;
     }
 
     public boolean match(SType v) {
         boolean r = false;
         if (v instanceof STyFun) {
-            if (((STyFun) v).getTypes().length == ty.length) {
+            if (((STyFun) v).getTypes().length == parameterType.length) {
                 r = true;
-                for (int i = 0; i < ty.length; i++) {
-                    r = r && ty[i].match(((STyFun) v).getTypes()[i]);
+                for (int i = 0; i < parameterType.length; i++) {
+                    r = r && parameterType[i].match(((STyFun) v).getTypes()[i]);
                 }
             }
         }
@@ -34,10 +45,10 @@ public class STyFun extends SType {
     @Override
     public String toString() {
         String s = "";
-        if (ty.length > 0) {
-            s = ty[0].toString();
-            for (int i = 1; i < ty.length; i++) {
-                s += "->" + ty[i].toString();
+        if (parameterType.length > 0) {
+            s = parameterType[0].toString();
+            for (int i = 1; i < parameterType.length; i++) {
+                s += "->" + parameterType[i].toString();
             }
         }
         return s;

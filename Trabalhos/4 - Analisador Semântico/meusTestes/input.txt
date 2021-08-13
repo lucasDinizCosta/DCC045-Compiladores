@@ -10,7 +10,8 @@ data Ponto{
 	y :: Int;
 }
 
-fat(n :: Int) : Int{
+fat(n :: Int, nC :: Char) : Int{
+  k = 1 + 'c';
   if(n == 0){
       return 1;
   }
@@ -39,7 +40,8 @@ main(){
        --x[i] = aux;
        i = i + 1;
     }
-	print pontos[0].x;
+	print pontos[0].x + 'c';
+	print pontos[0].x + fat(2.5, 'k')[0];
 	pontos[0].x = 'c';
     {-
 	iterate(k){

@@ -20,8 +20,8 @@ public class Parameters extends Node {
      * params: ID DOUBLE_COLON type (COMMA ID DOUBLE_COLON type)*  # ParametersFunction
     */
 
-    private List<String> id;
-    private List<Type> type;
+    private List<String> id;        // Nome das variaveis dos parametros
+    private List<Type> type;        // Tipos das variaveis dos parametros
     
     public Parameters (int line, int column){
         super(line, column);
@@ -71,7 +71,6 @@ public class Parameters extends Node {
     @Override
     public String toString(){
         String s = "";
-        // System.out.println("74 -- parametros --Type " + type.toString() );
         for(int i = 0; i < id.size(); i++){
             String idAux = id.get(i).toString();
             String typeAux = type.get(i).toString();
