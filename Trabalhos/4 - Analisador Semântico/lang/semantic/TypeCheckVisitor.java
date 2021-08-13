@@ -625,7 +625,7 @@ public class TypeCheckVisitor extends Visitor {
                 }
                 
                 // Empilha o ultimo tipo da função
-                stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
+                // stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
             }
 
             // Retorno da função para as duas variaveis determinadas
@@ -636,7 +636,18 @@ public class TypeCheckVisitor extends Visitor {
                 // Inverte a ordem quando empilha os operadores, logo, deve ser
                 // Desempilhado do direita pra esquerda
                 for (LValue l : ret) {
-                    temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                    if(temp.get(ret.get(it).getId()) != null){  // Variavel existe, entao tem um tipo
+                        if(temp.get(ret.get(it).getId()).match(((STyFun)function.getFuncType()).getReturnTypes()[it])){     // Verifica se o tipo bate com o retorno da função
+                            temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                        }
+                        else{
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A variavel \'" + ret.get(it).getId() + "\' ja existe e seu tipo eh \'" + temp.get(ret.get(it).getId()) + "\' e portanto, nao pode receber o valor do tipo \'" + ((STyFun)function.getFuncType()).getReturnTypes()[it] + "\' retornado pela funcao \'" + f.getId() + "\'");
+                            stk.push(tyErr);
+                        }
+                    }
+                    else{
+                        temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
+                    }
                     it--;
                 }
             }
@@ -1145,7 +1156,7 @@ public class TypeCheckVisitor extends Visitor {
 
         }
         else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): o tipo data \'" + d.getDataId() + "\' nao existe !!!");
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): A variavel \'" + d.getDataId() + "\' nao existe e portanto nao pode ter atributos !!!");
             stk.push(tyErr);
         }
     }
