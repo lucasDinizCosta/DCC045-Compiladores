@@ -60,6 +60,9 @@ public class LangCompiler {
                 return;
             }
             SuperNode result = langParser.parseFile(args[1]);
+            System.out.println("--------------------------------");
+            System.out.println("\n======> parsing ... [ ok ] \n");
+            System.out.println("--------------------------------");
             if (result == null) {
                 System.err.println("Aborting due to syntax error(s)");
                 System.exit(1);
@@ -67,8 +70,10 @@ public class LangCompiler {
                 // Interpreta o Visitor e elabora o ambiente de desenvolvimento
                 InterpretVisitor interpreter = new InterpretVisitor();  
                 
+                System.out.println("\n---------- Execuntando o Interpretador ------------\n");
                 // Aceita o nó e caminha na árvore
                 ((Node)result).accept(interpreter);               // Passa o node criado e testa o interpretador
+                System.out.println("\n--------------------------------------------------\n");
 
                 // Imprime o ambiente criado pelo interpretador
                 System.out.println("\n\n---------- Ambiente de execucao ------------");
@@ -78,7 +83,7 @@ public class LangCompiler {
                 // iv = new InteractiveInterpreterVisitor();
                 // result.accept(iv);
             } else if (args[0].equals("-tp")) {
-                // Checa o tipo e elabora o ambiente de desenvolvimento
+                // Checa o tipo e a parte semantica elabora o ambiente de desenvolvimento
                 TypeCheckVisitor typeCheck = new TypeCheckVisitor();  
                 
                 // Aceita o nó e caminha na árvore
@@ -88,10 +93,35 @@ public class LangCompiler {
                 if(typeCheck.getNumErrors() > 0){
                     typeCheck.printErrors();
                  }else{
-                    System.out.println("typing  ... [ ok ]"); 
+                    System.out.println("typing check ... [ ok ]"); 
                  }
                 System.out.println("\n-----------------------------\n");
-            } else if (args[0].equals("-pp")) {
+            
+            } 
+            else if (args[0].equals("-ti")) {
+                // Checa a parte semantica e elabora o ambiente de desenvolvimento
+                TypeCheckVisitor typeCheck = new TypeCheckVisitor();  
+                
+                // Aceita o nó e caminha na árvore
+                ((Node)result).accept(typeCheck);               
+                
+                if(typeCheck.getNumErrors() > 0){
+                    typeCheck.printErrors();
+                 }else{
+                    System.out.println("--------------------------------");
+                    System.out.println("\n======> typing check ... [ ok ]\n"); 
+                    System.out.println("--------------------------------\n");
+                    // Interpreta o Visitor e elabora o ambiente de desenvolvimento
+                    InterpretVisitor interpreter = new InterpretVisitor();  
+                    
+                    System.out.println("\n---------- Execuntando o Interpretador ------------\n");
+                    // Aceita o nó e caminha na árvore
+                    ((Node)result).accept(interpreter);               // Passa o node criado e testa o interpretador
+
+                    System.out.println("\n--------------------------------------------------\n");
+                 }
+            } 
+            else if (args[0].equals("-pp")) {
                 // iv = new PPrint();
                 // result.accept(iv);
                 // ((PPrint)iv).print();

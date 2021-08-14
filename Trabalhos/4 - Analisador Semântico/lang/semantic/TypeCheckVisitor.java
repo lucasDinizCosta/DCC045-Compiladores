@@ -58,7 +58,7 @@ public class TypeCheckVisitor extends Visitor {
     }
 
     public void printErrors() {
-        System.out.println("-------------- Type errors -----------\n");
+        System.out.println("-------------- ERROS DE TIPO -----------\n");
         int indice = 1;
         for (String s : logError) {
             System.out.println("=> " + (indice < 10 ? "0" + indice : indice) + ") - " + s);
@@ -136,7 +136,6 @@ public class TypeCheckVisitor extends Visitor {
 
         // Cria as funções no env
         for(Function f : p.getFunctions()){
-            System.out.println(getLineNumber() + " ---  " + f);
             if(f.getId().equals("main")){   // Checa se a funcao main já existe
                 if(env.getFuncoes(f.getId()).size() > 0){ // Tenta sobrecarregar a funcao main
                     logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A funcao \'" + main + "\' deve ser UNICA com esse nome e nao deve ter sobrecarga de funcoes com seu nome !");
@@ -262,7 +261,6 @@ public class TypeCheckVisitor extends Visitor {
         retChk = false;
         // Pega o ambiente da função
         ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
-        System.out.println(getLineNumber()+ " ---- " + funcFinded);
         temp = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
         if(funcFinded.size() > 1){  // Tem sobrecarga 
             for(int i = 0; i < funcFinded.size(); i++){
@@ -312,11 +310,7 @@ public class TypeCheckVisitor extends Visitor {
             // Padrao da documentação da função
             tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
         }
-        // tiposRetornoPadrao
-        //  System.out.println(getLineNumber() + " --- " + retChk + " --- " + f.getReturnTypes() +
-        //  "---" + tiposRetornoPadrao.length + " --- " + f.getId());
 
-        // if (!retChk && f.getReturnTypes().size() > 0) {
         if (!retChk && tiposRetornoPadrao.length > 0) {
             if(verificacaoIf){
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Na funcao \'" + f.getId() + "\' falta um estado de retorno depois do ultimo comando \'if\' !");
@@ -557,7 +551,6 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(Attribution a) {
         // a = 2 + b + ponto.x + array[1];
-        System.out.println(getLineNumber() + " --- " + a + " --- " + temp);
 
         // Variavel que vai ter os dados atribuidos nela
         LValue lvalue = a.getLValue();
@@ -666,7 +659,6 @@ public class TypeCheckVisitor extends Visitor {
                 // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
                 else {
                     a.getExp().accept(this);        // Empilha o tipo da expressao que será atribuida
-                    // System.out.println(getLineNumber() + " --- " + a + " -- " + a.getExp() + " -- " + lvalue + " -- " + stk); 
 
                     SType tipoExpAtribuicao = stk.pop();
                     SType tipoArray = stk.pop();
@@ -695,7 +687,6 @@ public class TypeCheckVisitor extends Visitor {
                 lvalue.accept(this);    // Empilha o Tipo do atributo do data ou o tipo data mesmo
             }
             
-            // System.out.println(getLineNumber() + " ---- " + stk );
             SType tipoVariavel = stk.pop();
             SType tipoExpressao = stk.pop();
             DataAccess d = (DataAccess)lvalue;
@@ -755,7 +746,7 @@ public class TypeCheckVisitor extends Visitor {
                             verificaRetDif = true;
                         }
                     }
-                    if(verificaRetDif){
+                    if(verificaRetDif){ // Os tipos de retornos são diferentes
                         continue;
                     }
 
@@ -768,7 +759,7 @@ public class TypeCheckVisitor extends Visitor {
                                 verificaRetDif = true;
                             }
                         }
-                        if(verificaRetDif){
+                        if(verificaRetDif){ // Os tipos dos parametros são diferentes
                             continue;
                         }
                         function = (LocalAmbiente<SType>)funcFinded.get(i);
@@ -1108,10 +1099,8 @@ public class TypeCheckVisitor extends Visitor {
                 }
 
                 if(datas.get(t.getDataName()) != null){ // Tipo data existe
-                    // SType tipoArray = stk.pop();
-                    // System.out.println(getLineNumber() + " ---=====> " + t.getDataName() + " --- " + t);
-
                     STyData tyData = new STyData(t.getDataName());
+
                     // Cria o tipo de array com referencia ao tipo primitivo informado
                     STyArr array = new STyArr(tyData);
                     stk.add(array);
@@ -1199,8 +1188,6 @@ public class TypeCheckVisitor extends Visitor {
 
                 int tempID = 0;
 
-                // System.out.println(getLineNumber() + " --- " + f.getFCallParams().getExps());
-
                 // Verifica se a quantidade de parametros informados é o mesmo da função
                 if(f.getFCallParams().getExps().size() == tipoFuncao.getTypes().length){
                     // Verifica os tipos dos parametros passado
@@ -1256,7 +1243,6 @@ public class TypeCheckVisitor extends Visitor {
         // verifica se o valor passado de posicao do array é inteiro
         f.getExpIndex().accept(this);
 
-        // System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
         SType tipoPosicaoRetorno = stk.pop();
         if (!tipoPosicaoRetorno.match(tyInt)) {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna:" + f.getColumn()
@@ -1309,8 +1295,6 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
-        // System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
-        // + d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
 
         // Certifica a existencia do tipo data passado no escopo atual
         if (temp.get(d.getDataId()) instanceof STyData) {
@@ -1467,7 +1451,6 @@ public class TypeCheckVisitor extends Visitor {
             }
         }
             
-        // System.out.println(getLineNumber() + " -- " + a + " -- " + a.getLValue() + " -- " + a.getLValue().getClass().getSimpleName() + " -- " + temp.get(a.getLValue().getId()) + " -- " + stk);
         a.getExp().accept(this); // Verifica se a posicao foi passada
         SType tipo = stk.pop();
         if (!tipo.match(tyInt)) { // Verifica se o tipo da posicao do array é um valor inteiro
