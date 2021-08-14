@@ -963,23 +963,10 @@ public class InterpretVisitor extends Visitor {
             }
             else if(left.getClass() == Float.class && right.getClass() == Float.class){
                 operands.push((Float) left + (Float) right);
-            }
-            else if(left.getClass() == Integer.class && right.getClass() == Float.class){
-                operands.push((Integer) left + (Float) right);
-            }
-            else if(left.getClass() == Float.class && right.getClass() == Integer.class){
-                operands.push((Float) left + (Integer) right);
-            }   
+            }  
             else{
                 throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de adicao \'+\' !!");
             }
-            /*if (left instanceof Float || right instanceof Float) {
-                operands.push((Float) left + (Float) right);
-            } else if (left instanceof Integer && right instanceof Integer) {
-                operands.push((Integer) left + (Integer) right);
-            } else{
-                throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de adicao \'+\' !!");
-            }*/
         } catch (Exception e) {
             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") " + e.getMessage());
         }
@@ -1000,22 +987,9 @@ public class InterpretVisitor extends Visitor {
             else if(left.getClass() == Float.class && right.getClass() == Float.class){
                 operands.push((Float) left - (Float) right);
             }
-            else if(left.getClass() == Integer.class && right.getClass() == Float.class){
-                operands.push((Integer) left - (Float) right);
-            }
-            else if(left.getClass() == Float.class && right.getClass() == Integer.class){
-                operands.push((Float) left - (Integer) right);
-            }  
             else{
                 throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de subtracao \'-\' !!");
             }
-            /*if (left instanceof Float || right instanceof Float) {
-                operands.push((Float) left - (Float) right);
-            } else if (left instanceof Integer && right instanceof Integer) {
-                operands.push((Integer) left - (Integer) right);
-            } else{
-                throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de subtracao \'-\' !!");
-            }*/
         } catch (Exception x) {
             throw new RuntimeException(" (" + s.getLine() + ", " + s.getColumn() + ") " + x.getMessage());
         }
@@ -1037,12 +1011,13 @@ public class InterpretVisitor extends Visitor {
             else if(left.getClass() == Float.class && right.getClass() == Float.class){
                 operands.push((Float) left * (Float) right);
             }
-            else if(left.getClass() == Integer.class && right.getClass() == Float.class){
+            /*else if(left.getClass() == Integer.class && right.getClass() == Float.class){
                 operands.push((Integer) left * (Float) right);
             }
             else if(left.getClass() == Float.class && right.getClass() == Integer.class){
                 operands.push((Float) left * (Integer) right);
-            } else{
+            } */
+            else{
                 throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de multiplicacao \'*\' !!");
             }
         } catch (Exception x) {
@@ -1065,12 +1040,12 @@ public class InterpretVisitor extends Visitor {
             else if(left.getClass() == Float.class && right.getClass() == Float.class){
                 operands.push((Float) left / (Float) right);
             }
-            else if(left.getClass() == Integer.class && right.getClass() == Float.class){
+            /*else if(left.getClass() == Integer.class && right.getClass() == Float.class){
                 operands.push((Integer) left / (Float) right);
             }
             else if(left.getClass() == Float.class && right.getClass() == Integer.class){
                 operands.push((Float) left / (Integer) right);
-            } else{
+            }*/ else{
                 throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Expressoes invalidas na operacao de divisao \'/\' !!");
             }  
         } catch (Exception x) {
@@ -1080,6 +1055,10 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Modular m) {
+        /**
+         * Operação modular: 10 % 2 => 0
+         * Só deve aceitar inteiros(Integer)
+         */
         try {
             m.getLeft().accept(this);
             m.getRight().accept(this);
@@ -1087,15 +1066,6 @@ public class InterpretVisitor extends Visitor {
             Object left = operands.pop();
             if(left.getClass() == Integer.class && right.getClass() == Integer.class){
                 operands.push((Integer) left / (Integer) right);
-            }
-            else if(left.getClass() == Float.class && right.getClass() == Float.class){
-                throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : operacao de divisao modular \'%\' so aceita numeros inteiros !!");
-            }
-            else if(left.getClass() == Integer.class && right.getClass() == Float.class){
-                throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : operacao de divisao modular \'%\' so aceita numeros inteiros !!");
-            }
-            else if(left.getClass() == Float.class && right.getClass() == Integer.class){
-                throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : operacao de divisao modular \'%\' so aceita numeros inteiros !!");
             }
             else{
                 throw new RuntimeException(" (" + m.getLine() + ", " + m.getColumn() + ") " + getErrorLine(getLineNumber()) + " : Nao foi utilizado numeros inteiros na operacao !!");
@@ -1189,12 +1159,12 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(PexpIdentifier i) {
-
+        // É expandido nas outras funções
     }
 
     @Override
     public void visit(ExpParenthesis e) {
-
+        // É expandido nas outras funções
     }
 
     @Override

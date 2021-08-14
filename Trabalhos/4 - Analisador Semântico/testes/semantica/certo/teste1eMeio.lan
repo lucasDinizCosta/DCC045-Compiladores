@@ -20,6 +20,6 @@ main(){
     print '\n';
 }
 
-divMod(n :: Int, q :: Int ) : Float, Int{
+divMod(n :: Int, q :: Int ) : Int, Int{
     return n / q, n % q;
 }
