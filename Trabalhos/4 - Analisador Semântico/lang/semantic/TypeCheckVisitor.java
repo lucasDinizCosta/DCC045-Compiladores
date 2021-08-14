@@ -84,9 +84,6 @@ public class TypeCheckVisitor extends Visitor {
             SType[] parameterType = new SType[0];
             SType[] returnType = new SType[0];
             String[] namesParameter = new String[0];
-            // ArrayList<String> nomesIguais;
-            // boolean nomeVarIgual = false;           // Verificação se há parametros com nomes iguais
-            // Integer contadorNomes = 0;
 
             // instancia o vetor com tamanho do num de params, se nao for sem params
             if (f.getParameters() != null) {
@@ -137,10 +134,6 @@ public class TypeCheckVisitor extends Visitor {
         if (main == null) {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + p.getLine() + ", coluna: " + p.getColumn() + "): Nao ha a funcao chamada \'main\' !");
             stk.push(tyErr);
-            // throw new RuntimeException("Nao ha uma funcao chamada \'main\' ! Finalizando o programa !");
-        }{
-            
-            //main.accept(this);
         }
     }
 
@@ -148,7 +141,7 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(Data d) {
         if (datas.get(d.getId()) != null) { // Tentativa de adicionar dois datas com mesmo nome
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): O tipo data \'" + d.getId() + "\' ja existe.");
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): O tipo data \'" + d.getId() + "\' ja existe !");
             stk.push(tyErr);
         } else {
             ArrayList<String> variaveis = new ArrayList<String>();
@@ -237,7 +230,6 @@ public class TypeCheckVisitor extends Visitor {
     // Partem do Type
     @Override
     public void visit(TypeArray t) {
-        //System.out.println(getLineNumber() + " --- " + t.getType() + " --- " + t + " ---- " + t.getType().getClass().getSimpleName());
         if(t.getType() instanceof NameType && datas.get(((NameType)t.getType()).getID()) == null){ // Tipo data nao existe
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + t.getLine() + ", coluna: " 
             + t.getColumn() + "): O tipo data \'" + t.getType() 
@@ -439,17 +431,11 @@ public class TypeCheckVisitor extends Visitor {
                     break;
                 }
 
-                if(tiposRetornados[contRetornos] instanceof STyInt && tiposRetornoPadrao[i] instanceof STyFloat){
-                    // Retornado um valor inteiro mas o padrao é Float, nao dispara um erro mas
-                    // Deve lembrar de ser convertido pra Float durante a operação depois
-                }
-                else{
-                    if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
-                        + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
-                        + tiposRetornoPadrao[i] +"\' !!!");
-                        stk.push(tyErr);
-                    }
+                if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
+                    + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
+                    + tiposRetornoPadrao[i] +"\' !!!");
+                    stk.push(tyErr);
                 }
                 
                 contRetornos++;
@@ -470,16 +456,13 @@ public class TypeCheckVisitor extends Visitor {
         if (lvalue instanceof Identifier) {
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
-            // System.out.println(getLineNumber() + " --- " + a.getExp() + " ---- " + a + " --- " + stk );
-            // System.out.println(getLineNumber() + " --- " + lvalue);
+
             SType tipoExpressao = stk.pop();
 
             if (tipoExpressao instanceof STyData) {
                 if ((temp.get(lvalue.getId()) == null)) { // Variavel de data nao existe
-                    // String name = ((TypeInstanciate) a.getExp()).getDataName();
                     String name = ((STyData)tipoExpressao).getName();
                     STyData newData = new STyData(name);
-                    System.out.println(getLineNumber() + " -- " + newData);
 
                     if (datas.get(name) == null) {
                         logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): O tipo de Data " + name + " ainda nao foi declarado.");
@@ -542,19 +525,12 @@ public class TypeCheckVisitor extends Visitor {
                         SType tipoExpAtribuicao = stk.pop();
                         SType tipoMatriz = stk.pop();
 
-                        System.out.println(getLineNumber() + " |---| " + tipoMatriz + " ---" + tipoExpAtribuicao);
-
-                        if(tipoMatriz instanceof STyFloat && tipoExpAtribuicao instanceof STyInt){
-                            // Array de float aceita o tipo inteiro mas desde que seja convertido
-                        }
-                        else{
-                            // Compara o tipo o objeto a ser adiciona com o tipo do array
-                            if (!tipoMatriz.match(tipoExpAtribuicao)) {   
-                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                                    + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
-                                    + tipoMatriz);
-                                stk.push(tyErr);
-                            }
+                        // Compara o tipo o objeto a ser adiciona com o tipo do array
+                        if (!tipoMatriz.match(tipoExpAtribuicao)) {   
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                                + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
+                                + tipoMatriz);
+                            stk.push(tyErr);
                         }
                     }
 
@@ -581,22 +557,16 @@ public class TypeCheckVisitor extends Visitor {
                 // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
                 else {
                     a.getExp().accept(this);        // Empilha o tipo da expressao que será atribuida
-                    System.out.println(getLineNumber() + " --- " + a + " -- " + a.getExp() + " -- " + lvalue + " -- " + stk); 
+                    // System.out.println(getLineNumber() + " --- " + a + " -- " + a.getExp() + " -- " + lvalue + " -- " + stk); 
 
                     SType tipoExpAtribuicao = stk.pop();
                     SType tipoArray = stk.pop();
 
-                    if(tipoArray instanceof STyFloat && tipoExpAtribuicao instanceof STyInt){
-                        // Array de float aceita o tipo inteiro mas desde que seja convertido
-                            
-                    }
-                    else{
-                        if (!tipoArray.match(tipoExpAtribuicao)) {   
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                                + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
-                                + tipoArray);
-                            stk.push(tyErr);
-                        }
+                    if (!tipoArray.match(tipoExpAtribuicao)) {   
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                            + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
+                            + tipoArray);
+                        stk.push(tyErr);
                     }
                 }
             }
@@ -616,7 +586,7 @@ public class TypeCheckVisitor extends Visitor {
                 lvalue.accept(this);    // Empilha o Tipo do atributo do data ou o tipo data mesmo
             }
             
-            System.out.println(getLineNumber() + " ---- " + stk );
+            // System.out.println(getLineNumber() + " ---- " + stk );
             SType tipoVariavel = stk.pop();
             SType tipoExpressao = stk.pop();
             DataAccess d = (DataAccess)lvalue;
@@ -659,7 +629,6 @@ public class TypeCheckVisitor extends Visitor {
                 STyFun tipoFuncao = (STyFun) function.getFuncType();
 
                 int indiceParamPassado = 0;
-
 
                 // Verifica os tipos dos parametros passado
                 for (Expression exp : f.getFCallParams().getExps()) {
@@ -728,7 +697,7 @@ public class TypeCheckVisitor extends Visitor {
         SType tyr = stk.pop();
         SType tyl = stk.pop();
         if ((tyr.match(tyInt))) {
-            if (tyl.match(tyInt) || tyl.match(tyFloat)) {
+            if (tyl.match(tyInt)){//|| tyl.match(tyFloat)) {
                 stk.push(tyl);
             } else {
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica aos tipos "
@@ -737,8 +706,8 @@ public class TypeCheckVisitor extends Visitor {
             }
 
         } else if (tyr.match(tyFloat)) {
-            if (tyl.match(tyInt) || tyl.match(tyFloat)) {
-                stk.push(tyr); // Independente do tipo tyl, empilho Float
+            if (tyl.match(tyFloat)) {
+                stk.push(tyr); 
             } else {
                 logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica aos tipos "
                     + tyl.toString() + " e " + tyr.toString());
