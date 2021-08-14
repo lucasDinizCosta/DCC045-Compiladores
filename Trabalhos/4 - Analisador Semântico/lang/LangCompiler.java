@@ -95,7 +95,7 @@ public class LangCompiler {
                  }else{
                     System.out.println("typing check ... [ ok ]"); 
                  }
-                System.out.println("\n-----------------------------\n");
+                System.out.println("\n------------------------------------------\n");
             
             } 
             else if (args[0].equals("-ti")) {

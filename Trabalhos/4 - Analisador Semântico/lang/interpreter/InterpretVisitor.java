@@ -1,13 +1,11 @@
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
-*                                                       *
-* Projeto do Interpretador para a Linguagem Lang        *
+*            Linguagem Lang                             *
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
 *                                                       *
 *********************************************************/
 package lang.interpreter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +124,7 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Declaration d) {
-
+        // É resolvido em nas funções de "Function" ou "Data"
     }
 
     // Partem do func
@@ -185,7 +183,6 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(p.toString());
                 System.out.println("\n");
             }
-            // System.out.println("--- Parameters --- " + p.getClass().getName());
 
             // Verifica os tipos de cada parâmetro da função
             for (Type type : p.getType()) {
@@ -306,14 +303,6 @@ public class InterpretVisitor extends Visitor {
             if(ehParametro == false){  // Não é função, é um instanciamento de tipo
                 operands.push(n);           // Empilha o tipo no operands para que ele seja pego no TypeInstan
             }
-
-            /*if (r != null || (r == null && env.peek().containsKey(n.getID()))) {
-                System.out.println("LINHA 282 --- " + r);
-                operands.push(r);
-            } else {
-                // throw new RuntimeException("Erro!");
-                throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + " : Erro !!");
-            }*/
         } catch (Exception x) {
             throw new RuntimeException(" (" + n.getLine() + ", " + n.getColumn() + ") " + x.getMessage());
         }
@@ -321,7 +310,7 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(Type t) {
-
+        // É realizado na função dos tipos especificos
     }
 
     // Partem do cmd
@@ -525,16 +514,12 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("\n------------------------------------\n");
             }
 
-            // System.out.println("Linha 488 - ATTRIBUTION -- " + a.getLValue().getClass().getSimpleName() + " -- " + a.getExp() + " --- " + a.toString() );
-
             // Empilha a expressão que será atribuida
             a.getExp().accept(this);            
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
 
-            // System.out.println("Linha 488 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + lvalue.toString() );
-            // System.out.println("Linha 498 - ATTRIBUTION -- " + lvalue.getId() + " -- " + lvalue.getClass().getSimpleName() + " --- " + a.toString() );
             // Se a variavel estiver dentro de um data
             if (lvalue instanceof DataAccess) {
                 
@@ -583,7 +568,6 @@ public class InterpretVisitor extends Visitor {
                         String nomeAtributo = ((DataAccess)lvalue).getId();
                         String nomeObjeto = ((DataAccess)lvalue).getDataId();
                         Integer position = (Integer)operands.pop();
-                        // a.getExp().accept(this);            // Passar o valor a ser atribuido pro operands
                         Integer valorAtribuicao = (Integer) operands.pop();
 
                         // o array é um list de elementos
@@ -592,8 +576,6 @@ public class InterpretVisitor extends Visitor {
                         // Busca o array no env
                         List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                         Integer tamanhoArray = ((List)objetoArray).size();
-
-                        // System.out.println("461 --- " + objetoArray.toString() + " -- " + nomeAtributo +" -- "+ valorAtribuicao);
                         
                         if((position >= 0) && (position <= tamanhoArray - 1)){
                             Object elemento = objetoArray.get(position);    // pega o elemento na posicao
@@ -611,8 +593,6 @@ public class InterpretVisitor extends Visitor {
                 else{   // Somente o DATA 
                     String nomeAtributo = ((DataAccess)lvalue).getId();
                     String nomeObjeto = ((DataAccess)lvalue).getDataId();
-                    
-                    // System.out.println("448 ---- " + nomeAtributo + " -- " + nomeObjeto);
     
                     // Atributo do lado do '=' 
                     Object atributo = operands.pop();
@@ -630,10 +610,8 @@ public class InterpretVisitor extends Visitor {
                 }
             } else if (lvalue instanceof Identifier) {  // Adicionar o valor em uma variavel
                 // Se é um Identificador literal, variavel ou resultados de funções
-                System.out.println(getLineNumber() + " --- " + lvalue.getId() + " -- " + a.getExp());
                 Object valorVariavel = env.peek().get(((Identifier) lvalue).getId());
                 Object expressao = operands.pop();
-                System.out.println(getLineNumber() + " --- " + valorVariavel + " --- " + expressao);
 
                 if(valorVariavel != null){  // Variavel Existe
 
@@ -687,13 +665,10 @@ public class InterpretVisitor extends Visitor {
 
                     // Checa consistencia no numero de linha e coluna
                     if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
-                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();//.size();
+                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();
                         if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
                             Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
                             
-                            
-                            System.out.println(getLineNumber() + " --- " + valor);
-
                             // Variavel com tipo fixo: new Int, Float, Char, Bool ou Data
                             if(((List)elementoMatriz).get(posicaoColuna) instanceof ObjectDefault){
                                 Boolean verificaTipo = ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).coincideTipo(valor);
@@ -729,18 +704,12 @@ public class InterpretVisitor extends Visitor {
                     List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
                     Integer tamanhoArray = ((List)objetoArray).size();
                     Object valor = operands.pop();
+                    Object elementoArray = objetoArray.get(position);
 
-                    System.out.println(getLineNumber() + " --- " + valor + " --- " + objetoArray);
-                    
                     if((position >= 0) && (position <= tamanhoArray - 1)){
-                        /**
-                         * NAO FAZ A VERIFICAÇÃO DE TIPOS, SE FOR UM TIPO INT, ELE VAI ACEITAR
-                         */
-
-                        if(((List)objetoArray).get(position) instanceof ObjectDefault){
-                            // System.out.println(getLineNumber() + " --- " + ((ObjectDefault)((List)objetoArray).get(position)) + " --- " + ((List<Object>)valor).get(0));
+                        if(elementoArray instanceof ObjectDefault){
                             if(valor instanceof ObjectDefault){ // (content, tipo)
-                                Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(valor);    // Passa um objeto do array e verifica
+                                Boolean verificaTipo = ((ObjectDefault)elementoArray).coincideTipo(valor);    // Passa um objeto do array e verifica
                                 if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
                                     
                                     // Atribui o valor na posicao da matriz na variavel
@@ -752,8 +721,11 @@ public class InterpretVisitor extends Visitor {
                                     throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: O tipo da expressao de atribuicao nao eh compativel com o tipo da variavel na matriz \'" + a.getLValue().getId() + "\' !!!");
                                 }
                             }
+                            else if(valor instanceof List){ // Caso de matriz que aloca um array e um array
+                                objetoArray.set(position, valor);
+                            }
                             else{
-                                Boolean verificaTipo = ((ObjectDefault)((List)objetoArray).get(position)).coincideTipo(valor);    
+                                Boolean verificaTipo = ((ObjectDefault) elementoArray).coincideTipo(valor);    
                                 if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
                                     
                                     // Atribui o valor na posicao da matriz na variavel
@@ -810,12 +782,9 @@ public class InterpretVisitor extends Visitor {
                 // monta o parametro da função
                 if (f.getFCallParams() != null) {
                     int tempID = 0;
-                    //System.out.println("Teste -- 455");
+
                     // Verifica os parametros da função
-                    
-                    // System.out.println("Teste -- 458 -- " + f.getFCallParams());
                     for (Expression exp : f.getFCallParams().getExps()) {
-                        //System.out.println("Teste -- 458 -- " + exp.toString() + " --- " + f.getFCallParams());
 
                         exp.accept(this);
                         Object obj = (Object) operands.pop();
@@ -1246,7 +1215,7 @@ public class InterpretVisitor extends Visitor {
                 if (t.getExp() != null) {
                     t.getType().accept(this);           // Empilha o tipo no operand
                     t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-                    // System.out.println("LINHA 838 -- " + t.getType() + " --- " + t.getExp());
+
                     // Trata a condição de ser array do tipo DATA
                     if(t.getType() instanceof NameType){   
 
@@ -1382,15 +1351,8 @@ public class InterpretVisitor extends Visitor {
                     }
                 }
 
-                // System.out.println(getLineNumber() + " ------- " + function);
-                // debugMode();
-
                 // Executa a função e coloca o retorno dos parametros em operands
                 function.accept(this);
-
-                // System.out.println(getLineNumber() + " -------");
-                // debugMode();
-                
 
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
@@ -1526,10 +1488,6 @@ public class InterpretVisitor extends Visitor {
             // lvalue: lvalue OPEN_BRACKET exp CLOSE_BRACKET # ArrayAccess
 
             if (debug) {
-                // Imprime a função
-                // System.out.println("\n -- ArrayAccess --- " + a.getClass().getName());
-                // System.out.println(a.toString());
-                // System.out.println("\n");
                 System.out.println("\n---------- ArrayAccess ------------\n");
                 System.out.println("=> Comando completo do ArrayAccess: " + a.toString());
                 System.out.println("=> Variavel que sera armazenada: " + a.getLValue());
