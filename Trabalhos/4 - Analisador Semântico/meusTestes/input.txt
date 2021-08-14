@@ -19,6 +19,13 @@ fat(n :: Int, nC :: Char) : Int{
   return n*fat(n-1)[0];
 }
 
+fat(n :: Int, n2 :: Float) : Int{
+  if(n == 0){
+      return 1;
+  }
+  return n*fat(n-1)[0];
+}
+
 --testaDatas(p1 :: Ponto, pts :: Ponto[]) : Bool{
 testaDatas(p1 :: Ponto, pts :: Ponto[][]) : Bool, Ponto[][]{
 	a = 2;
@@ -33,6 +40,7 @@ testaDatas(p1 :: Ponto, pts :: Ponto[][]) : Bool, Ponto[][]{
 
 main(){
     k = 5;
+	print fat(5, 6.0)[0];
 	pontos = new Ponto[k];
 	malhaPontos = new Ponto[][k];
     x = new Float[k]; -- x = new Float[][k];

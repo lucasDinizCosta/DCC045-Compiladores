@@ -11,10 +11,11 @@ public class STyFun extends SType {
         returnType = retornos;
     }
 
-    public STyFun(SType t[], SType retornos[], String[] names) {
+    public STyFun(SType t[], SType retornos[], String[] names, String nomeFuncao) {
         parameterType = t;
         returnType = retornos;
         nameParams = names;
+        id = nomeFuncao;
     }
 
     public SType[] getTypes() {

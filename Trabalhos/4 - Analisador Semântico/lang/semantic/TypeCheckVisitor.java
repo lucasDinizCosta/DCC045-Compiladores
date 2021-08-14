@@ -69,6 +69,31 @@ public class TypeCheckVisitor extends Visitor {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
     }
 
+    public Boolean functionIsValid(Integer linha, Integer coluna, LocalAmbiente<SType> funcaoNova){
+        // Verificaremos os parametros, os tipos dos parametros, os tipos dos retornos
+        boolean isValid = true;
+        ArrayList<LocalAmbiente<SType>> funcoes = null;
+        funcoes = env.getFuncoes(funcaoNova.getFuncID());// Retorna a lista de funções
+        if(funcoes == null){ // Logo nao existe a funcao na base ainda e portanto ela é valida
+            return true;
+        }
+        else{   
+        // Existe na base funcoes com o mesmo nome agora teremos que conferir os dados da funcao para ver se uma funcao igual existe
+
+            for(int i = 0; i < funcoes.size(); i++){
+                LocalAmbiente<SType> funcaoBase = funcoes.get(i);
+                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
+                STyFun funcaoNovaTipo = (STyFun)funcaoNova.getFuncType();
+                if(funcaoBaseTipo.getTypes().length == funcaoNovaTipo.getTypes().length){
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + linha + ", coluna: " + coluna + "): Ambiguidade na funcao \'" + funcaoBase.getFuncID() + "\' pois a nova funcao tem a mesma quantidade de parametros e o mesmo nome de uma funcao que ja existe !!!");
+                    stk.push(tyErr);
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+    }
+
     // Partem do prog
     @Override
     public void visit(Program p) {
@@ -79,8 +104,25 @@ public class TypeCheckVisitor extends Visitor {
             d.accept(this);
         }
 
+        boolean checaMain = false;
+
         // Cria as funções no env
         for(Function f : p.getFunctions()){
+            System.out.println(getLineNumber() + " ---  " + f);
+            if(f.getId().equals("main")){   // Checa se a funcao main já existe
+                if(env.getFuncoes(f.getId()).size() > 0){ // Tenta sobrecarregar a funcao main
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A funcao \'" + main + "\' deve ser UNICA com esse nome e nao deve ter sobrecarga de funcoes com seu nome !");
+                    stk.push(tyErr);
+                    checaMain = true;
+                }   
+            }
+
+            if(checaMain){  // Se tentou sobrecarregar a funcao main ==> Continua e ignora a funcao de sobrecarga
+                checaMain = false;
+                continue;
+            }
+            
+            
             SType[] parameterType = new SType[0];
             SType[] returnType = new SType[0];
             String[] namesParameter = new String[0];
@@ -113,8 +155,18 @@ public class TypeCheckVisitor extends Visitor {
                     returnType[i] = stk.pop();
                 }
             }
-            // adiciona no ambiente
-            env.set(f.getId(), new LocalAmbiente<SType>(f.getId(), new STyFun(parameterType, returnType, namesParameter)));
+
+            LocalAmbiente<SType> novaFuncao = new LocalAmbiente<SType>(f.getId(), new STyFun(parameterType, returnType, namesParameter, f.getId()));
+
+            // Passa o ambiente da funcao para checar sobrecarga e verificar se existe funcoes iguais
+            boolean funcaoValida = functionIsValid(f.getLine(), f.getColumn(), novaFuncao);
+
+            if(funcaoValida){
+                // adiciona no ambiente
+                env.add(novaFuncao);
+                System.out.println(getLineNumber() + " ---- ");
+            }
+
         }
 
         // Checa as funções
@@ -178,7 +230,23 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(Function f) {
         retChk = false;
-        temp = env.get(f.getId()); // Pega o ambiente da função
+        // Pega o ambiente da função
+        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
+        System.out.println(getLineNumber()+ " ---- " + funcFinded);
+        temp = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
+        if(funcFinded.size() > 1){  // Tem sobrecarga 
+            for(int i = 0; i < funcFinded.size(); i++){
+                LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
+
+                // Se a funcao tem o mesmo numero de parametros entao é a correta
+                if(funcaoBaseTipo.getTypes().length == f.getParameters().getType().size()){
+                    temp = (LocalAmbiente<SType>)funcFinded.get(i);
+                    break;
+                }
+            }
+        }
+
         if (f.getParameters() != null) {
             Parameters params = f.getParameters();
 
@@ -449,6 +517,7 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(Attribution a) {
         // a = 2 + b + ponto.x + array[1];
+        System.out.println(getLineNumber() + " --- " + a + " --- " + temp);
 
         // Variavel que vai ter os dados atribuidos nela
         LValue lvalue = a.getLValue();
@@ -615,9 +684,22 @@ public class TypeCheckVisitor extends Visitor {
          * pode ser tbm
          * divmod(5,2); SEM RETORNO
          */
-
+        // Pega o ambiente da função
+        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
         // Pega a função correspondente
-        LocalAmbiente<SType> function = env.get(f.getId());
+        LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
+        if(funcFinded.size() > 1){  // Tem sobrecarga 
+            for(int i = 0; i < funcFinded.size(); i++){
+                LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
+
+                // Se a funcao tem o mesmo numero de parametros entao é a correta
+                if(funcaoBaseTipo.getTypes().length == f.getFCallParams().getExps().size()){
+                    function = (LocalAmbiente<SType>)funcFinded.get(i);
+                    break;
+                }
+            }
+        }
 
         // Garante a existencia da função
         if (function != null) {
@@ -976,8 +1058,22 @@ public class TypeCheckVisitor extends Visitor {
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
 
+        // Pega o ambiente da função
+        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
         // Pega a função correspondente
-        LocalAmbiente<SType> function = env.get(f.getId());
+        LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
+        if(funcFinded.size() > 1){  // Tem sobrecarga 
+            for(int i = 0; i < funcFinded.size(); i++){
+                LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
+
+                // Se a funcao tem o mesmo numero de parametros entao é a correta
+                if(funcaoBaseTipo.getTypes().length == f.getFCallParams().getExps().size()){
+                    function = (LocalAmbiente<SType>)funcFinded.get(i);
+                    break;
+                }
+            }
+        }
 
         // Garante a existencia da função
         if (function != null) {
