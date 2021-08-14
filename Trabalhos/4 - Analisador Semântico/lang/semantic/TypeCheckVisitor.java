@@ -78,7 +78,6 @@ public class TypeCheckVisitor extends Visitor {
         for (Data d : p.getDatas()) {
             d.accept(this);
         }
-        System.out.println(getLineNumber() + " --- " + p);
 
         // Cria as funções no env
         for(Function f : p.getFunctions()){
@@ -123,6 +122,7 @@ public class TypeCheckVisitor extends Visitor {
 
         // Checa as funções
         for (Function f : p.getFunctions()) {
+            f.accept(this);
             if (f.getId().equals("main")) {     // Verifica se tem a função main
                 
                 // Certifica que a funcao main nao deve ter parametros
@@ -135,10 +135,12 @@ public class TypeCheckVisitor extends Visitor {
         }
 
         if (main == null) {
-            throw new RuntimeException("Nao ha uma funcao chamada \'main\' ! Finalizando o programa !");
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + p.getLine() + ", coluna: " + p.getColumn() + "): Nao ha a funcao chamada \'main\' !");
+            stk.push(tyErr);
+            // throw new RuntimeException("Nao ha uma funcao chamada \'main\' ! Finalizando o programa !");
         }{
             
-            main.accept(this);
+            //main.accept(this);
         }
     }
 
@@ -194,15 +196,35 @@ public class TypeCheckVisitor extends Visitor {
             }
         }
 
-        for (Command command : f.getCommands()) {
-            command.accept(this); // Executa os comandos que compoem o corpo da função
-            if (retChk) // Se encontrou um return, para de expandir outros comandos
-                break;
+        boolean verificacaoIf = false;
+        for(int i = 0; i < f.getCommands().size(); i++){
+            Command command = f.getCommands().get(i);
+            command.accept(this);
+            if(command instanceof If && i == f.getCommands().size() - 1){   // Ultimo comando é um if
+                verificacaoIf = true;
+                retChk = false;
+            }
         }
 
-        if (!retChk && f.getReturnTypes().size() > 0) {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Função " + f.getId() + " deve retornar algum valor.");
-            stk.push(tyErr);
+        SType[] tiposRetornoPadrao = new SType[0];
+        if (temp.getFuncType() instanceof STyFun) {
+            // Padrao da documentação da função
+            tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
+        }
+        // tiposRetornoPadrao
+        //  System.out.println(getLineNumber() + " --- " + retChk + " --- " + f.getReturnTypes() +
+        //  "---" + tiposRetornoPadrao.length + " --- " + f.getId());
+
+        // if (!retChk && f.getReturnTypes().size() > 0) {
+        if (!retChk && tiposRetornoPadrao.length > 0) {
+            if(verificacaoIf){
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Na funcao \'" + f.getId() + "\' falta um estado de retorno depois do ultimo comando \'if\' !");
+                stk.push(tyErr);
+            }
+            else{
+                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Funcao " + f.getId() + " deve retornar algum valor.");
+                stk.push(tyErr);
+            }   
         }
     }
 
@@ -310,6 +332,7 @@ public class TypeCheckVisitor extends Visitor {
         if (expressao.match(tyBool)) {
             retChk = false; // a variavel de retorno de função é falsa até encontrar um commando return
             i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
+            
         } else {
             logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
                 + "): Expressao de teste do IF deve ser tipo Bool e nao \'" + expressao.toString() + "\' !");
@@ -447,8 +470,8 @@ public class TypeCheckVisitor extends Visitor {
         if (lvalue instanceof Identifier) {
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
-            System.out.println(getLineNumber() + " --- " + a.getExp() + " ---- " + a + " --- " + stk );
-            System.out.println(getLineNumber() + " --- " + lvalue);
+            // System.out.println(getLineNumber() + " --- " + a.getExp() + " ---- " + a + " --- " + stk );
+            // System.out.println(getLineNumber() + " --- " + lvalue);
             SType tipoExpressao = stk.pop();
 
             if (tipoExpressao instanceof STyData) {
@@ -984,8 +1007,6 @@ public class TypeCheckVisitor extends Visitor {
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
 
-        System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
-
         // Pega a função correspondente
         LocalAmbiente<SType> function = env.get(f.getId());
 
@@ -1108,8 +1129,8 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
-        System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
-        + d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
+        // System.out.println(getLineNumber() + " ---- " + d + " ---- " + d.getDataId() + " ---- " 
+        // + d.getLValue() + " ---- " + d.getLValue().getId() + " ----- " + d.getId());
 
         // Certifica a existencia do tipo data passado no escopo atual
         if (temp.get(d.getDataId()) instanceof STyData) {
@@ -1222,7 +1243,6 @@ public class TypeCheckVisitor extends Visitor {
         if(a.getLValue() instanceof Identifier){    // Já for a variavel entao é um array
             if(temp.get(a.getLValue().getId()) != null){
                 SType tipoAux = temp.get(a.getLValue().getId());
-                System.out.println(getLineNumber() + " -- " + tipoAux);
                 if(tipoAux instanceof STyArr){
                     SType argumento = ((STyArr)tipoAux).getArg();
                     stk.push(argumento);           // Empilha o tipo do array
@@ -1253,7 +1273,6 @@ public class TypeCheckVisitor extends Visitor {
                                 stk.push(tyErr);
                             }
 
-                            System.out.println(getLineNumber() + " --- " + tipoMatriz);
                             stk.push(tipoMatriz);       // Empilha o tipo da matriz
                         }
                     }
@@ -1268,7 +1287,7 @@ public class TypeCheckVisitor extends Visitor {
             }
         }
             
-        System.out.println(getLineNumber() + " -- " + a + " -- " + a.getLValue() + " -- " + a.getLValue().getClass().getSimpleName() + " -- " + temp.get(a.getLValue().getId()) + " -- " + stk);
+        // System.out.println(getLineNumber() + " -- " + a + " -- " + a.getLValue() + " -- " + a.getLValue().getClass().getSimpleName() + " -- " + temp.get(a.getLValue().getId()) + " -- " + stk);
         a.getExp().accept(this); // Verifica se a posicao foi passada
         SType tipo = stk.pop();
         if (!tipo.match(tyInt)) { // Verifica se o tipo da posicao do array é um valor inteiro
