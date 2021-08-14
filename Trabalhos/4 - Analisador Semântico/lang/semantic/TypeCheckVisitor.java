@@ -1028,13 +1028,13 @@ public class TypeCheckVisitor extends Visitor {
                     if(f.getFCallParams().getExps().size() > tipoFuncao.getTypes().length){
                         logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
                         + "): Foi passado mais argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
-                        + " apresenta !!!");
+                        + " apresenta, sendo: " + f.getFCallParams().getExps().size() + " argumento(s) no parametro na chamada da funcao e " + tipoFuncao.getTypes().length + " argumento(s) no parametro na declaracao da funcao  !!!");
                         stk.push(tyErr);
                     }
                     else{
                         logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
                         + "): Foi passado menos argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
-                        + " apresenta !!!");
+                        + " apresenta, sendo: " + f.getFCallParams().getExps().size() + " argumento(s) no parametro na chamada da funcao e " + tipoFuncao.getTypes().length + " argumento(s) no parametro na declaracao da funcao  !!!");
                         stk.push(tyErr);
                     }
                 }
