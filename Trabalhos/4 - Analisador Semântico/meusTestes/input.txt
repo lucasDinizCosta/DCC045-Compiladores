@@ -19,6 +19,13 @@ fat(n :: Int, nC :: Char) : Int{
   return n*fat(n-1)[0];
 }
 
+fat(n :: Int, n2 :: Char) : Int{
+  if(n == 0){
+      return 1;
+  }
+  return n*fat(n-1)[0];
+}
+
 fat(n :: Int, n2 :: Float) : Int{
   if(n == 0){
       return 1;

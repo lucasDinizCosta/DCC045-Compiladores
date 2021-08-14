@@ -40,11 +40,16 @@ public class TypeCheckVisitor extends Visitor {
     // tipo func(1, 2)[1];  // Qual será o tipo do indice 1
     private Object positionReturnFunction;
 
+    // Armzanena as Funcoes para poder compara os tipos na sobrecarga
+    private ArrayList<Function> funcs;
+
+
     public TypeCheckVisitor() {
         stk = new Stack<SType>();
         env = new TyEnv<LocalAmbiente<SType>>();
         logError = new ArrayList<String>();
         datas = new HashMap<String, DataAttributes>();
+        funcs = new ArrayList<Function>();
     }
 
     // Retorna a quantidade de erros
@@ -69,6 +74,18 @@ public class TypeCheckVisitor extends Visitor {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
     }
 
+    // Retorna a lista de funções da arvore AST com base no nome
+    // Para comparar a sobrecarga no FunctionReturn e FunctionCall
+    public ArrayList<Function> getFunctionAST(String nome){
+        ArrayList<Function> funcoesAST = new ArrayList<Function>();
+        for(Function f : funcs){
+            if(f.getId().equals(nome)){
+                funcoesAST.add(f);
+            }
+        }
+        return funcoesAST;
+    }
+
     public Boolean functionIsValid(Integer linha, Integer coluna, LocalAmbiente<SType> funcaoNova){
         // Verificaremos os parametros, os tipos dos parametros, os tipos dos retornos
         boolean isValid = true;
@@ -85,9 +102,20 @@ public class TypeCheckVisitor extends Visitor {
                 STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
                 STyFun funcaoNovaTipo = (STyFun)funcaoNova.getFuncType();
                 if(funcaoBaseTipo.getTypes().length == funcaoNovaTipo.getTypes().length){
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + linha + ", coluna: " + coluna + "): Ambiguidade na funcao \'" + funcaoBase.getFuncID() + "\' pois a nova funcao tem a mesma quantidade de parametros e o mesmo nome de uma funcao que ja existe !!!");
-                    stk.push(tyErr);
-                    isValid = false;
+                    boolean isDifferentType = false;
+                    // testa o casamento de todos os tipos
+                    for(int j = 0; j < funcaoBaseTipo.getTypes().length; j++){
+                        // se for diferente
+                        if(!(funcaoBaseTipo.getTypes()[j].match(funcaoNovaTipo.getTypes()[j]))){
+                            isDifferentType = true;
+                            break;
+                        }
+                    }
+                    if(!isDifferentType){
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + linha + ", coluna: " + coluna + "): Ambiguidade na funcao \'" + funcaoBase.getFuncID() + "\' pois a nova funcao tem a mesma quantidade de parametros e tipos iguais e o mesmo nome de uma funcao que ja existe !!!");
+                        stk.push(tyErr);
+                        isValid = false;
+                    }
                 }
             }
             return isValid;
@@ -164,7 +192,9 @@ public class TypeCheckVisitor extends Visitor {
             if(funcaoValida){
                 // adiciona no ambiente
                 env.add(novaFuncao);
-                System.out.println(getLineNumber() + " ---- ");
+
+                // Adiciona na lista de funções
+                funcs.add(f);
             }
 
         }
@@ -241,8 +271,18 @@ public class TypeCheckVisitor extends Visitor {
 
                 // Se a funcao tem o mesmo numero de parametros entao é a correta
                 if(funcaoBaseTipo.getTypes().length == f.getParameters().getType().size()){
-                    temp = (LocalAmbiente<SType>)funcFinded.get(i);
-                    break;
+                    int counterTypes = 0;   // Conta os tipos iguais para achar a funcao certa
+                    for(int j = 0; j < funcaoBaseTipo.getTypes().length; j++){
+                        if(funcaoBaseTipo.getTypes()[j].equals(
+                            ((Type)f.getParameters().getSingleType(j)).toString()   // Compara com o tipo da funcao
+                        )){
+                            counterTypes++;
+                        }
+                    }
+                    if(counterTypes == funcaoBaseTipo.getTypes().length ){
+                        temp = (LocalAmbiente<SType>)funcFinded.get(i);
+                        break;
+                    }
                 }
             }
         }
@@ -684,19 +724,56 @@ public class TypeCheckVisitor extends Visitor {
          * pode ser tbm
          * divmod(5,2); SEM RETORNO
          */
+        // Informacoes da funcao que sera retomada no functionReturn
+        Integer qtdParamPassados = 0;           // A funcao nao foi passado parametross
+        if(f.getFCallParams() != null){
+            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+        }
+        String nomeFuncao = f.getId();
+        // TEM RETORNO A FUNCAO
+
         // Pega o ambiente da função
-        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
+        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(nomeFuncao);
+
         // Pega a função correspondente
         LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
         if(funcFinded.size() > 1){  // Tem sobrecarga 
+            ArrayList<Function> funcoesAST = getFunctionAST(nomeFuncao);
             for(int i = 0; i < funcFinded.size(); i++){
+                Function funcaoDeclaracao = funcoesAST.get(i);
                 LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+
                 STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
 
-                // Se a funcao tem o mesmo numero de parametros entao é a correta
-                if(funcaoBaseTipo.getTypes().length == f.getFCallParams().getExps().size()){
-                    function = (LocalAmbiente<SType>)funcFinded.get(i);
-                    break;
+                // Quantidade de retornos
+                if(funcaoDeclaracao.getReturnTypes().size() == funcaoBaseTipo.getReturnTypes().length){
+                    boolean verificaRetDif = false;
+                    for(int j = 0; j < funcaoDeclaracao.getReturnTypes().size(); j++){
+                        String tipo = funcaoDeclaracao.getReturnTypes().get(j).toString();
+                        // Compara os nomes de tipos, se for diferente nao eh a funcao
+                        if(!(tipo.equals(funcaoBaseTipo.getReturnTypes()[j].toString()))){
+                            verificaRetDif = true;
+                        }
+                    }
+                    if(verificaRetDif){
+                        continue;
+                    }
+
+                    // Se a funcao tem o mesmo numero de parametros entao é possivelmente a correta
+                    if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
+                        for(int j = 0; j < funcaoDeclaracao.getParameters().getType().size(); j++){
+                            Type tipo = funcaoDeclaracao.getParameters().getSingleType(j);
+                            // Verifica se casa o nome do tipo da função com o tipo da função analisada
+                            if(!(tipo.toString().equals(funcaoBaseTipo.getTypes()[j].toString()))){
+                                verificaRetDif = true;
+                            }
+                        }
+                        if(verificaRetDif){
+                            continue;
+                        }
+                        function = (LocalAmbiente<SType>)funcFinded.get(i);
+                        break;
+                    }
                 }
             }
         }
@@ -1058,19 +1135,57 @@ public class TypeCheckVisitor extends Visitor {
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
 
+        // Informacoes da funcao que sera retomada no functionReturn
+        Integer qtdParamPassados = 0;           // A funcao nao foi passado parametross
+        if(f.getFCallParams() != null){
+            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+        }
+        String nomeFuncao = f.getId();
+        // TEM RETORNO A FUNCAO
+
         // Pega o ambiente da função
-        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
+        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(nomeFuncao);
+
+        
         // Pega a função correspondente
         LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
         if(funcFinded.size() > 1){  // Tem sobrecarga 
+            ArrayList<Function> funcoesAST = getFunctionAST(nomeFuncao);
             for(int i = 0; i < funcFinded.size(); i++){
+                Function funcaoDeclaracao = funcoesAST.get(i);
                 LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+
                 STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
 
-                // Se a funcao tem o mesmo numero de parametros entao é a correta
-                if(funcaoBaseTipo.getTypes().length == f.getFCallParams().getExps().size()){
-                    function = (LocalAmbiente<SType>)funcFinded.get(i);
-                    break;
+                // Quantidade de retornos
+                if(funcaoDeclaracao.getReturnTypes().size() == funcaoBaseTipo.getReturnTypes().length){
+                    boolean verificaRetDif = false;
+                    for(int j = 0; j < funcaoDeclaracao.getReturnTypes().size(); j++){
+                        String tipo = funcaoDeclaracao.getReturnTypes().get(j).toString();
+                        // Compara os nomes de tipos, se for diferente nao eh a funcao
+                        if(!(tipo.equals(funcaoBaseTipo.getReturnTypes()[j].toString()))){
+                            verificaRetDif = true;
+                        }
+                    }
+                    if(verificaRetDif){
+                        continue;
+                    }
+
+                    // Se a funcao tem o mesmo numero de parametros entao é possivelmente a correta
+                    if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
+                        for(int j = 0; j < funcaoDeclaracao.getParameters().getType().size(); j++){
+                            Type tipo = funcaoDeclaracao.getParameters().getSingleType(j);
+                            // Verifica se casa o nome do tipo da função com o tipo da função analisada
+                            if(!(tipo.toString().equals(funcaoBaseTipo.getTypes()[j].toString()))){
+                                verificaRetDif = true;
+                            }
+                        }
+                        if(verificaRetDif){
+                            continue;
+                        }
+                        function = (LocalAmbiente<SType>)funcFinded.get(i);
+                        break;
+                    }
                 }
             }
         }
