@@ -84,6 +84,9 @@ public class TypeCheckVisitor extends Visitor {
             SType[] parameterType = new SType[0];
             SType[] returnType = new SType[0];
             String[] namesParameter = new String[0];
+            // ArrayList<String> nomesIguais;
+            // boolean nomeVarIgual = false;           // Verificação se há parametros com nomes iguais
+            // Integer contadorNomes = 0;
 
             // instancia o vetor com tamanho do num de params, se nao for sem params
             if (f.getParameters() != null) {
@@ -93,6 +96,15 @@ public class TypeCheckVisitor extends Visitor {
                     f.getParameters().getSingleType(i).accept(this);
                     parameterType[i] = stk.pop();
                     namesParameter[i] = f.getParameters().getSingleId(i);
+                    // Compara o nome das variaveis para verificar se tem nomes iguais
+                    for(int j = 0; j <= i; j++){
+                        // Compara todos e garante que nao compara o parametro com ele mesmo
+                        if(namesParameter[j].equals(f.getParameters().getSingleId(i)) & i != j){
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): Os parametros \'" + f.getParameters().getSingleParameterToString(j) + "\' e \'"+f.getParameters().getSingleParameterToString(i) +"\' tem nomes iguais para as variaveis!");
+                            stk.push(tyErr);
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -110,9 +122,9 @@ public class TypeCheckVisitor extends Visitor {
 
         // Checa as funções
         for (Function f : p.getFunctions()) {
-            // adiciona no ambiente
-            //f.accept(this);
             if (f.getId().equals("main")) {     // Verifica se tem a função main
+                
+                // Certifica que a funcao main nao deve ter parametros
                 if(((Parameters)f.getParameters()).getType().size() != 0){
                     logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A funcao \'main\' nao pode ter parametros na sua declaracao !");
                     stk.push(tyErr);

@@ -51,6 +51,10 @@ public class Parameters extends Node {
         return this.type.get(type);
     }
 
+    public String getSingleParameterToString(int number) {
+        return this.id.get(number) + " :: " + this.type.get(number);
+    }
+
     public void setId(List<String> id) {
         this.id = id;
     }
@@ -74,7 +78,7 @@ public class Parameters extends Node {
         for(int i = 0; i < id.size(); i++){
             String idAux = id.get(i).toString();
             String typeAux = type.get(i).toString();
-            s += idAux.toString() + " : " + typeAux.toString() + ", ";
+            s += idAux.toString() + " :: " + typeAux.toString() + ", ";
         }
         return s;
      }
