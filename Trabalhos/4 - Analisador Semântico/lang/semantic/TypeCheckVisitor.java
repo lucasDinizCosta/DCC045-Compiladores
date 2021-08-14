@@ -78,6 +78,7 @@ public class TypeCheckVisitor extends Visitor {
         for (Data d : p.getDatas()) {
             d.accept(this);
         }
+        System.out.println(getLineNumber() + " --- " + p);
 
         // Cria as funções no env
         for(Function f : p.getFunctions()){
@@ -983,7 +984,7 @@ public class TypeCheckVisitor extends Visitor {
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
 
-        // System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
+        System.out.println(getLineNumber() + " ---- " + f + " --- " + stk);
 
         // Pega a função correspondente
         LocalAmbiente<SType> function = env.get(f.getId());
@@ -991,8 +992,6 @@ public class TypeCheckVisitor extends Visitor {
         // Garante a existencia da função
         if (function != null) {
 
-            // Passa do operand para o params
-            // monta o parametro da função
             if (f.getFCallParams() != null) {
 
                 STyFun tipoFuncao = (STyFun) function.getFuncType();
@@ -1038,6 +1037,17 @@ public class TypeCheckVisitor extends Visitor {
                         + " apresenta !!!");
                         stk.push(tyErr);
                     }
+                }
+            }
+            else{
+                STyFun tipoFuncao = (STyFun) function.getFuncType();
+
+                if(tipoFuncao.getTypes().length > 0){   // Tem parametros na declaracao da funcao mas nao tem na chamada dela
+                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + 
+                        "): Foi passado 0 argumentos como parametro na chamada da funcao \'" + f.getId()+"\'"
+                        + " sendo que na declaracao da funcao ela precisa de " + tipoFuncao.getTypes().length + " parametro(s) !!"
+                    );
+                    stk.push(tyErr);
                 }
             }
         }
