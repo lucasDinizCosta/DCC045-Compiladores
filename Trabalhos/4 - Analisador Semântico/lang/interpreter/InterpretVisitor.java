@@ -19,7 +19,11 @@ import lang.interpreter.Visitor;
 public class InterpretVisitor extends Visitor {
 
     private Stack<HashMap<String, Object>> env; // Escopo de variaveis de objetos
-    private HashMap<String, Function> funcs;    // Funções da linguagem lang
+
+    // Funções da linguagem lang
+    // Foi colocado um arraylist pra pdoer comportar sobrecarga de funções
+    private HashMap<String, ArrayList<Function>> funcs;    
+    // private HashMap<String, Function> funcs;    // Funções da linguagem lang
     private HashMap<String, Data> datas;        // Tipos de dados novos
     private Stack<Object> operands;             // Operandos
     // public HashMap<Integer, Object> parms;   // Parametros de funções
@@ -29,7 +33,7 @@ public class InterpretVisitor extends Visitor {
     public InterpretVisitor() {
         env = new Stack<HashMap<String, Object>>();
         // env.push(new HashMap<String, Object>());
-        funcs = new HashMap<String, Function>();
+        funcs = new HashMap<String, ArrayList<Function>>();
         parms = new Stack<Object>();        //parms = new HashMap<Integer, Object>();
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
@@ -49,10 +53,13 @@ public class InterpretVisitor extends Visitor {
          * Entry.getKey method returns the key and Entry.getValue returns the value of
          * the HashMap entry.
          */
-        for (HashMap.Entry<String, Function> entry : funcs.entrySet()) {
-            // entry.getValue().toString() mostra a função completa
-            // entry.getValue().getId() mostra o nome da função somente
-            System.out.println(entry.getKey() + " => " + entry.getValue().getId());     
+        for (HashMap.Entry<String, ArrayList<Function>> entry : funcs.entrySet()) {
+            ArrayList<Function> listaFuncoes = entry.getValue();
+            for(int i = 0; i < listaFuncoes.size(); i++){
+                // entry.getValue().toString() mostra a função completa
+                // entry.getValue().getId() mostra o nome da função somente
+                System.out.println(entry.getKey() + " => " + listaFuncoes.get(i).getId());   
+            }
         }
         System.out.println("\n---- DADOS DE parms ----\n");
         for (int i = 0; i < parms.size(); i++) {
@@ -95,11 +102,23 @@ public class InterpretVisitor extends Visitor {
         }
 
         for (Function f : p.getFunctions()) {
-            funcs.put(f.getId(), f);
+            System.out.println(getLineNumber()+ " ---- "+ f+" ---- \n\n");
+            ArrayList<Function> listaFuncoes = funcs.get(f.getId());
+            if(listaFuncoes != null){   //ArrayList existe, então basta adicionar a função
+                listaFuncoes.add(f);
+            }
+            else{   // Nao tem o arraylist da funcao criado
+                ArrayList<Function> listaNova = new ArrayList<Function>();
+                funcs.put(f.getId(), listaNova);
+                listaNova.add(f);
+            }
+                
             if (f.getId().equals("main")) {     // Verifica se tem a função main
                 main = f;
             }
         }
+        debugMode();
+        //System.out.println();
 
         if (main == null) {
             throw new RuntimeException("Não há uma função chamada \'main\' ! abortando !");
@@ -505,17 +524,18 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(Attribution a) {
         try {
-            if (debug) {
+            // if (debug) {
                 System.out.println("\n---------- ATTRIBUTION ------------\n");
                 System.out.println("=> Comando completo da atribuicao: " + a.toString());
                 System.out.println("=> Classe da variavel que sera armazenada: " + a.getLValue().getClass().getSimpleName());
                 System.out.println("=> Variavel que sera armazenada: " + a.getLValue());
                 System.out.println("=> Expressao que sera armazenada na variavel: " + a.getExp());
                 System.out.println("\n------------------------------------\n");
-            }
-
+            // }
+            System.out.println(getLineNumber() + " --- " + operands);
             // Empilha a expressão que será atribuida
             a.getExp().accept(this);            
+            System.out.println(getLineNumber() + " --- " + operands);
 
             // Variavel que vai ter os dados atribuidos nela
             LValue lvalue = a.getLValue();
@@ -529,8 +549,14 @@ public class InterpretVisitor extends Visitor {
                     ArrayAccess arrayElement = ((ArrayAccess)((DataAccess)lvalue).getLValue());
 
                     if(arrayElement.getLValue() instanceof ArrayAccess){    // Matriz de data
+
+                        System.out.println(getLineNumber()+ " --- "+env.peek().get(arrayElement.getLValue().getId()));
+                        ObjectDefault objetoMatriz = (ObjectDefault)env.peek().get(arrayElement.getLValue().getId());
+
+                        System.out.println(getLineNumber()+ " --- "+objetoMatriz);
                         // Pega a matriz na lista de variaveis
-                        Object obj = env.peek().get(arrayElement.getLValue().getId());
+                        // List obj = env.peek().get(arrayElement.getLValue().getId());
+                        List obj = (List)(objetoMatriz.getContent());
 
                         // Empilha o numero da linha no operands
                         ((ArrayAccess)arrayElement.getLValue()).getExp().accept(this);  
@@ -544,15 +570,19 @@ public class InterpretVisitor extends Visitor {
                         String nomeAtributo = ((DataAccess)lvalue).getId(); // Atributo do data
                         Object valor = operands.pop();              // Valor a ser atribuido na matriz
 
+                        System.out.println(getLineNumber()+ " --- "+valor);
                         // Checa consistencia no numero de linha e coluna
                         if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
-                            Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();
+                            ObjectDefault objetoArrayLinha = (ObjectDefault)obj.get(posicaoLinha);
+                            Integer tamanhoColunas = ((List)(objetoArrayLinha.getContent())).size();
                             if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
-                                Object elementoLinhaMatriz = ((List)((List)obj).get(posicaoLinha));
-                                Object elementoMatriz = ((List)elementoLinhaMatriz).get(posicaoColuna);
+                                List elementoLinhaMatriz = ((List)(objetoArrayLinha.getContent()));
+                                ObjectDefault elementoMatriz = (ObjectDefault)((ObjectDefault)(elementoLinhaMatriz.get(posicaoColuna))).getContent();
                                 
+                                System.out.println(getLineNumber() + " --- " + elementoMatriz 
+                                + " --- " + elementoMatriz.getContent());
                                 // Atribui o valor na posicao da matriz no atributo do data na matriz
-                                ((HashMap)elementoMatriz).put(nomeAtributo, valor);
+                                ((HashMap)(elementoMatriz.getContent())).put(nomeAtributo, valor);
                             }
                             else{
                                 throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
@@ -562,23 +592,28 @@ public class InterpretVisitor extends Visitor {
                             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
                         }
                     }
-                    else /*if(arrayElement.getLValue() == null)*/{  // Tipo array
+                    else {  // Tipo array
                         arrayElement.getExp().accept(this); // Aceita e adiciona a posicao do array no operandos
 
                         String nomeAtributo = ((DataAccess)lvalue).getId();
                         String nomeObjeto = ((DataAccess)lvalue).getDataId();
                         Integer position = (Integer)operands.pop();
-                        Integer valorAtribuicao = (Integer) operands.pop();
+                        Object valorAtribuicao = operands.pop();
 
                         // o array é um list de elementos
                         String nomeArray = arrayElement.getId();
 
+                        System.out.println(nomeArray + " ----- " );
+
                         // Busca o array no env
-                        List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
-                        Integer tamanhoArray = ((List)objetoArray).size();
+                        ObjectDefault objetoArray = ((ObjectDefault)env.peek().get(nomeArray));
+                        System.out.println(objetoArray + " ----- " );
+                        List<Object> lista = ((List<Object>) objetoArray.getContent());
+                        Integer tamanhoArray = lista.size();
                         
                         if((position >= 0) && (position <= tamanhoArray - 1)){
-                            Object elemento = objetoArray.get(position);    // pega o elemento na posicao
+                            Object elemento = ((ObjectDefault)(lista.get(position))).getContent();    // pega o elemento na posicao
+                            System.out.println(getLineNumber() + " ---- " + elemento);
                             ((HashMap<String, Object>) elemento).put(nomeAtributo, valorAtribuicao);
 
                         }
@@ -596,8 +631,12 @@ public class InterpretVisitor extends Visitor {
     
                     // Atributo do lado do '=' 
                     Object atributo = operands.pop();
+
+                    // Objecto data que está no env
+                    ObjectDefault objetoData = (ObjectDefault)env.peek().get(nomeObjeto);
+
                     // Busca o objeto no env e adiciona o atributo na variavel dele
-                    HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) env.peek().get(nomeObjeto));
+                    HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) objetoData.getContent());
                     
                     // Verifica se o atributo do objeto existe no hashmap
                     if(objetoDinamico.get(nomeAtributo) != null){
@@ -610,6 +649,7 @@ public class InterpretVisitor extends Visitor {
                 }
             } else if (lvalue instanceof Identifier) {  // Adicionar o valor em uma variavel
                 // Se é um Identificador literal, variavel ou resultados de funções
+                System.out.println(getLineNumber() + " --- " + operands);
                 Object valorVariavel = env.peek().get(((Identifier) lvalue).getId());
                 Object expressao = operands.pop();
 
@@ -650,7 +690,9 @@ public class InterpretVisitor extends Visitor {
                     ArrayAccess arrayObjeto = (ArrayAccess)lvalue;
 
                     // Pega a matriz na lista de variaveis
-                    Object obj = env.peek().get(arrayObjeto.getLValue().getId());
+                    ObjectDefault objetoMatriz = (ObjectDefault) env.peek().get(arrayObjeto.getLValue().getId());
+                    //Object obj = env.peek().get(arrayObjeto.getLValue().getId());
+                    List obj = (List)objetoMatriz.getContent();
 
                     // Empilha o numero da linha no operands
                     ((ArrayAccess)arrayObjeto.getLValue()).getExp().accept(this);  
@@ -660,14 +702,16 @@ public class InterpretVisitor extends Visitor {
 
                     Integer posicaoColuna = (Integer) operands.pop();
                     Integer posicaoLinha = (Integer) operands.pop();
-                    Integer tamanhoLinhas = ((List)obj).size();
+                    Integer tamanhoLinhas = obj.size();
                     Object valor = operands.pop();              // Valor a ser atribuido na matriz
 
                     // Checa consistencia no numero de linha e coluna
                     if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
-                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();
+                        ObjectDefault arrayColuna = (ObjectDefault)obj.get(posicaoLinha);
+                        Integer tamanhoColunas = ((List)(arrayColuna.getContent())).size();
+
                         if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
-                            Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
+                            Object elementoMatriz = ((List)(arrayColuna).getContent());
                             
                             // Variavel com tipo fixo: new Int, Float, Char, Bool ou Data
                             if(((List)elementoMatriz).get(posicaoColuna) instanceof ObjectDefault){
@@ -700,21 +744,25 @@ public class InterpretVisitor extends Visitor {
                     ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
                     Integer position = (Integer)operands.pop();         // Posicao do array
 
+                    ObjectDefault objetoArray = (ObjectDefault)env.peek().get(nomeArray);
+                    System.out.println(getLineNumber() + " ---- " + objetoArray);
                     // Busca o array no env
-                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
-                    Integer tamanhoArray = ((List)objetoArray).size();
+                    List<Object> lista = ((List<Object>) objetoArray.getContent());
+                    Integer tamanhoArray = ((List)lista).size();
                     Object valor = operands.pop();
-                    Object elementoArray = objetoArray.get(position);
-
+                    Object elementoArray = lista.get(position);
+                    System.out.println(getLineNumber() + " ---- " + valor + " --- " + elementoArray 
+                    + " ---- ");
                     if((position >= 0) && (position <= tamanhoArray - 1)){
                         if(elementoArray instanceof ObjectDefault){
                             if(valor instanceof ObjectDefault){ // (content, tipo)
+                                System.out.println(getLineNumber() + " -- " + elementoArray);
                                 Boolean verificaTipo = ((ObjectDefault)elementoArray).coincideTipo(valor);    // Passa um objeto do array e verifica
                                 if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
                                     
                                     // Atribui o valor na posicao da matriz na variavel
                                     // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
-                                    ((List)objetoArray).set(position, valor);
+                                    ((List)lista).set(position, valor);
                                 }
                                 else{
                                     // Lançar excessão de tipo diferente
@@ -722,7 +770,7 @@ public class InterpretVisitor extends Visitor {
                                 }
                             }
                             else if(valor instanceof List){ // Caso de matriz que aloca um array e um array
-                                objetoArray.set(position, valor);
+                                lista.set(position, valor);
                             }
                             else{
                                 Boolean verificaTipo = ((ObjectDefault) elementoArray).coincideTipo(valor);    
@@ -731,7 +779,7 @@ public class InterpretVisitor extends Visitor {
                                     // Atribui o valor na posicao da matriz na variavel
                                     // ((ObjectDefault)((List)elementoMatriz).get(posicaoColuna)).setContent(valor);
                                     // ((List)objetoArray).set(position, valor);
-                                    ((ObjectDefault)((List)objetoArray).get(position)).setContent(valor);
+                                    ((ObjectDefault)((List)lista).get(position)).setContent(valor);
                                 }
                                 else{
                                     // Lançar excessão de tipo diferente
@@ -742,7 +790,7 @@ public class InterpretVisitor extends Visitor {
                         }else{
                             // Pega o elemento do topo de operands e adiciona na posição do vetor
                             // ((List)objetoArray).set(position, operands.pop());  
-                            ((List)objetoArray).set(position, valor); 
+                            ((List)lista).set(position, valor); 
                         }
                     }
                     else{
@@ -765,15 +813,67 @@ public class InterpretVisitor extends Visitor {
              * 
              * Exemplo: divmod(5, 2)<q, r>; // Será retornada 2 valores e armazenados na
              * variavel q e r
+             * 
+             * ACEITA TAMBEM SEM RETORNO: divmod(5,2);
              */
             if (debug) {
                 System.out.println("\n --- FunctionCall  -- " + f.getClass().getName());
                 System.out.println(f.toString());
                 System.out.println("\n");
             }
-                
+
+            Integer qtdParamPassados = 0;           // A funcao nao foi passado parametross
+            if(f.getFCallParams() != null){
+                qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+            }
+            Integer qtdRetFunctionCall = 0;
+            if(f.getLValues() != null){
+                qtdRetFunctionCall = f.getLValues().size();
+            }
+            String nomeFuncao = f.getId();
+            // TEM RETORNO A FUNCAO
+            
+            // Pega o ambiente da função
+            ArrayList<Function> funcFinded = funcs.get(nomeFuncao);
+
             // Pega a função correspondente
-            Function function = funcs.get(f.getId());
+            Function function = funcFinded.get(0);   // Só uma funcao
+            /*if(funcFinded.size() > 1){  // Tem sobrecarga 
+                for(int i = 0; i < funcFinded.size(); i++){
+                    Function funcaoDeclaracao = funcFinded.get(i);
+
+                    // Quantidade de retornos
+                    if(funcaoDeclaracao.getReturnTypes().size() == qtdRetFunctionCall){
+                        boolean verificaRetDif = false;
+                        for(int j = 0; j < funcaoDeclaracao.getReturnTypes().size(); j++){
+                            String tipo = funcaoDeclaracao.getReturnTypes().get(j).toString();
+                            // Compara os nomes de tipos, se for diferente nao eh a funcao
+                            if(!(tipo.equals(funcaoBaseTipo.getReturnTypes()[j].toString()))){
+                                verificaRetDif = true;
+                            }
+                        }
+                        if(verificaRetDif){ // Os tipos de retornos são diferentes
+                            continue;
+                        }
+
+                        // Se a funcao tem o mesmo numero de parametros entao é possivelmente a correta
+                        if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
+                            for(int j = 0; j < funcaoDeclaracao.getParameters().getType().size(); j++){
+                                Type tipo = funcaoDeclaracao.getParameters().getSingleType(j);
+                                // Verifica se casa o nome do tipo da função com o tipo da função analisada
+                                if(!(tipo.toString().equals(funcaoBaseTipo.getTypes()[j].toString()))){
+                                    verificaRetDif = true;
+                                }
+                            }
+                            if(verificaRetDif){ // Os tipos dos parametros são diferentes
+                                continue;
+                            }
+                            function = (LocalAmbiente<SType>)funcFinded.get(i);
+                            break;
+                        }
+                    }
+                }
+            }*/
 
             // Garante a existencia da função
             if (f != null) {
@@ -1170,7 +1270,7 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(TypeInstanciate t) {
         try {
-            if (debug) {
+            // if (debug) {
                 System.out.println("\n---------- TypeInstanciate ------------\n");
                 System.out.println("=> Comando completo do TypeInstanciate: " + t.toString());
                 System.out.println("=> Tipo que sera instanciado(Comum): " + t.getType());
@@ -1178,106 +1278,177 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("=> Tipo que sera instanciado(data): " + t.getDataName());
                 System.out.println("=> Expressao do type instanciate ou tamanho do array/matriz: " + t.getExp());
                 System.out.println("\n------------------------------------\n");
-            }
+            // }
 
             // Garante que não é um tipo Data
             if(t.getType() != null){
                 if (t.getExp() != null) {
-                    t.getType().accept(this);           // Empilha o tipo no operand
-                    t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-
                     // Trata a condição de ser array do tipo DATA
                     if(t.getType() instanceof NameType){   
+                        t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
+                        t.getType().accept(this);           // Empilha o tipo no operand
+                        // Pega o tamanho do vetor na pilha de operandos
+                        // Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto 
+                        // Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        // List<Object> lista = new ArrayList<Object>(i); // Tipo array
+                        // for (int k = 0; k < i; k++) {
+                        //     lista.add(obj);
+                        // }
+                        // operands.push(lista);
+                        
+
+                        Type type = (Type)operands.pop();                // Tipo do array -> Int, Float, Char ....
+
+                        // Pega o nome do objeto do Data
+                        String dataID = t.getDataName();
+                        
+                        if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
+                            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
+                        }
+    
+                        ObjectDefault objetoArray = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
 
                         // Pega o tamanho do vetor na pilha de operandos
-                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto 
-                        Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+    
                         List<Object> lista = new ArrayList<Object>(i); // Tipo array
+    
                         for (int k = 0; k < i; k++) {
-                            lista.add(obj);
+                            ObjectDefault objetoData = new ObjectDefault(t.getLine(), t.getColumn(), type);
+    
+                            // Cria um Hashmap pra servir de alocação variaveis para o objeto
+                            HashMap<String, Object> newVar = new HashMap<String, Object>();
+                            for (Declaration d : datas.get(dataID).getDeclarations()) {
+                                // Cria um objeto especial para destacar quais variaveis e seu tipo
+                                // dentro do data
+                                Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
+                                d.getId(), d.getType());
+    
+                                // Adiciona o objeto com as variaveis vazias
+                                newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
+                            }
+                            lista.add(objetoData);
                         }
-                        operands.push(lista);
+                        objetoArray.setContent(lista);
+                        operands.push(objetoArray);
+
+                        System.out.println(getLineNumber() + " --- "+ objetoArray);
                     }
+                    /*else if(t.getType() instanceof TypeArray){
+                        t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
+                        t.getType().accept(this);           // Empilha o tipo no operand
+                        // Pega o tamanho do vetor na pilha de operandos
+                        // Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto 
+                        // Object obj = operands.pop();                // Tipo do array -> Int, Float, Char ....
+                        // List<Object> lista = new ArrayList<Object>(i); // Tipo array
+                        // for (int k = 0; k < i; k++) {
+                        //     lista.add(obj);
+                        // }
+                        // operands.push(lista);
+                        
+                        System.out.println(getLineNumber() + " --- " + t.getType());
+                        Type type = (Type)operands.pop();                // Tipo do array -> Int, Float, Char ....
+
+                        // Pega o nome do objeto do Data
+                        String dataID = t.getDataName();
+                        
+                        if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
+                            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
+                        }
+    
+                        ObjectDefault objetoArray = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
+
+                        // Pega o tamanho do vetor na pilha de operandos
+                        Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
+    
+                        List<Object> lista = new ArrayList<Object>(i); // Tipo array
+    
+                        for (int k = 0; k < i; k++) {
+                            ObjectDefault objetoData = new ObjectDefault(t.getLine(), t.getColumn(), type);
+    
+                            // Cria um Hashmap pra servir de alocação variaveis para o objeto
+                            HashMap<String, Object> newVar = new HashMap<String, Object>();
+                            for (Declaration d : datas.get(dataID).getDeclarations()) {
+                                // Cria um objeto especial para destacar quais variaveis e seu tipo
+                                // dentro do data
+                                Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
+                                d.getId(), d.getType());
+    
+                                // Adiciona o objeto com as variaveis vazias
+                                newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
+                            }
+                            lista.add(objetoData);
+                        }
+                        objetoArray.setContent(lista);
+                        operands.push(objetoArray);
+
+                        System.out.println(getLineNumber() + " --- "+ objetoArray);
+
+                    }*/
                     else{       // Array generico 
+
+                        t.getType().accept(this);           // Empilha o tipo no operand
+                        t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
                         // Pega o tamanho do vetor na pilha de operandos
                         Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
 
                         Type type = (Type)operands.pop();                // Tipo do array -> Int, Float, Char ....
 
+                        ObjectDefault arrayObject = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
+
                         List<Object> lista = new ArrayList<Object>(i); // Tipo array
                         for (int k = 0; k < i; k++) {
-                            Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), type);
+                            ObjectDefault valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), type);
                             lista.add(valorPadrao);
                         }
-                        operands.push(lista);
+                        arrayObject.setContent(lista);
+                        operands.push(arrayObject);
                     }
                 }
-                else{   // É um tipo de dado comum: Int, Float, Char
+                else{   // É um tipo de dado comum: Int, Float, Char ---- E o data
+                    if(t.getType() instanceof NameType){   
 
-                    // Cria um objeto especial para destacar quais variaveis e seu tipo
-                    Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
-                    operands.push(valorPadrao);
-                }
-            }
-            else{   // Tipo data que no qual o atributo Type é null
-                if (t.getExp() == null) {                   // Tipo normal de data
-                    // Pega o nome do objeto do Data
-                    String dataID = t.getDataName();
-                    
-                    if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
-                        throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
-                    }
+                        // Pega o nome do objeto do Data
+                        String dataID = t.getDataName();
+                        
+                        if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
+                            throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
+                        }
 
-                    // Cria um Hashmap pra servir de alocação variaveis para o objeto
-                    HashMap<String, Object> newVar = new HashMap<String, Object>();
-                    
-                    for (Declaration d : datas.get(dataID).getDeclarations()) {
-                        // Verifica as declarações das variaveis e tipos no data
-                        d.getType().accept(this);
+                        // System.out.println(" ---- "+ datas.get(dataID).get);
 
-                        // Desempilha os tipos que esta presenta no operands
-                        operands.pop();
+                        // Objeto default de valor padrao
+                        ObjectDefault objetoData = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
 
-                        // Cria um objeto especial para destacar quais variaveis e seu tipo
-                        // dentro do data
-                        Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
-                        d.getId(), d.getType());
-
-                        // Adiciona o objeto com as variaveis vazias
-                        newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
-                    }
-                    operands.push(newVar);
-                }
-                else{   // Trata a condição de ser array do tipo DATA
-                    t.getExp().accept(this);            // Executa exp passando o tamanho do vetor para operands
-
-                    // Pega o nome do objeto do Data
-                    String dataID = t.getDataName();
-                    
-                    if(datas.get(dataID) == null){  // Tipo de dado nao existe na base
-                        throw new RuntimeException(" (" + t.getLine() + ", " + t.getColumn() + ") - Tipo de dado \'" + dataID + "\' nao existe !!!");
-                    }
-
-                    // Pega o tamanho do vetor na pilha de operandos
-                    Integer i = (Integer) operands.pop();       // Tamanho do array já foi visto
-
-                    List<Object> lista = new ArrayList<Object>(i); // Tipo array
-
-                    for (int k = 0; k < i; k++) {
                         // Cria um Hashmap pra servir de alocação variaveis para o objeto
                         HashMap<String, Object> newVar = new HashMap<String, Object>();
+                        
                         for (Declaration d : datas.get(dataID).getDeclarations()) {
+                            // Verifica as declarações das variaveis e tipos no data
+                            d.getType().accept(this);
+
+                            // Desempilha os tipos que esta presenta no operands
+                            operands.pop();
+
                             // Cria um objeto especial para destacar quais variaveis e seu tipo
                             // dentro do data
-                            Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
+                            ObjectDefault valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(),
                             d.getId(), d.getType());
 
                             // Adiciona o objeto com as variaveis vazias
                             newVar.put(d.getId(), valorPadrao);    // Adiciona um objeto vazio
                         }
-                        lista.add(newVar);
+
+                        objetoData.setContent(newVar);
+                        System.out.println(getLineNumber() + " --- " + objetoData);
+
+                        operands.push(objetoData);  // Empilha o objeto Data
                     }
-                    operands.push(lista);
+                    else{
+                        // Cria um objeto especial para destacar quais variaveis e seu tipo
+                        Object valorPadrao = new ObjectDefault(t.getLine(), t.getColumn(), t.getType());
+                        operands.push(valorPadrao);
+                    }
                 }
             }
         } catch (Exception x) {
@@ -1302,13 +1473,125 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("\n");
             }
 
+
+            Integer qtdParamPassados = 0;           // A funcao nao foi passado parametross
+            if(f.getFCallParams() != null){
+                qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+            }
+            String nomeFuncao = f.getId();
+            // TEM RETORNO A FUNCAO
+
+            
+
+            // Pega o ambiente da função
+            ArrayList<Function> funcFinded = funcs.get(nomeFuncao);
+            // System.out.println(getLineNumber() + " ---- " + funcFinded);
             // Pega a função correspondente
-            Function function = funcs.get(f.getId());
+            Function function = funcFinded.get(0);   // Só uma funcao
+            if(funcFinded.size() > 1){  // Tem sobrecarga 
+                for(int i = 0; i < funcFinded.size(); i++){
+                    Function funcao = funcFinded.get(i);
+                    // System.out.println("\n"+getLineNumber()+" --- "+ funcao + "\n");
+                    if(funcao.getParameters()!= null && 
+                        (funcao.getParameters().getType().size() == qtdParamPassados)
+                    ){  // Quantidade de parametros é o mesmo
+                        List<Type> tiposFuncao = funcao.getParameters().getType();
+                        int indice = 0;
+                        int qtdComumTipos = 0;
+
+                        // Empilha os parametros passados
+                        for (Expression exp : f.getFCallParams().getExps()) {
+                            exp.accept(this);               // Adiciona o valor do parametro no operands
+                            Object obj = operands.pop();
+                            System.out.println(getLineNumber() + " ---- " + obj + " --- " + obj.getClass().getSimpleName());
+                            System.out.println(getLineNumber() + " ---- " + exp + " --- " + exp.getClass().getSimpleName());
+                            if(obj instanceof ObjectDefault){   // Tipo data
+                                System.out.println(getLineNumber() + " ---- " + obj);
+                                if(tiposFuncao.get(indice) instanceof NameType){
+                                    System.out.println(getLineNumber() + " --- " +tiposFuncao.get(indice) +" --- ");
+                                    qtdComumTipos++;
+                                }
+                                else
+                                    break;
+                            }
+                            else if(obj instanceof HashMap){
+
+                            }
+                            else if(obj instanceof Integer){
+                                if(tiposFuncao.get(indice) instanceof TypeInt){
+                                    System.out.println(getLineNumber() + " --- ");
+                                    qtdComumTipos++;
+                                }
+                                else
+                                    break;
+                            }
+                            else if(obj instanceof Float){
+                                if(tiposFuncao.get(indice) instanceof TypeFloat){
+                                    qtdComumTipos++;
+                                }
+                                else
+                                    break;
+                            }
+                            else if(obj instanceof Character){
+                                if(tiposFuncao.get(indice) instanceof TypeChar){
+                                    qtdComumTipos++;
+                                }
+                                else
+                                    break;
+                            }
+                            // System.out.println(getLineNumber() + " --- " + obj + " ---- " + obj.getClass().getSimpleName());
+                            indice++;
+                        }
+                        
+                        // Se a qtd de tipos do parametro for igual => sai do loop
+                        if(qtdComumTipos == qtdParamPassados){
+                            System.out.println(getLineNumber() + " --- " + qtdComumTipos);
+                            function = funcao;
+                            break;
+                        }
+
+                        
+                    }
+                    /*LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
+
+                    STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
+
+                    // Quantidade de retornos
+                    if(funcao.getReturnTypes().size() == funcaoBaseTipo.getReturnTypes().length){
+                        boolean verificaRetDif = false;
+                        for(int j = 0; j < funcaoDeclaracao.getReturnTypes().size(); j++){
+                            String tipo = funcaoDeclaracao.getReturnTypes().get(j).toString();
+                            // Compara os nomes de tipos, se for diferente nao eh a funcao
+                            if(!(tipo.equals(funcaoBaseTipo.getReturnTypes()[j].toString()))){
+                                verificaRetDif = true;
+                            }
+                        }
+                        if(verificaRetDif){
+                            continue;
+                        }
+
+                        // Se a funcao tem o mesmo numero de parametros entao é possivelmente a correta
+                        if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
+                            for(int j = 0; j < funcaoDeclaracao.getParameters().getType().size(); j++){
+                                Type tipo = funcaoDeclaracao.getParameters().getSingleType(j);
+                                // Verifica se casa o nome do tipo da função com o tipo da função analisada
+                                if(!(tipo.toString().equals(funcaoBaseTipo.getTypes()[j].toString()))){
+                                    verificaRetDif = true;
+                                }
+                            }
+                            if(verificaRetDif){
+                                continue;
+                            }
+                            function = (LocalAmbiente<SType>)funcFinded.get(i);
+                            break;
+                        }
+                    }*/
+                }
+            }
 
             // Garante a existencia da função
             if (f != null) {
                 if (f.getFCallParams() != null) {
-                    int tempID = 0;
 
                     // Verifica os parametros da função
                     for (Expression exp : f.getFCallParams().getExps()) {
@@ -1317,7 +1600,6 @@ public class InterpretVisitor extends Visitor {
 
                         // Adiciona o parametro na listagem
                         parms.push(obj);    // Adiciona no topo da pilha de parametros
-                        tempID++;
                     }
                 }
 
@@ -1374,12 +1656,12 @@ public class InterpretVisitor extends Visitor {
 
     @Override
     public void visit(LValue l) {
-
+        // É expandido em outras funcoes
     }
 
     @Override
     public void visit(ID i) {
-
+        // É expandido em outras funcoes
     }
 
     @Override
@@ -1387,7 +1669,7 @@ public class InterpretVisitor extends Visitor {
         try {
             if (debug) {
                 // Imprime a função
-                System.out.println("\n -- Identifier");
+                System.out.println("\n -- Identifier"); // Varoaveç
                 System.out.println(i.toString());
                 System.out.println("\n");
             }
@@ -1405,13 +1687,14 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(DataAccess d) {
         try {
-            if (debug) {
+            // if (debug) {
                 // Imprime a função
                 System.out.println("\n -- DataAccess");
                 System.out.println(d.toString());
                 System.out.println("\n");
-            }
+            // }
             Object obj = env.peek().get(d.getLValue().getId());
+            System.out.println(obj + " --- "+ getLineNumber());
             if(d.getLValue() instanceof ArrayAccess){ // array de data
                 // Quando chega array do tipo pontos[0].x => d é um dataAccess
                 if (obj != null) {
@@ -1420,7 +1703,8 @@ public class InterpretVisitor extends Visitor {
                     array.getExp().accept(this);    // Adiciona a posicao do vetor no operands
                     Integer position = (Integer)operands.pop();
                     String atributoDoObjeto = d.getId();
-                    HashMap objeto = (HashMap)((List)obj).get(position);
+                    ObjectDefault objetoArray = (ObjectDefault)((List)((ObjectDefault)obj).getContent()).get(position);
+                    HashMap objeto = (HashMap)objetoArray.getContent();//((List)obj).get(position);
                     if(objeto.containsKey(atributoDoObjeto)){   // Se o objeto tem o atributo
                         operands.push(objeto.get(atributoDoObjeto));
                     }
@@ -1435,8 +1719,9 @@ public class InterpretVisitor extends Visitor {
             }
             else{       // Data
                 if (obj != null) {
-                    if (((HashMap<String, Object>) obj).containsKey(d.getId())) {
-                        operands.push(((HashMap<String, Object>) obj).get(d.getId()));
+                    HashMap<String, Object> variaveis = (HashMap<String, Object>)((ObjectDefault)obj).getContent();
+                    if (((HashMap<String, Object>) variaveis).containsKey(d.getId())) {
+                        operands.push(((HashMap<String, Object>) variaveis).get(d.getId()));
                     } else {
                         // Atributo que não pertence ao objeto
                         throw new RuntimeException(" (" + d.getLine() + ", " + d.getColumn() + ") Erro: Atributo "+ "\'"+d.getId()+"\'"+" eh inexistente no objeto " + "\""+d.getLValue().getId()+"\" !!!");
@@ -1479,18 +1764,21 @@ public class InterpretVisitor extends Visitor {
                     // Empilha o numero da coluna no operands
                     a.getExp().accept(this);  
 
+                    ObjectDefault objetoArray = (ObjectDefault) obj;
+
                     Integer posicaoColuna = (Integer) operands.pop();
                     Integer posicaoLinha = (Integer) operands.pop();
-                    Integer tamanhoLinhas = ((List)obj).size();
-
+                    List listaLinhas = (List)objetoArray.getContent();
+                    Integer tamanhoLinhas = listaLinhas.size();
                     // Checa consistencia no numero de linha e coluna
                     if((posicaoLinha >= 0) && (posicaoLinha <= tamanhoLinhas - 1)){
-                        Integer tamanhoColunas = ((List)((List)obj).get(posicaoLinha)).size();//.size();
+                        List listaColunas = (List)((ObjectDefault)listaLinhas.get(posicaoLinha)).getContent(); 
+                        Integer tamanhoColunas = listaColunas.size();
                         if((posicaoColuna >= 0) && (posicaoColuna <= tamanhoColunas - 1)){
-                            Object elementoMatriz = ((List)((List)obj).get(posicaoLinha));
+                            Object elementoMatriz = ((ObjectDefault)(listaColunas.get(posicaoColuna))).getContent();
 
                             // Empilha no operands o elemento da matriz
-                            operands.push(((List)elementoMatriz).get(posicaoColuna));
+                            operands.push(elementoMatriz);
                         }
                         else{
                             throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida na matriz \'"+a.getLValue().getId()+"\'  !!!");
@@ -1511,9 +1799,12 @@ public class InterpretVisitor extends Visitor {
                 if (obj != null) {
                     a.getExp().accept(this);        // Adiciona a posicao no vetor nos operands
                     Integer position = (Integer) operands.pop();
-                    Integer tamanhoArray = ((List)obj).size();
+                    List listaArray = (List)(((ObjectDefault) (obj)).getContent());
+                    Integer tamanhoArray = ((List)listaArray).size();
+
                     if((position >= 0) && (position <= tamanhoArray - 1)){
-                        operands.push(((List)obj).get(position));
+                        ObjectDefault elementoArray = (ObjectDefault)listaArray.get(position);
+                        operands.push(elementoArray.getContent());
                     }
                     else{
                         throw new RuntimeException(" (" + a.getLine() + ", " + a.getColumn() + ") Erro: Acesso a uma posicao invalida no array \'"+a.getLValue().getId()+"\'  !!!");

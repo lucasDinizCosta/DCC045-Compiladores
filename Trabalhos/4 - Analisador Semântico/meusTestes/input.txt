@@ -2,9 +2,104 @@ data Ponto {
    x :: Float;
    y :: Float;
 }
+{-
+fat(n :: Float) : Float{
+	if( n < 1.0)
+		return 2.0;
+	return n*fat(n-1.0)[0];
+}
+
+
+fat(n :: Int) : Int{
+	if( n < 1)
+		return 1;
+	return n*fat(n-1)[0];
+}
+-}
+soma(n1 :: Int, n2 :: Int) : Int{
+	return n1 + n2;
+}
+
+soma(n1 :: Float, n2 :: Float) : Int{
+	return n1 + n2;
+}
+
+soma(n1 :: Ponto, n2 :: Ponto) : Float{
+	--return n1.x + n2.x;
+	return 2.5;
+}
+
+preencheMatriz(m1 :: Ponto[][], size :: Int) : Ponto[][]{
+	i = 0;
+	iterate(size){
+		j = 0;
+		iterate(size){
+			m1[i][j].x = 0.5* 2.1 * 23.2;
+			--m1[i][j].y = 0.5*2.7 / 2.3;
+			j = j + 1;
+		}
+		i = i + 1;
+	}
+	return m1;
+}
+
+preencheArray(vet :: Int[], size :: Int) : Int[]{
+	i = 0;
+	iterate(size){
+		vet[i] = i;
+		i = i + 1;
+	}
+	return vet;
+}
+
+retornaMatriz(vet :: Int[], size :: Int) : Int[][]{
+	i = 0;
+	m1 = new Int[][size];
+	iterate(size){
+		m1[i] = new Int[size];
+		i = i + 1;
+	}
+	i = 0;
+	iterate(size){
+		j = 0;
+		iterate(size){
+			m1[i][j] = new Int;
+			m1[i][j] = i * j * 100 % (vet[j] + 1);
+			j = j + 1;
+		}
+		i = i + 1;
+	}
+	return m1;
+}
 
 main(){
+	pontos = new Ponto[1];
+	pontos[0] = new Ponto;
+	pontos[0].x = 12.5;
+	pontos[0].y = 13.5;
+	print pontos[0].x + pontos[0].y;
+	t = new Int[5];
+	print preencheArray(t, 5)[0];
+	matriz = retornaMatriz(preencheArray(t, 5)[0], 5)[0];
+	print matriz[0][0] + matriz[0][1];
+	--print retornaMatriz(preencheArray(t, 5)[0], 5)[0];
+	k = new Ponto[][2];
+	k[0] = new Ponto[2];
+	k[1] = new Ponto[2];
+	k[0][0] = new Ponto; k[0][1] = new Ponto; k[1][0] = new Ponto; k[1][1] = new Ponto;
+	print preencheMatriz(k, 2)[0];
+	print '\n'; print '\n'; print 'k'; print '\n';
+	print k;
+	print '\n'; print '\n';
     x = new Ponto;
-    x.x = 1.5;
+    x.x = 5.5;
    print x.x;
+   print '\n';
+   --print fat(x.x)[0];
+   print soma(x.x, x.x)[0];
+   print '\n';
+   print soma(75, 75)[0];
+   x.x = 10.5;
+   print '\n';
+   print soma(x, x)[0];
 }

@@ -14,6 +14,7 @@ public class ObjectDefault extends LValue{
     
     private String id;              // Nome da variavel e o tipo
     private Object content;         // Conteudo: Numero inteiro, numero float, caracteres
+    private String dataName;        // Nome do Data
     private Type tipo;
 
     public ObjectDefault(int line, int column) {
@@ -67,6 +68,8 @@ public class ObjectDefault extends LValue{
             return true;
         }
         if(exp instanceof ObjectDefault){           // Checa os objetos do tipo data e tipo array
+            System.out.println( " ---- " + ((ObjectDefault) exp).getType().getClass() + " --- " + tipo.getClass()); 
+            System.out.println( " ---- " + ((ObjectDefault) exp).getType() + " --- " + tipo); 
             // Compara o tipo do array com o tipo do objeto
             if(tipo instanceof TypeArray && ((TypeArray)tipo).getType().getClass() == ((ObjectDefault)exp).getType().getClass()){
                 return true;
@@ -74,7 +77,8 @@ public class ObjectDefault extends LValue{
             }
             // Trata o tipo data
             // Ex: Ponto igual a Ponto
-            if(((ObjectDefault) exp).getType().getClass() == tipo.getClass()){    
+            if(((ObjectDefault) exp).getType().getClass() == tipo.getClass()){  
+                 
                 return true;
             }
         }
