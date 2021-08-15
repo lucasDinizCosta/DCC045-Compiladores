@@ -21,7 +21,7 @@ soma(n1 :: Int, n2 :: Int) : Int{
 }
 
 soma(n1 :: Float, n2 :: Float) : Int{
-	return n1 + n2;
+	return 2;
 }
 
 soma(n1 :: Ponto, n2 :: Ponto) : Float{
