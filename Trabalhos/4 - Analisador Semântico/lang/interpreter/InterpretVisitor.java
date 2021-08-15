@@ -1426,10 +1426,10 @@ public class InterpretVisitor extends Visitor {
                 System.out.println("\n");
             }
 
-
             Integer qtdParamPassados = 0;           // A funcao nao foi passado parametross
             if(f.getFCallParams() != null){
-                qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+                // A funcao foi passada parametros
+                qtdParamPassados = f.getFCallParams().getExps().size(); 
             }
             String nomeFuncao = f.getId();
             
@@ -1437,7 +1437,7 @@ public class InterpretVisitor extends Visitor {
             ArrayList<Function> funcFinded = funcs.get(nomeFuncao);
             // Pega a função correspondente
             Function function = funcFinded.get(0);   // Só uma funcao
-            if(funcFinded.size() > 1){  // Tem sobrecarga 
+            if(funcFinded.size() > 1){              // Tem sobrecarga 
                 for(int i = 0; i < funcFinded.size(); i++){
                     Function funcao = funcFinded.get(i);
                     if(funcao.getParameters()!= null && 

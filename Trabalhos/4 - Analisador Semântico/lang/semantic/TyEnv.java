@@ -1,8 +1,16 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*            Linguagem Lang                             *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.semantic;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+// Define o ambiente de variavel ou função que associa o nome da variavel ou funcao 
+// para o tipo correspondente. È utilizado na analise semantica no typeCheckVisitor
 public class TyEnv<A>{
 
     private TreeMap<String,A> typeEnv;

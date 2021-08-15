@@ -1,7 +1,6 @@
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
-*                                                       *
-* Projeto do Interpretador para a Linguagem Lang        *
+*            Linguagem Lang                             *
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
 *                                                       *
 *********************************************************/

@@ -1,7 +1,6 @@
 /********************************************************
 * Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
-*                                                       *
-* Projeto do Interpretador para a Linguagem Lang        *
+*            Linguagem Lang                             *
 * Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
 *                                                       *
 *********************************************************/
@@ -17,7 +16,7 @@ public class LangCompiler {
     // Recupera o nome base (sem extensão) de um arquivo.
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Lang compiler v 0.0.1 - Julho de 2020");
+            System.out.println("Lang compiler v 0.0.1 - Agosto de 2021");
             System.out.println("Use java -cp . Lang ação <Caminho para código Fonte> ");
             System.out.println("Ação (uma das seguintes possibilidades): ");
 

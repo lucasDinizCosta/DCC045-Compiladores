@@ -1,3 +1,9 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*            Linguagem Lang                             *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.semantic;
 
 import java.util.ArrayList;
@@ -9,6 +15,7 @@ import lang.interpreter.Visitor;
 import lang.ast.*;
 import lang.semantic.*;
 
+// Define o visitor que fará a analise semantica 
 public class TypeCheckVisitor extends Visitor {
     private STyInt tyInt = STyInt.newSTyInt();
     private STyFloat tyFloat = STyFloat.newSTyFloat();

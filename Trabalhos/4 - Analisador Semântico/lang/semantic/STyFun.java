@@ -1,9 +1,16 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*            Linguagem Lang                             *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+*                                                       *
+*********************************************************/
 package lang.semantic;
 
+// Define os tipos de função para a analise semantica no TypeCheckVisitor
 public class STyFun extends SType {
-    private String id;          // Nome da função
+    private String id;                  // Nome da função
     private SType parameterType[];      // Tipos do parametro
-    private String nameParams[];         // Nome dos parametros
+    private String nameParams[];        // Nome dos parametros
     private SType returnType[];         // Tipos de retorno
 
     public STyFun(SType t[], SType retornos[]) {
