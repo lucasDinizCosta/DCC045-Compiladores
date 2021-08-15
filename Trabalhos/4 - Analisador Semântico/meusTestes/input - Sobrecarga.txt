@@ -70,6 +70,6 @@ main(){
    print soma(pontos, 2)[0];
    print '\n';
    soma(pontos, 2)<q1>;
-   print '\n';
+   print '\n'; print '\n';print '\n';print '\n';print '\n';
    print q1;
 }

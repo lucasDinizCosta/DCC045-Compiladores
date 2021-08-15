@@ -114,7 +114,7 @@ public class LangCompiler {
                     // Interpreta o Visitor e elabora o ambiente de desenvolvimento
                     InterpretVisitor interpreter = new InterpretVisitor();  
                     
-                    System.out.println("\n---------- Execuntando o Interpretador ------------\n");
+                    System.out.println("\n---------- Executando o Interpretador ------------\n");
                     // Aceita o nó e caminha na árvore
                     ((Node)result).accept(interpreter);               // Passa o node criado e testa o interpretador
 

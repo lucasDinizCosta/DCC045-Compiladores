@@ -68,8 +68,6 @@ public class ObjectDefault extends LValue{
             return true;
         }
         if(exp instanceof ObjectDefault){           // Checa os objetos do tipo data e tipo array
-            System.out.println( " ---- " + ((ObjectDefault) exp).getType().getClass() + " --- " + tipo.getClass()); 
-            System.out.println( " ---- " + ((ObjectDefault) exp).getType() + " --- " + tipo); 
             // Compara o tipo do array com o tipo do objeto
             if(tipo instanceof TypeArray && ((TypeArray)tipo).getType().getClass() == ((ObjectDefault)exp).getType().getClass()){
                 return true;
