@@ -21,12 +21,10 @@ public class InterpretVisitor extends Visitor {
     private Stack<HashMap<String, Object>> env; // Escopo de variaveis de objetos
 
     // Funções da linguagem lang
-    // Foi colocado um arraylist pra pdoer comportar sobrecarga de funções
-    private HashMap<String, ArrayList<Function>> funcs;    
-    // private HashMap<String, Function> funcs;    // Funções da linguagem lang
+    // Foi colocado um arraylist pra poder comportar sobrecarga de funções
+    private HashMap<String, ArrayList<Function>> funcs;     // Funções da linguagem lang
     private HashMap<String, Data> datas;        // Tipos de dados novos
     private Stack<Object> operands;             // Operandos
-    // public HashMap<Integer, Object> parms;   // Parametros de funções
     private Stack<Object> parms;                // Parametros de funções
     private boolean retMode, debug;
 
@@ -34,7 +32,7 @@ public class InterpretVisitor extends Visitor {
         env = new Stack<HashMap<String, Object>>();
         // env.push(new HashMap<String, Object>());
         funcs = new HashMap<String, ArrayList<Function>>();
-        parms = new Stack<Object>();        //parms = new HashMap<Integer, Object>();
+        parms = new Stack<Object>();        
         datas = new HashMap<String, Data>();
         operands = new Stack<Object>();
         retMode = false;
@@ -118,10 +116,11 @@ public class InterpretVisitor extends Visitor {
         }
 
         if (main == null) {
-            throw new RuntimeException("Não há uma função chamada \'main\' ! abortando !");
+            throw new RuntimeException("Nao ha uma funcao chamada \'main\' ! abortando !");
         }
-
-        main.accept(this);
+        else{
+            main.accept(this);
+        }
     }
 
     // Partem do data

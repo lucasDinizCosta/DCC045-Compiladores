@@ -22,7 +22,7 @@ public class LangCompiler {
 
             System.out.println(" -bs : Executa uma bateria de testes sintáticos");
             System.out.println(" -bsm : Executa uma bateria de testes no interpretador");
-            // System.out.println(" -bty : Executa uma bateria de testes no sistemas de tipos");
+            System.out.println(" -byt : Executa uma bateria de testes no sistemas de tipos na analise semantica");
 
             System.out.println(" -pp: Pretty print program.");
             System.out.println(" -tp: Verificar tipos e imprimir o ambiente de tipos");
@@ -44,6 +44,7 @@ public class LangCompiler {
             }
             ParseAdaptor langParser = new ParseAdaptorImplementation();
             InterpreterAdaptorImplementation interpreterImplementation = new InterpreterAdaptorImplementation();
+            SemanticAdaptorImplementation semanticImplementation = new SemanticAdaptorImplementation();
             
             if (args[0].equals("-bs")) {
                 System.out.println("Executando bateria de testes sintáticos:");
@@ -56,11 +57,12 @@ public class LangCompiler {
                 System.out.println("\nFim da execucao.\n");
                 return;
             }
-            /*if (args[0].equals("-byt")) {
-                System.out.println("Executando bateria de testes sintáticos:");
-                // TestParser tp = new TestParser(langParser); ;
+            if (args[0].equals("-byt")) {
+                System.out.println("Executando bateria de testes de tipos na analise semantica:\n");
+                TestSemantic tp = new TestSemantic(semanticImplementation);
+                System.out.println("\nFim da execucao.\n");
                 return;
-            }*/
+            }
             if (args.length != 2) {
                 System.out.println("Para usar essa opção, especifique um nome de arquivo");
                 return;
