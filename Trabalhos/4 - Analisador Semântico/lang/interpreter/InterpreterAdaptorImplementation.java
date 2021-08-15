@@ -33,7 +33,6 @@ public class InterpreterAdaptorImplementation implements InterpreterAdaptor {
 
             // Cria um analisador léxico que é carregado com os dados do arquivo
             LangLexer lexer = new LangLexer(stream);
-            // LangLexer lexer = new LexerErrors(stream);
 
             // Cria um buffer de tokens com base no analisador léxico
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -80,9 +79,12 @@ public class InterpreterAdaptorImplementation implements InterpreterAdaptor {
             return node;
         } catch (IOException e) {
             e.printStackTrace();
-            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
-            // compilador
-            return null;//new Node();
+            System.out.println("\n\n ===> ERRO no InterpreterAdaptorImplementation: O arquivo \'" + path
+            +"\' nao foi encontrado !!! \n");
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

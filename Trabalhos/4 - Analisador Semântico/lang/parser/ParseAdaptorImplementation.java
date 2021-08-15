@@ -72,6 +72,13 @@ public class ParseAdaptorImplementation implements ParseAdaptor {
             Node node = ast.visit(tree);    
 
             return node;
+        }catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("\n\n ===> ERRO no ParseAdaptorImplementation: O arquivo \'" + path
+            +"\' nao foi encontrado !!! \n");
+            // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do
+            // compilador
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             // O Nó é vazio mas esta classe poderá ser utilizada nas próximas etapas do

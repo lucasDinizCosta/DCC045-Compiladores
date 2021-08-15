@@ -35,6 +35,13 @@ public class LangCompiler {
 
         }
         try {
+            if(args.length < 1){
+                System.out.println(" Nao foram passados parametros com local(nome) de arquivo ou acao para ser executada.");
+                System.out.println("--------------------------");
+                System.out.println("| Abortando o programa !!!");
+                System.out.println("--------------------------");
+                return;
+            }
             ParseAdaptor langParser = new ParseAdaptorImplementation();
             InterpreterAdaptorImplementation interpreterImplementation = new InterpreterAdaptorImplementation();
             
