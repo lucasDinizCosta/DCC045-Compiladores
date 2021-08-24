@@ -1,0 +1,99 @@
+group cPlusPlus;
+
+program(name, funcs, datas) ::= <<
+    #include \<iostream>
+
+    <datas; separator="\n\n">
+
+    <funcs; separator="\n\n">
+  
+    int main() {
+        inicio();
+        return 0;
+    }
+>>
+
+data(name, decl) ::= <<
+class <name>
+{
+    public:
+        <if(decl)><decl; separator=";\n">;<endif>
+}
+>>
+
+func(type, name, params, decl, stmt) ::= <<
+<type> <name>(<params; separator=", ">) {
+    <if(decl)><decl; separator=";\n">;<endif>
+    <stmt>
+}
+>>
+
+param(type, name) ::= "<type> <name>"
+declaration(type, name) ::= "<type> <name>"
+
+array_type(type) ::= "<type>[]"
+int_type() ::= "int"
+float_type() ::= "float"
+boolean_type() ::= "bool"
+char_type() ::= "float"
+data_type(data) ::= "<data>"
+null_type() ::= "null"
+typeInstanciate(type) ::= "new <type>;"
+
+print(expr) ::= "std::cout \<\< <expr> \<\< std::endl;"
+read(expr) ::= "std::cin \>\> <expr>;"
+return(expr) ::= "return <expr>;"
+
+iterate(expr, cmd, loopAtual) ::= <<
+$! Cria uma variavel para poder fazer o laço do loop !$
+int I_nd3x__L00p__loopAtual = 0;
+for (int I_nd3x__L00p__loopAtual = 0; I_nd3x__L00p__loopAtual \< <expr>; I_nd3x__L00p__loopAtual++) {
+    <cmd>
+}
+>>
+
+if(expr, cmd) ::= <<
+if(<expr>) {
+    <cmd>
+}
+>>
+
+if_else(expr, cmd, else) ::= <<
+if(<expr>) {
+    <cmd>
+} <if(else)>else {
+    <else>
+}
+<endif>
+>>
+
+stmt_list(stmt1, stmt2) ::= <<
+<stmt1>
+<stmt2>
+>>
+
+attribution(var, expr) ::= "<var> = <expr>;"
+lvalue(name, array) ::= "<name><array>"
+array_access(expr) ::= "[<expr>]"
+
+boolean_expr(value) ::= "<value>"
+float_expr(value) ::= "<value>"
+char_expr(value) ::= "<value>"
+int_expr(value) ::= "<value>"
+
+new_array(var, type, expr) ::= "<type> <var>[<expr>];"
+
+call(name, args) ::= <<<name>(<args; separator=", ">)>>
+
+mult_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
+div_expr(left_expr, right_expr) ::= "(<left_expr> / <right_expr>)"
+mod_expr(left_expr, right_expr) ::= "(<left_expr> % <right_expr>)"
+add_expr(left_expr, right_expr) ::= "(<left_expr> + <right_expr>)"
+sub_expr(left_expr, right_expr) ::= "(<left_expr> - <right_expr>)"
+
+lt_expr(left_expr, right_expr) ::= "(<left_expr> \< <right_expr>)"
+equallity_expr(left_expr, right_expr) ::= "(<left_expr> == <right_expr>)"
+diff_expr(left_expr, right_expr) ::= "(<left_expr> != <right_expr>)"
+and_expr(left_expr, right_expr) ::= "(<left_expr> && <right_expr>)"
+not_expr(expr) ::= "!<expr>"
+minus_expr(expr) ::= "-<expr>"

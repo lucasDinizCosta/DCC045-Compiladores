@@ -1,0 +1,75 @@
+data Ponto {
+   x :: Float;
+   y :: Float;
+}
+{-
+fat(n :: Float) : Float{
+	if( n < 1.0)
+		return 2.0;
+	return n*fat(n-1.0)[0];
+}
+
+
+fat(n :: Int) : Int{
+	if( n < 1)
+		return 1;
+	return n*fat(n-1)[0];
+}
+-}
+soma(n1 :: Int, n2 :: Int) : Int{
+	return n1 + n2;
+}
+
+soma(n1 :: Float, n2 :: Float) : Int{
+	return n1 + n2;
+}
+
+soma(n1 :: Ponto, n2 :: Ponto) : Float{
+	--return n1.x + n2.x;
+	return 2.5;
+}
+
+soma(n1 :: Ponto, n2 :: Float) : Float{
+	return n1.x + n2;
+	--return 2.5;
+}
+
+soma(n1 :: Ponto[], size :: Int) : Float{
+	result = new Float;
+	result = 1.5;
+	indice = 0;
+	iterate(size){
+		result = result + n1[indice].x + n1[indice].y;
+		indice = indice + 1;
+	}
+	return result;
+}
+
+
+main(){
+	x = new Ponto;
+    x.x = 5.5; x.y = 17.5;
+	pontos = new Ponto[2];
+	pontos[0] = new Ponto;
+	pontos[1] = new Ponto;
+	pontos[0] = x;
+	pontos[1] = x;
+    
+   print x.x;
+   print '\n';
+   --print fat(x.x)[0];
+   print soma(x.x, x.x)[0];
+   print '\n';
+   print soma(75, 75)[0];
+   x.x = 10.5;
+   print '\n';
+   print soma(x, x)[0];
+   print '\n';
+   print soma(x, x.x)[0];
+   print '\n';
+   print soma(pontos, 2)[0];
+   print '\n';
+   soma(pontos, 2)<q1>;
+   print '\n'; print '\n';print '\n';print '\n';print '\n';
+   print q1;
+}

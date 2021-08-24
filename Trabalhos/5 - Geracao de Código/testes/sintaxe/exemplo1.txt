@@ -1,0 +1,21 @@
+fat(Int n) : k{
+   if(n == 0){ 
+       k = 1; 
+   }else{
+       k = mult(k,fat(k-1));
+   }
+}
+
+
+mult(Int m, Int n ) : q + 1{
+    q = m;
+    if(n == 0){
+       q = 0;
+    }else{
+       while(1 < n){
+           q = q + m;
+           n = n - 1;
+       }
+    }
+}
+

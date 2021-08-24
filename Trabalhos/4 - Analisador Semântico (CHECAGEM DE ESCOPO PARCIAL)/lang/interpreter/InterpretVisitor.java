@@ -18,7 +18,8 @@ import lang.interpreter.Visitor;
 
 public class InterpretVisitor extends Visitor {
 
-    private Stack<HashMap<String, Object>> env; // Escopo de variaveis de objetos
+    // private Stack<HashMap<String, Object>> env; // Escopo de variaveis de objetos
+    private List<HashMap<String, Object>> env; // Escopo de variaveis de objetos
 
     // Funções da linguagem lang
     // Foi colocado um arraylist pra poder comportar sobrecarga de funções
@@ -28,9 +29,14 @@ public class InterpretVisitor extends Visitor {
     private Stack<Object> parms;                // Parametros de funções
     private boolean retMode, debug;
 
+    // Variaveis que regulam o escopo
+    int escopoNumFuncao = 0;
+    int escopoNumAtual = 0;
+
+
     public InterpretVisitor() {
-        env = new Stack<HashMap<String, Object>>();
-        env.push(new HashMap<String, Object>());
+        env = new ArrayList<HashMap<String, Object>>();
+        env.add(new HashMap<String, Object>());    // Primeiro nível é o escopo global
         funcs = new HashMap<String, ArrayList<Function>>();
         parms = new Stack<Object>();        
         datas = new HashMap<String, Data>();
@@ -44,7 +50,8 @@ public class InterpretVisitor extends Visitor {
         System.out.println("---- DADOS DO DEBUG MODE ----\n");
         System.out.println("---- DADOS DE env ----\n");
         for (int i = 0; i < env.size(); i++) {
-            System.out.println(env.elementAt(i));
+            // System.out.println(env.elementAt(i));
+            System.out.println(env.get(i));
         }
         System.out.println("\n---- DADOS DE funcs ----\n");
         /*
@@ -85,6 +92,39 @@ public class InterpretVisitor extends Visitor {
     public String getErrorLine(int lineNumber){
         String text = " -- (linha: " + lineNumber + " classe: " + InterpretVisitor.class.getSimpleName() + ") -- ";
         return text;
+    }
+
+    public Integer getSizeScopes(){
+        return env.size();
+    }
+
+    public HashMap<String, Object> getLastScope(){
+        if(getSizeScopes() >= 0)
+            return env.get(env.size() - 1);
+        return null;
+    }
+
+    public void removeLastScope(){
+        if(getSizeScopes() > 0){
+            escopoNumAtual--;
+            env.remove(getSizeScopes() - 1);
+        }
+    }
+
+    public Object getElementOnScope(String nome){
+        for(int i = escopoNumAtual; i >= 0; i--){
+            HashMap<String, Object> escopoAuxiliar = env.get(i);
+            if(escopoAuxiliar.get(nome) != null){
+                return escopoAuxiliar.get(nome);
+            }
+        }
+        // Variavel nao existe
+        return null;
+    }
+
+    public void addScope(){
+        escopoNumAtual++;
+        env.add(new HashMap<String, Object>());    //  Adiciona um novo escopo
     }
 
     // Partem do prog
@@ -170,7 +210,9 @@ public class InterpretVisitor extends Visitor {
             }
         }
         // Adiciona o escopo da função no env
-        env.push(localEnv);
+        escopoNumFuncao++;
+        escopoNumAtual++;
+        env.add(localEnv);
 
         // Corpo da função
         // Verifica os commandos que compoem o corpo da função
@@ -181,7 +223,8 @@ public class InterpretVisitor extends Visitor {
         }
 
         // Remove o escopo local criado pra função
-        env.pop();
+        removeLastScope();
+        escopoNumFuncao--;
 
         // Certifica que foi computado o return, voltando para false a opção
         retMode = false;
@@ -347,18 +390,13 @@ public class InterpretVisitor extends Visitor {
     @Override
     public void visit(CommandsList c) {
         /**
+         * ===> EXPANDE OS COMANDOS DO IF OU IF-ELSE POIS UM COMANDO PODE SER
+         * if(){            ou  if(condicao)
+         *  instrucao               instrucao
+         * }
          * ------- Regra: -------------------
          * cmd: OPEN_BRACES cmd* CLOSE_BRACES      # CommandsList
          * --------------
-         * => Possibilita criar escopo de bloco
-         * Exemplo: 
-         * func(k :: int){
-         *       x = 2;
-         *       {
-         *           y = 4;
-         *           k = 5;
-         *       }
-         * }
          */
         if (retMode) {
             return;
@@ -380,10 +418,13 @@ public class InterpretVisitor extends Visitor {
     public void visit(If i) {
         try {
             i.getExp().accept(this);
-
             // Desempilha os operandos com "parametro" do if
             if ((boolean) operands.pop()) {
+                addScope();
+
                 i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
+
+                removeLastScope();
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
@@ -397,9 +438,17 @@ public class InterpretVisitor extends Visitor {
 
             // Desempilha os operandos com "parametro" do if
             if ((boolean) operands.pop()) {
+                addScope();
+
                 i.getCmd().accept(this); // Verifica se o corpo de comandos do if é aceito
+
+                removeLastScope();
             } else {
+                addScope();
+
                 i.getElseCmd().accept(this);
+
+                removeLastScope();
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
@@ -417,18 +466,25 @@ public class InterpretVisitor extends Visitor {
             i.getExp().accept(this);        // Empilha o valor lógico da expressão no operands
             Object obj = operands.pop();
             if (obj instanceof Boolean){ // Objeto do tipo booleano na lista de operandos
+                addScope();
                 do{                    
                     i.getCmd().accept(this);        // Executa os comandos do iterate
                     i.getExp().accept(this);        // Empilha o criterio de repetição atualizado
                     obj = operands.pop();
                 }
                 while ((Boolean) obj); // Repito enquanto esse objeto do parametro do iterate for true
+
+                removeLastScope();
             }
             else if (obj instanceof Integer) {
+                addScope();
+
                 // Iterate com um número limitado de vezes
                 for (int j = 0; j < (Integer) obj; j++) {
                     i.getCmd().accept(this);
                 }
+
+                removeLastScope();
             }
         } catch (Exception x) {
             throw new RuntimeException(" (" + i.getLine() + ", " + i.getColumn() + ") " + x.getMessage());
@@ -449,7 +505,7 @@ public class InterpretVisitor extends Visitor {
             if (lvalue instanceof Identifier) {
                 // Adiciona o valor digitado pelo usuário no escopo
                 // (Nome da variavel, valor digitado)
-                env.peek().put(((Identifier) lvalue).getId(), input);
+                getLastScope().put(((Identifier) lvalue).getId(), input);
             } else if (lvalue instanceof DataAccess) {
                 if(((DataAccess)lvalue).getLValue() instanceof ArrayAccess){ // array de data
                     // Quando chega array do tipo pontos[0].x => lValue é um dataAccess
@@ -463,7 +519,7 @@ public class InterpretVisitor extends Visitor {
                     String nomeArray = arrayElement.getId();
 
                     // Busca o array no env
-                    List<Object> objetoArray = ((List<Object>) env.peek().get(nomeArray));
+                    List<Object> objetoArray = ((List<Object>) (getElementOnScope(nomeArray)));
                     Integer tamanhoArray = ((List)objetoArray).size();
                     
                     if((position >= 0) && (position <= tamanhoArray - 1)){
@@ -475,7 +531,7 @@ public class InterpretVisitor extends Visitor {
                     }
                 }
                 else{   // Tipo data normal
-                    Object obj = env.peek().get(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
+                    Object obj = getElementOnScope(((Identifier) ((DataAccess) lvalue).getLValue()).getId());
                     ((HashMap<String, Object>) obj).put(((DataAccess) lvalue).getId(), input);
 
                 }
@@ -544,10 +600,10 @@ public class InterpretVisitor extends Visitor {
                     ArrayAccess arrayElement = ((ArrayAccess)((DataAccess)lvalue).getLValue());
 
                     if(arrayElement.getLValue() instanceof ArrayAccess){    // Matriz de data
-                        ObjectDefault objetoMatriz = (ObjectDefault)env.peek().get(arrayElement.getLValue().getId());
+                        ObjectDefault objetoMatriz = (ObjectDefault)getElementOnScope(arrayElement.getLValue().getId());
 
                         // Pega a matriz na lista de variaveis
-                        // List obj = env.peek().get(arrayElement.getLValue().getId());
+                        // List obj = getElementOnScope(arrayElement.getLValue().getId());
                         List obj = (List)(objetoMatriz.getContent());
 
                         // Empilha o numero da linha no operands
@@ -593,7 +649,7 @@ public class InterpretVisitor extends Visitor {
                         String nomeArray = arrayElement.getId();
 
                         // Busca o array no env
-                        ObjectDefault objetoArray = ((ObjectDefault)env.peek().get(nomeArray));
+                        ObjectDefault objetoArray = ((ObjectDefault) getElementOnScope(nomeArray));
                         List<Object> lista = ((List<Object>) objetoArray.getContent());
                         Integer tamanhoArray = lista.size();
                         
@@ -618,7 +674,7 @@ public class InterpretVisitor extends Visitor {
                     Object atributo = operands.pop();
 
                     // Objecto data que está no env
-                    ObjectDefault objetoData = (ObjectDefault)env.peek().get(nomeObjeto);
+                    ObjectDefault objetoData = (ObjectDefault)getElementOnScope(nomeObjeto);
 
                     // Busca o objeto no env e adiciona o atributo na variavel dele
                     HashMap<String, Object> objetoDinamico = ((HashMap<String, Object>) objetoData.getContent());
@@ -634,7 +690,7 @@ public class InterpretVisitor extends Visitor {
                 }
             } else if (lvalue instanceof Identifier) {  // Adicionar o valor em uma variavel
                 // Se é um Identificador literal, variavel ou resultados de funções
-                Object valorVariavel = env.peek().get(((Identifier) lvalue).getId());
+                Object valorVariavel = getElementOnScope(((Identifier) lvalue).getId());
                 Object expressao = operands.pop();
 
                 if(valorVariavel != null){  // Variavel Existe
@@ -645,7 +701,7 @@ public class InterpretVisitor extends Visitor {
                         if(verificaTipo){   // Tipo coincidiu, então pode fazer a operação
                             if(expressao instanceof ObjectDefault){ // New Int/Float/Char
                                 // Adiciona a expressão empilhada no operands na variavel
-                                env.peek().put(((Identifier) lvalue).getId(), expressao);
+                                getLastScope().put(((Identifier) lvalue).getId(), expressao);
                             }
                             else{
                                 ((ObjectDefault)valorVariavel).setContent(expressao);
@@ -658,13 +714,13 @@ public class InterpretVisitor extends Visitor {
                     }
                     else{   // Variavel sem tipo definido simplesmente reatribui o tipo
                         // Adiciona a expressão empilhada no operands na variavel
-                        env.peek().put(((Identifier) lvalue).getId(), expressao);
+                        getLastScope().put(((Identifier) lvalue).getId(), expressao);
                     }
                 }
                 else{   // Varivel esta sendo criada
 
                     // Adiciona a expressão empilhada no operands na variavel
-                    env.peek().put(((Identifier) lvalue).getId(), expressao);
+                    getLastScope().put(((Identifier) lvalue).getId(), expressao);
                 }
             }
             else if(lvalue instanceof ArrayAccess){     // Atribuição a um array
@@ -674,8 +730,8 @@ public class InterpretVisitor extends Visitor {
                     ArrayAccess arrayObjeto = (ArrayAccess)lvalue;
 
                     // Pega a matriz na lista de variaveis
-                    ObjectDefault objetoMatriz = (ObjectDefault) env.peek().get(arrayObjeto.getLValue().getId());
-                    //Object obj = env.peek().get(arrayObjeto.getLValue().getId());
+                    ObjectDefault objetoMatriz = (ObjectDefault) getElementOnScope(arrayObjeto.getLValue().getId());
+                    //Object obj = getElementOnScope(arrayObjeto.getLValue().getId());
                     List obj = (List)objetoMatriz.getContent();
 
                     // Empilha o numero da linha no operands
@@ -725,7 +781,7 @@ public class InterpretVisitor extends Visitor {
                     ((ArrayAccess)lvalue).getExp().accept(this);        // Aceita e adiciona a posicao no operandos
                     Integer position = (Integer)operands.pop();         // Posicao do array
 
-                    ObjectDefault objetoArray = (ObjectDefault)env.peek().get(nomeArray);
+                    ObjectDefault objetoArray = (ObjectDefault)getElementOnScope(nomeArray);
                     // Busca o array no env
                     List<Object> lista = ((List<Object>) objetoArray.getContent());
                     Integer tamanhoArray = ((List)lista).size();
@@ -916,7 +972,7 @@ public class InterpretVisitor extends Visitor {
                     // Inverte a ordem quando empilha os operadores, logo, deve ser
                     // Desempilhado do direita pra esquerda
                     for (LValue l : ret) {
-                        env.peek().put(ret.get(it).getId(), operands.pop());
+                        getLastScope().put(ret.get(it).getId(), operands.pop());
                         it--;
                     }
                 }
@@ -1526,6 +1582,10 @@ public class InterpretVisitor extends Visitor {
                 // Executa a função e coloca o retorno dos parametros em operands
                 function.accept(this);
 
+                // Remove do escopo
+                // removeLastScope();
+                // escopoNumFuncao--;
+
                 // Pega o valor da posicão da que identifica qual variavel o
                 // usuario quer que seja retornada
                 Object valueObj = f.getExpIndex();
@@ -1593,8 +1653,8 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(i.toString());
                 System.out.println("\n");
             }
-            Object r = env.peek().get(i.getId());
-            if (r != null || (r == null && env.peek().containsKey(i.getId()))){
+            Object r = getElementOnScope(i.getId());
+            if (r != null || (r == null && getLastScope().containsKey(i.getId()))){
                 if(r instanceof ObjectDefault){
                    ObjectDefault varAux = ((ObjectDefault) r);
 
@@ -1628,7 +1688,7 @@ public class InterpretVisitor extends Visitor {
                 System.out.println(d.toString());
                 System.out.println("\n");
             }
-            Object obj = env.peek().get(d.getLValue().getId());
+            Object obj = getElementOnScope(d.getLValue().getId());
             if(d.getLValue() instanceof ArrayAccess){ // array de data
                 // Quando chega array do tipo pontos[0].x => d é um dataAccess
                 if (obj != null) {
@@ -1696,7 +1756,7 @@ public class InterpretVisitor extends Visitor {
             if(a.getLValue() instanceof ArrayAccess){   // Trata a condição de ser uma matriz
 
                 // Pega a matriz na lista de variaveis
-                Object obj = env.peek().get(a.getLValue().getId());
+                Object obj = getElementOnScope(a.getLValue().getId());
 
                 if(obj != null){
                     // Empilha o numero da linha no operands
@@ -1736,7 +1796,7 @@ public class InterpretVisitor extends Visitor {
             }
             else{
                 // obj é uma lista => lista de elementos do array
-                Object obj = env.peek().get(a.getLValue().getId());
+                Object obj = getElementOnScope(a.getLValue().getId());
                 if (obj != null) {
                     a.getExp().accept(this);        // Adiciona a posicao no vetor nos operands
                     Integer position = (Integer) operands.pop();
