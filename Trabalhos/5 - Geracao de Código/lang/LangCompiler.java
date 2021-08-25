@@ -162,6 +162,10 @@ public class LangCompiler {
     }
 
     public static String getFileName(String path){
-        return "";
+        System.out.println(path.lastIndexOf('/'));
+        String nomeArquivo = path.substring(path.lastIndexOf('/') != -1 ? path.lastIndexOf('/') + 1 : 0, 
+        path.lastIndexOf('.') != -1 ? path.lastIndexOf('.') : path.length());
+        System.out.println(nomeArquivo);
+        return nomeArquivo;
     }
 }
