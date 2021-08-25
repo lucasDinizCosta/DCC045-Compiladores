@@ -240,7 +240,6 @@ public class CPlusPlusVisitor extends Visitor {
                 fun.add("decl", decl);
             }
         }
-
         f.getBody().accept(this);
         fun.add("stmt", stmt);
 

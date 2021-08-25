@@ -148,7 +148,8 @@ public class LangCompiler {
                 }
                 TyEnv<LocalAmbiente<SType>> env = v.getEnv();
                 System.out.println("Executando a geracao de codigo de lang para C++:\n");
-                ((Node)result).accept(new CPlusPlusVisitor(args[0].substring(0, args[1].length()-4), env, v.getDatas()));
+                System.out.println(args[1] + " --- " + args[1].substring(0, args[1].length() - 4));
+                ((Node)result).accept(new CPlusPlusVisitor(getFileName(args[1]), env, v.getDatas()));
             }
             else if (args[0].equals("-pp")) {
                 // iv = new PPrint();
@@ -158,5 +159,9 @@ public class LangCompiler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getFileName(String path){
+        return "";
     }
 }
