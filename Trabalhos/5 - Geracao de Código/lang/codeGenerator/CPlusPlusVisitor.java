@@ -26,11 +26,14 @@ public class CPlusPlusVisitor extends Visitor {
 
     TyEnv<LocalAmbiente<SType>> env;    // Ambiente do código
 
-    // Atributos dos tipos data
+    // Atributos dos tipos data ==> Com o tipo semantico
     private HashMap<String, DataAttributes> datasAttrib;
 
-    // Armzanena as Funcoes 
+    // Armazena as Funcoes 
     private ArrayList<Function> functionsAST;
+
+    // Tipos de dados novos
+    private HashMap<String, Data> datasAST;        
 
     public CPlusPlusVisitor(String fileName, TyEnv<LocalAmbiente<SType>> env, HashMap<String, DataAttributes> datasAttrib) {
         groupTemplate = new STGroupFile("./template/c++.stg");
@@ -48,6 +51,7 @@ public class CPlusPlusVisitor extends Visitor {
         datas = new ArrayList<ST>();
         // Aceita os tipos data para fazer a verificação de tipo
         for (Data d : p.getDatas()) {
+            datasAST.put(d.getId(), d);
             d.accept(this);
         }
         template.add("datas", datas);
@@ -79,39 +83,20 @@ public class CPlusPlusVisitor extends Visitor {
         ST data = groupTemplate.getInstanceOf("data");
         data.add("name", d.getNameType());  // o nome do tipo data
         DataAttributes dataElement = datasAttrib.get(d.getNameType());
-
-
-
-
-        // LocalEnv<SType> local = env.get(f.getID());
-        // Set<String> keys = local.getKeys();
-
-
-        // f.getTipo().accept(this);
-        // fun.add("type", type);
-
-        params = new ArrayList<ST>();
-        for (Param p : f.getParams()) {
-            keys.remove(p.getID());
-            p.accept(this);
+        List<Declaration> listaDeclaracoes = d.getDeclarations();
+        int indiceTipo = 0;
+        declarations.clear();
+        for(Declaration declaration : listaDeclaracoes){
+            ST decl = groupTemplate.getInstanceOf("declaration");
+            SType tipo = dataElement.getTipos().get(indiceTipo);
+            decl.add("name", declaration.getId());
+            processSType(tipo);       
+            decl.add("type", type);
+            declarations.add(decl);
+            indiceTipo++;
         }
-        fun.add("params", params);
-
-        for (String key : keys) {
-            SType t = local.get(key);
-            if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
-                ST decl = groupTemplate.getInstanceOf("declaration");
-                decl.add("name", key);
-                processSType(t);       
-                decl.add("type", type);
-                fun.add("decl", decl);
-            }
-        }
-
-        f.getBody().accept(this);
-        fun.add("stmt", stmt);
-
-        datas.add(fun);
+        data.add("decl", declarations);
+        datas.add(data);
     }
 
     // Partem do decl
@@ -754,28 +739,32 @@ public class CPlusPlusVisitor extends Visitor {
     // True e False
     @Override
     public void visit(BooleanValue b) {
-        stk.push(tyBool);
+        expr = groupTemplate.getInstanceOf("boolean_expr");
+        expr.add("value", b.getValue());
     }
 
     @Override
     public void visit(Null n) {
-        stk.push(tyNull);
+        expr = groupTemplate.getInstanceOf("null_type");
+        expr.add("value", n.getValue());
     }
 
     @Override
     public void visit(IntegerNumber i) {
-        positionReturnFunction = i;
-        stk.push(tyInt);
+        expr = groupTemplate.getInstanceOf("int_expr");
+        expr.add("value", i.getValue());
     }
 
     @Override
     public void visit(FloatNumber p) {
-        stk.push(tyFloat);
+        expr = groupTemplate.getInstanceOf("float_expr");
+        expr.add("value", p.getValue());
     }
 
     @Override
     public void visit(CharLitteral c) {
-        stk.push(tyChar);
+        expr = groupTemplate.getInstanceOf("char_expr");
+        expr.add("value", c.getValue());
     }
 
     // Partem do pexp
