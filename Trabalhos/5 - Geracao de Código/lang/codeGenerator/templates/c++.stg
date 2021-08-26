@@ -17,7 +17,7 @@ data(name, decl) ::= <<
 class <name>
 {
     public:
-        <if(decl)><decl; separator=";\n">;<endif>
+        <if(decl)><decl; separator="\n"><endif>
 }
 >>
 

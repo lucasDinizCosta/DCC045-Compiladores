@@ -41,6 +41,7 @@ public class CPlusPlusVisitor extends Visitor {
         this.env = env;
         this.datasAttrib = datasAttrib;
         functionsAST = new ArrayList<Function>();
+        datasAST = new HashMap<String, Data>();
     }
 
     // Partem do prog
@@ -55,6 +56,7 @@ public class CPlusPlusVisitor extends Visitor {
             d.accept(this);
         }
         template.add("datas", datas);
+        System.out.println(getLineNumber() + " --- ");
 
         funcs = new ArrayList<ST>();
         // Checa as funções
@@ -81,14 +83,18 @@ public class CPlusPlusVisitor extends Visitor {
     @Override
     public void visit(Data d) {
         ST data = groupTemplate.getInstanceOf("data");
-        data.add("name", d.getNameType());  // o nome do tipo data
-        DataAttributes dataElement = datasAttrib.get(d.getNameType());
+        data.add("name", d.getId());  // o nome do tipo data
+        declarations = new ArrayList<ST>();
+        System.out.println(getLineNumber() + " --- " + d + " --- " +  d.getId());
+        DataAttributes dataElement = datasAttrib.get(d.getId());
         List<Declaration> listaDeclaracoes = d.getDeclarations();
+        System.out.println(getLineNumber() + " --- " + dataElement + " --- " + d.getDeclarations());
         int indiceTipo = 0;
         declarations.clear();
         for(Declaration declaration : listaDeclaracoes){
             ST decl = groupTemplate.getInstanceOf("declaration");
             SType tipo = dataElement.getTipos().get(indiceTipo);
+            System.out.println(getLineNumber() + " --- " + tipo + " --- " + tipo.getClass().getSimpleName());
             decl.add("name", declaration.getId());
             processSType(tipo);       
             decl.add("type", type);
@@ -1294,6 +1300,10 @@ public class CPlusPlusVisitor extends Visitor {
             type = groupTemplate.getInstanceOf("float_type");
         else if (t instanceof STyCharacter)
             type = groupTemplate.getInstanceOf("char_type");
+        else if (t instanceof STyData){
+            type = groupTemplate.getInstanceOf("data_type");
+            type.add("data", ((STyData)t).getName());
+        }
     }
 
 }

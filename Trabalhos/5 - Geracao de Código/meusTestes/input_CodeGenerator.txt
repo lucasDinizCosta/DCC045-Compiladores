@@ -1,3 +1,20 @@
+data Ponto {
+   x :: Float;
+   y :: Float;
+}
+
+data Reta {
+   p1 :: Ponto;
+   p2 :: Ponto;
+}
+
+data Quadrado {
+   r1 :: Reta;
+   r2 :: Reta;
+   r3 :: Reta;
+   r4 :: Reta;
+}
+
 main(){
 
 }
