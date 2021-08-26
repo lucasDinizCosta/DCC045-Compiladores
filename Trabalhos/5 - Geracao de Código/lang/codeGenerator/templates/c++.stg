@@ -7,10 +7,6 @@ program(name, funcs, datas) ::= <<
 
     <funcs; separator="\n\n">
   
-    int main() {
-        inicio();
-        return 0;
-    }
 >>
 
 data(name, decl) ::= <<
@@ -18,7 +14,7 @@ class <name>
 {
     public:
         <if(decl)><decl; separator="\n"><endif>
-}
+};
 >>
 
 func(type, name, params, decl, stmt) ::= <<
@@ -35,7 +31,7 @@ array_type(type) ::= "<type>*"
 int_type() ::= "int"
 float_type() ::= "float"
 boolean_type() ::= "bool"
-char_type() ::= "float"
+char_type() ::= "char"
 data_type(data) ::= "<data>"
 null_type() ::= "null"
 typeInstanciate(type) ::= "new <type>;"

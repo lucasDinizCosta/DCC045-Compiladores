@@ -13,6 +13,8 @@ data Quadrado {
    r2 :: Reta;
    r3 :: Reta;
    r4 :: Reta;
+   description :: Char[][];
+   retas :: Reta[][];
 }
 
 main(){

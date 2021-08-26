@@ -11,7 +11,6 @@ import org.stringtemplate.v4.STGroupFile;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 public class CPlusPlusVisitor extends Visitor {
 
@@ -56,7 +55,6 @@ public class CPlusPlusVisitor extends Visitor {
             d.accept(this);
         }
         template.add("datas", datas);
-        System.out.println(getLineNumber() + " --- ");
 
         funcs = new ArrayList<ST>();
         // Checa as funções
@@ -96,7 +94,12 @@ public class CPlusPlusVisitor extends Visitor {
             SType tipo = dataElement.getTipos().get(indiceTipo);
             System.out.println(getLineNumber() + " --- " + tipo + " --- " + tipo.getClass().getSimpleName());
             decl.add("name", declaration.getId());
-            processSType(tipo);       
+            if(tipo instanceof STyArr){
+                adjustSTyArr((STyArr)tipo);
+            }
+            else{
+                processSType(tipo);       
+            }
             decl.add("type", type);
             declarations.add(decl);
             indiceTipo++;
@@ -1304,6 +1307,26 @@ public class CPlusPlusVisitor extends Visitor {
             type = groupTemplate.getInstanceOf("data_type");
             type.add("data", ((STyData)t).getName());
         }
+    }
+
+    private void adjustSTyArr(STyArr t){
+        List<ST> array = new ArrayList<ST>();   // Lista dos arrays
+        SType tipoArray = t;    // Utiliza uma cópia de t, pois será atualizado
+        // Adiciona os tipos array em uma lista
+        // Exemplo: mat[][] => adiciona mat[]'[]' => depois mat'[]'[]
+        while(tipoArray instanceof STyArr){     
+            type = groupTemplate.getInstanceOf("array_type");
+            array.add(type);
+            tipoArray = ((STyArr)tipoArray).getArg();
+        }
+        // Pega do elemento mais externo para o mais interno que será o tipo do array
+        for(int i = 1; i < array.size(); i++){  // Ajusta o tipo caso tenha array de array
+            ST aux = array.get(i);
+            aux.add("type", array.get(i - 1));
+        }
+        processSType(tipoArray);                // Passa o tipo do array ou matriz || Exemplo: Ponto, Char, Int, Float
+        array.get(0).add("type", type);         // Adiciona o tipo do array no elemento mais interno
+        type = array.get(array.size() - 1);     // O tipo completo será o da ultima posição da lista
     }
 
 }
