@@ -6,6 +6,8 @@
 *********************************************************/
 package lang.semantic;
 
+import lang.semantic.*;
+
 // Armazena um ambiente para cada função no Typecheck
 public class LocalAmbiente<A> extends TyEnv<A>{
     private String id; 

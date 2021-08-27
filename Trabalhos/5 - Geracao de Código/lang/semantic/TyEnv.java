@@ -7,13 +7,15 @@
 package lang.semantic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.Set;
 
 // Define o ambiente de variavel ou função que associa o nome da variavel ou funcao 
 // para o tipo correspondente. È utilizado na analise semantica no typeCheckVisitor
 public class TyEnv<A>{
 
-    private TreeMap<String,A> typeEnv;
+    private TreeMap<String, A> typeEnv;
     private ArrayList<A> typeEnvFuncoes;
 
     public TyEnv(){
@@ -61,6 +63,11 @@ public class TyEnv<A>{
            s += ((String)x[i]) + " : " + (typeEnv.get(x[i])).toString() + "\n";
         }
         return s;*/
+    }
+
+    // Retorna a lista de variaveis
+    public Set<String> getKeys() {
+        return typeEnv.keySet();
     }
     
 }

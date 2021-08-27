@@ -4,11 +4,14 @@ import lang.ast.*;
 import lang.interpreter.*;
 import lang.semantic.*;
 
+import org.antlr.v4.parse.ANTLRParser.throwsSpec_return;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +19,7 @@ public class CPlusPlusVisitor extends Visitor {
 
     private STGroup groupTemplate;
     private ST type, stmt, expr;
-    private List<ST> funcs, params, datas, declarations, commands;
+    private List<ST> funcs, params, datas, declarations;
     private String fileName;
 
     // Indice que identifica qual o loopAtual, ou seja, se há vários iterate internos
@@ -167,6 +170,9 @@ public class CPlusPlusVisitor extends Visitor {
                 fun.add("type", type);
             }
 
+            // Declaração das variaveis que são usadas no corpo da função
+            Set<String> keys = local.getKeys();
+
             // Instancia a lista que vai armazenar os comandos da função
             params = new ArrayList<ST>();
 
@@ -177,7 +183,8 @@ public class CPlusPlusVisitor extends Visitor {
                 for (int i = 0; i < paramsList.size(); i++) {
                     SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
                     ST p = groupTemplate.getInstanceOf("param");
-                    p.add("name", paramsList.getSingleId(i));
+                    String nomeParametro = paramsList.getSingleId(i);
+                    p.add("name", nomeParametro);
                     if(t instanceof STyArr){
                         adjustSTyArr((STyArr)t);
                     }
@@ -186,25 +193,42 @@ public class CPlusPlusVisitor extends Visitor {
                     }
                     p.add("type", type);
                     params.add(p);
+
+                    // Remove o parametro da função da lista de variaveis do corpo da função
+                    keys.remove(nomeParametro);
                 }
             }
             fun.add("params", params);
 
-            // Instancia a lista que vai armazenar os comandos da função
-            commands = new ArrayList<ST>();
+            // Instancia as variaveis antes de usar nas operações presente no corpo da função
+            for (String key : keys) {
+                SType t = local.get(key);
+                // if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
+                ST decl = groupTemplate.getInstanceOf("param");
+                decl.add("name", key);
+                if(t instanceof STyArr){
+                    adjustSTyArr((STyArr)t);
+                }
+                else{
+                    processSType(t);       
+                }       
+                decl.add("type", type);
+                fun.add("decl", decl);
+                // }
+            }
 
             for(int i = 0; i < f.getCommands().size(); i++){
                 Command command = f.getCommands().get(i);
                 command.accept(this);
-                commands.add(stmt);
+                fun.add("stmt", stmt);
             }
-            fun.add("stmt", commands);
+            
 
             // Adiciona o 'return 0;' na função main do código em C++
             if(f.getId().equals("main")){
-                ST ret = groupTemplate.getInstanceOf("return");
-                ret.add("expr", 0 );  // 'return 0;'
-                fun.add("stmt", ret);
+                stmt = groupTemplate.getInstanceOf("return");
+                stmt.add("expr", 0 );  // 'return 0;'
+                fun.add("stmt", stmt);
             }
 
             funcs.add(fun);
@@ -229,6 +253,9 @@ public class CPlusPlusVisitor extends Visitor {
                 f.getReturnTypes().get(idRetorno - 1).accept(this); 
                 fun.add("type", type);
 
+                // Declaração das variaveis que são usadas no corpo da função
+                Set<String> keys = local.getKeys();
+
                 // Instancia a lista que vai armazenar os comandos da função
                 params = new ArrayList<ST>();
 
@@ -239,7 +266,8 @@ public class CPlusPlusVisitor extends Visitor {
                     for (int i = 0; i < paramsList.size(); i++) {
                         SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
                         ST p = groupTemplate.getInstanceOf("param");
-                        p.add("name", paramsList.getSingleId(i));
+                        String nomeParametro = paramsList.getSingleId(i);
+                        p.add("name", nomeParametro);
                         if(t instanceof STyArr){
                             adjustSTyArr((STyArr)t);
                         }
@@ -248,19 +276,35 @@ public class CPlusPlusVisitor extends Visitor {
                         }
                         p.add("type", type);
                         params.add(p);
+
+                        // Remove o parametro da função da lista de variaveis do corpo da função
+                        keys.remove(nomeParametro);
                     }
                 }
                 fun.add("params", params);
 
-                // Instancia a lista que vai armazenar os comandos da função
-                commands = new ArrayList<ST>();
+                // Instancia as variaveis antes de usar nas operações presente no corpo da função
+                for (String key : keys) {
+                    SType t = local.get(key);
+                    // if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
+                    ST decl = groupTemplate.getInstanceOf("param");
+                    decl.add("name", key);
+                    if(t instanceof STyArr){
+                        adjustSTyArr((STyArr)t);
+                    }
+                    else{
+                        processSType(t);       
+                    }       
+                    decl.add("type", type);
+                    fun.add("decl", decl);
+                    // }
+                }
 
                 for(int i = 0; i < f.getCommands().size(); i++){
                     Command command = f.getCommands().get(i);
                     command.accept(this);
-                    commands.add(stmt);
+                    fun.add("stmt", stmt);
                 }
-                fun.add("stmt", commands);
 
                 funcs.add(fun);
                 idRetorno++;
@@ -335,7 +379,6 @@ public class CPlusPlusVisitor extends Visitor {
     public void visit(CommandsList c) {
         for (Command command : c.getCommands()) { // Executa os comandos
             command.accept(this);
-            commands.add(stmt);
         }
     }
 
@@ -408,53 +451,6 @@ public class CPlusPlusVisitor extends Visitor {
             System.out.println(getLineNumber() + " --- " + r.getExps());
             stmt.add("expr", expr);
         }
-        
-        /*if (temp.getFuncType() instanceof STyFun) {
-            // Padrao da documentação da função
-            SType[] tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
-            SType[] tiposRetornados = new SType[qtdExpRetorno];
-
-            // Desempilha os tipos retornados
-            for(int i = 0; i < qtdExpRetorno; i++){
-                tiposRetornados[i] = stk.pop();
-            }
-            
-            // Quantidades de retorno para diferente em relação a quantidade descrita na função
-            if(qtdExpRetorno != tiposRetornoPadrao.length){
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
-                + r.getColumn() + "): Foram especificados " + tiposRetornoPadrao.length 
-                + " tipos de retorno na documentacao da funcao mas no comando \'return\' apresenta " 
-                + qtdExpRetorno + " retorno(s) !!");
-                stk.push(tyErr);
-            }
-
-            int contRetornos = 0;
-
-            // O retorno deve ser desempilhado na ordem contraria
-            for(int i = tiposRetornoPadrao.length - 1; i >= 0; i--){  // Verificação de tipo nos retornos
-
-                if(contRetornos > qtdExpRetorno){   // Sai da função se a quantidade for diferente
-                    break;
-                }
-
-                if(!tiposRetornados[contRetornos].match(tiposRetornoPadrao[i])){
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + r.getLine() + ", coluna: " 
-                    + r.getColumn() + "): O tipo retornado na funcao \'" + tiposRetornados[contRetornos] + "\'" + " eh diferente de \'"
-                    + tiposRetornoPadrao[i] +"\' !!!");
-                    stk.push(tyErr);
-                }
-                
-                contRetornos++;
-            }
-        } else {
-            stk.pop().match(temp.getFuncType());
-        }
-
-        // stmt = groupTemplate.getInstanceOf("return");
-        // r.getExpr().accept(this);
-        // stmt.add("expr", expr);
-
-        */
     }
 
     @Override
@@ -468,7 +464,6 @@ public class CPlusPlusVisitor extends Visitor {
         LValue lvalue = a.getLValue();
 
         a.getLValue().accept(this);
-            // a.getId().accept(this);
         stmt.add("var", expr);
         // Empilha o tipo da expressao que sera atribuida
         a.getExp().accept(this);

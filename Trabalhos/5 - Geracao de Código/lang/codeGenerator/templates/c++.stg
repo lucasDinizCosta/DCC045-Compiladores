@@ -20,7 +20,7 @@ class <name>
 func(type, name, params, decl, stmt) ::= <<
 <type> <name>(<params; separator=", ">) {
     <if(decl)><decl; separator=";\n">;<endif>
-    <stmt>
+    <stmt; separator="\n">
 }
 >>
 param(type, name) ::= "<type> <name>"

@@ -27,5 +27,8 @@ soma(n1 :: Int, n2 :: Float[], p1 :: Ponto[][]) : Int, Float {
 }
 
 main(){
-
+	i = 2 + 2;
+	j = 0;
+	print i;
+	--ponto = new Ponto;
 }
