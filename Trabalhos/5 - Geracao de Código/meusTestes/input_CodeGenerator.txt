@@ -16,6 +16,14 @@ data Quadrado {
    description :: Char[][];
    retas :: Reta[][];
 }
+{-
+soma(n1 :: Int, n2 :: Int) : Int{
+	return n1 + n2;
+}
+-}
+
+soma(n1 :: Int, n2 :: Float[], p1 :: Ponto[][]){
+}
 
 main(){
 

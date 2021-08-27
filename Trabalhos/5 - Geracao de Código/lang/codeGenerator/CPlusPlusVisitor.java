@@ -178,48 +178,23 @@ public class CPlusPlusVisitor extends Visitor {
 
             // Adiciona as variaveis do parametro no escopo local
             for (int i = 0; i < paramsList.size(); i++) {
-                // tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
                 SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
-                if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
-                    ST p = groupTemplate.getInstanceOf("param");
-                    p.add("name", paramsList.getSingleId(i));
-                    processSType(t);       
-                    p.add("type", type);
-                    params.add(p);
+                ST p = groupTemplate.getInstanceOf("param");
+                p.add("name", paramsList.getSingleId(i));
+                //processSType(t);       
+                if(t instanceof STyArr){
+                    adjustSTyArr((STyArr)t);
+                    System.out.println(getLineNumber() + " --- ");
                 }
-                //paramsList.getSingleType(i).accept(this);
-                //local.set(paramsList.getSingleId(i), stk.pop());
+                else{
+                    processSType(t);       
+                }
+                p.add("type", type);
+                params.add(p);
             }
         }
-/*
-        for (String key : keys) {
-            SType t = local.get(key);
-            if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
-                ST decl = groupTemplate.getInstanceOf("param");
-                decl.add("name", key);
-                processSType(t);       
-                decl.add("type", type);
-                fun.add("decl", decl);
-            }
-        }
-        // for (Parameters p : f.getParameters()) {
-        //     keys.remove(p.getID());
-        //     p.accept(this);
-        // }
         fun.add("params", params);
 
-        for (String key : keys) {
-            SType t = local.get(key);
-            if(!(t instanceof STyArr)){   // Se nao for array declara normalmente
-                ST decl = groupTemplate.getInstanceOf("param");
-                decl.add("name", key);
-                processSType(t);       
-                decl.add("type", type);
-                fun.add("decl", decl);
-            }
-        }
-*/
-        // f.getBody().accept(this);
         for(int i = 0; i < f.getCommands().size(); i++){
             Command command = f.getCommands().get(i);
             command.accept(this);
