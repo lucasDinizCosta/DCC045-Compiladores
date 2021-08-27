@@ -35,7 +35,7 @@ public class ArrayAccess extends LValue{
 
     @Override
     public String toString(){
-        return lvalue.toString() + " [ " + exp.toString() + " ] ";
+        return lvalue.toString() + " [ " + exp.toString() + " ]";
     }
 
     @Override

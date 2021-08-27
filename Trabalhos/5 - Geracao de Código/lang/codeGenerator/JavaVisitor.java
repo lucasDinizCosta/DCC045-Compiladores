@@ -477,6 +477,10 @@ public class JavaVisitor extends Visitor {
 
         } else if (lvalue instanceof ArrayAccess) {
             if(((ArrayAccess)lvalue).getLValue() != null && ((ArrayAccess)lvalue).getLValue() instanceof ArrayAccess){   // Trata o caso de matriz
+                stmt.add("var", expr);  //lvalue
+                // Empilha o tipo da expressao que sera atribuida
+                a.getExp().accept(this);
+                stmt.add("expr", expr);
                 /*ArrayAccess matriz = (ArrayAccess)((ArrayAccess)lvalue).getLValue();
                 
                 lvalue.accept(this);    // Empilha o tipo da matriz e verifica os indices
@@ -554,6 +558,11 @@ public class JavaVisitor extends Visitor {
         } else if (lvalue instanceof DataAccess) {
             // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
             // dentro do dataAccess se casa
+
+            stmt.add("var", expr);  //lvalue
+            // Empilha o tipo da expressao que sera atribuida
+            a.getExp().accept(this);
+            stmt.add("expr", expr);
 
             /*if(((DataAccess)lvalue).getLValue() != null && ((DataAccess)lvalue).getLValue() instanceof ArrayAccess){    // Matriz de data
 
@@ -870,13 +879,45 @@ public class JavaVisitor extends Visitor {
 
         if (t.getType() != null) {
             if (t.getExp() != null) { // Array comum e Array de data
-                // Empilha o tipo do array
-                t.getType().accept(this);
-                aux.add("type", type);
-                
-                // Empilha o tamanho do array
-                t.getExp().accept(this);
-                aux.add("expr", expr);
+                if(t.getType() instanceof TypeArray){   // Matriz
+                    // Troca o modo de criação da matriz
+                    // Na Lang: ... new Char[][5]
+                    // Outras linguagens: ... new Char[5][]
+
+                    System.out.println(getLineNumber() + " --- " + t + " -- " 
+                    + t.getType() + " --- " + t.getExp());
+                    TypeArray tArray = (TypeArray)t.getType();
+                    ST lvalue = groupTemplate.getInstanceOf("lvalue");
+                    tArray.getType().accept(this);  // Converte o tipo do array pro padrao java: Ex: Char -> char
+                    lvalue.add("name", type);
+                    ST arrayAccess = groupTemplate.getInstanceOf("array_access");
+                    // Empilha o numero de linhas da matriz
+                    t.getExp().accept(this);
+                    arrayAccess.add("expr", expr);
+                    lvalue.add("array", arrayAccess);  
+                    aux.add("type", lvalue);    // Adiciona o numero de linhas na frente da declaração
+
+                    // Adiciona uma expressão vazia somente para ter os colchetes das colunas na matriz
+                    aux.add("expr", "");
+                    
+                    
+
+                    // Empilha o tipo do array
+                    // t.getType().accept(this);
+                    // aux.add("type", type);
+                }
+                else{       // Array
+                    System.out.println(getLineNumber() + " --- " + t + " -- " 
+                    + t.getType() + " --- " + t.getExp());
+
+                    // Empilha o tipo do array
+                    t.getType().accept(this);
+                    aux.add("type", type);
+                    
+                    // Empilha o tamanho do array
+                    t.getExp().accept(this);
+                    aux.add("expr", expr);
+                }  
             } else { // new Int; -- new Float; -- new Char; -- new data;
                 t.getType().accept(this);
                 aux.add("type", type);
@@ -1076,11 +1117,11 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
-        variavel = groupTemplate.getInstanceOf("lvalue");
+        expr = groupTemplate.getInstanceOf("lvalue");
         //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
         System.out.println(getLineNumber() + " --- " + d.getId());
-        variavel.add("name", d.getId());
-        System.out.println(getLineNumber() + " --- " + variavel.render());
+        expr.add("name", d.toString());
+        System.out.println(getLineNumber() + " --- " + expr.render());
 
         // Certifica a existencia do tipo data passado no escopo atual
         /*if (temp.get(d.getDataId()) instanceof STyData) {

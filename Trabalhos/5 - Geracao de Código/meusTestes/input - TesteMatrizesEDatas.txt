@@ -83,7 +83,7 @@ main(){
 	matriz = retornaMatriz(preencheArray(t, 5)[0], 5)[0];
 	print matriz[0][0] + matriz[0][1];
 	--print retornaMatriz(preencheArray(t, 5)[0], 5)[0];
-	k = new Ponto[][2];
+	k = new Ponto[][2];				-- Cria as linhas da matriz
 	k[0] = new Ponto[2];
 	k[1] = new Ponto[2];
 	k[0][0] = new Ponto; k[0][1] = new Ponto; k[1][0] = new Ponto; k[1][1] = new Ponto;

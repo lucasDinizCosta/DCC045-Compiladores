@@ -1,6 +1,6 @@
 data Ponto {
-   x :: Float;
-   y :: Float;
+   x :: Int;
+   y :: Int;
 }
 
 data Reta {
@@ -33,10 +33,19 @@ main(){
 	ponto = new Ponto;
 	reta = new Reta;
 	pontos = new Ponto[5];
+	caracteres = new Char[][5];	-- Cria as linhas da matriz
 	indice = 0;
 	iterate(5){
 		pontos[indice] = new Ponto;
+		caracteres[indice] = new Char[5];
 		indice = indice + 1;
 	}
+	indice = 0;
+	iterate(5){
+		pontos[indice].x = indice * 2;
+		pontos[indice].y = indice * 6;
+		indice = indice + 1;
+	}
+	print pontos[3].x + pontos[3].y;
 	--ponto = new Ponto;
 }

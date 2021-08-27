@@ -47,8 +47,7 @@ return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<
 // Cria uma variavel para poder fazer o laço do loop
-int I_nd3x__L00p__<loopAtual> = 0;
-for (I_nd3x__L00p__<loopAtual> = 0; I_nd3x__L00p__<loopAtual> \< <expr>; I_nd3x__L00p__<loopAtual>++) {
+for (int I_nd3x__L00p__<loopAtual> = 0; I_nd3x__L00p__<loopAtual> \< <expr>; I_nd3x__L00p__<loopAtual>++) {
     <cmd; separator="\n">
 }
 >>
