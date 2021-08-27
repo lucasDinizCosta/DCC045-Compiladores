@@ -150,7 +150,12 @@ public class CPlusPlusVisitor extends Visitor {
         }
 
         if(f.getReturnTypes().size() == 0){ // void => 0 retornos
-            fun.add("type", "void");
+            if(f.getId().equals("main")){   // Função 'main' pra c++ tem retornar valor inteiro
+                fun.add("type", "int");
+            }
+            else{
+                fun.add("type", "void");
+            }
         }
         else if(f.getReturnTypes().size() == 1){    // 1 retorno somente
             f.getReturnTypes().get(0).accept(this); // Empilha o único tipo de retorno que será o tipo da função
@@ -219,12 +224,15 @@ public class CPlusPlusVisitor extends Visitor {
             Command command = f.getCommands().get(i);
             command.accept(this);
             commands.add(stmt);
-            /*if(command instanceof If && i == f.getCommands().size() - 1){   // Ultimo comando é um if
-                verificacaoIf = true;
-                retChk = false;
-            }*/
         }
         fun.add("stmt", commands);
+
+        // Adiciona o 'return 0;' na função main do código em C++
+        if(f.getId().equals("main")){
+            ST ret = groupTemplate.getInstanceOf("return");
+            ret.add("expr", 0 );  // 'return 0;'
+            fun.add("stmt", ret);
+        }
 
         funcs.add(fun);
     }

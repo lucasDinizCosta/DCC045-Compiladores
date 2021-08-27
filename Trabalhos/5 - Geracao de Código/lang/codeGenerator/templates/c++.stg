@@ -23,7 +23,6 @@ func(type, name, params, decl, stmt) ::= <<
     <stmt>
 }
 >>
-
 param(type, name) ::= "<type> <name>"
 declaration(type, name) ::= "<type> <name>;"    
 
