@@ -4,18 +4,16 @@ import lang.ast.*;
 import lang.interpreter.*;
 import lang.semantic.*;
 
-import org.antlr.v4.parse.ANTLRParser.throwsSpec_return;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CPlusPlusVisitor extends Visitor {
+public class JavaVisitor extends Visitor {
 
     private STGroup groupTemplate;
     private ST type, stmt, expr;
@@ -41,8 +39,8 @@ public class CPlusPlusVisitor extends Visitor {
     // para ser tratado no comando return
     private int idRetorno = 0;
 
-    public CPlusPlusVisitor(String fileName, TyEnv<LocalAmbiente<SType>> env, HashMap<String, DataAttributes> datasAttrib) {
-        groupTemplate = new STGroupFile("./lang/codeGenerator/templates/c++.stg");
+    public JavaVisitor(String fileName, TyEnv<LocalAmbiente<SType>> env, HashMap<String, DataAttributes> datasAttrib) {
+        groupTemplate = new STGroupFile("./lang/codeGenerator/templates/java.stg");
         this.fileName = fileName;
         this.env = env;
         this.datasAttrib = datasAttrib;
@@ -884,7 +882,7 @@ public class CPlusPlusVisitor extends Visitor {
     @Override
     public void visit(FloatNumber p) {
         expr = groupTemplate.getInstanceOf("float_expr");
-        expr.add("value", p.getValue());
+        expr.add("value", p.getValue()+"f");
     }
 
     @Override

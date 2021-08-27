@@ -151,6 +151,20 @@ public class LangCompiler {
                 System.out.println(args[1] + " --- " + args[1].substring(0, args[1].length() - 4));
                 ((Node)result).accept(new CPlusPlusVisitor(getFileName(args[1]), env, v.getDatas()));
             }
+            else if(args[0].equals("-Java")){    // Geração de código para Java
+                TypeCheckVisitor v = new TypeCheckVisitor();
+                ((Node)result).accept(v);
+
+                if(v.getNumErrors() != 0) {
+                    System.out.println(" Erros ocorreram durante a analise semântica.\nAbortando");
+                    v.printErrors();
+                    System.exit(1);
+                }
+                TyEnv<LocalAmbiente<SType>> env = v.getEnv();
+                System.out.println("Executando a geracao de codigo de lang para Java:\n");
+                System.out.println(args[1] + " --- " + args[1].substring(0, args[1].length() - 4));
+                ((Node)result).accept(new JavaVisitor(getFileName(args[1]), env, v.getDatas()));
+            }
             else if (args[0].equals("-pp")) {
                 // iv = new PPrint();
                 // result.accept(iv);

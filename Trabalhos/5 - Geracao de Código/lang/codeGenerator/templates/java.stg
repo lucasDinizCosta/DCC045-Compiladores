@@ -1,43 +1,69 @@
 group java;
 
-program(name, funcs) ::= <<
+program(name, funcs, datas) ::= <<
+import java.util.Scanner;
+
 public class <name> {
+    <datas; separator="\n\n">
+
     <funcs; separator="\n\n">
-  
+
     public static void main(String args[]) {
-        inicio();
+        main();
     }
 }
+>>
+
+data(name, decl) ::= <<
+public class <name> {
+    <if(decl)><decl; separator="\n"><endif>
+};
 >>
 
 func(type, name, params, decl, stmt) ::= <<
 static <type> <name>(<params; separator=", ">) {
     <if(decl)><decl; separator=";\n">;<endif>
-    <stmt>
+    <stmt; separator="\n">
 }
 >>
-
 param(type, name) ::= "<type> <name>"
+declaration(type, name) ::= "<type> <name>;"    
 
 array_type(type) ::= "<type>[]"
 int_type() ::= "int"
 float_type() ::= "float"
-boolean_type() ::= "boolean"
+boolean_type() ::= "bool"
+char_type() ::= "char"
+data_type(data) ::= "<data>"
+null_type() ::= "null"
+typeInstanciate(type) ::= "new <type>;"
 
 print(expr) ::= "System.out.println(<expr>);"
+read(expr) ::=<<
+    Scanner S_c___anner = new Scanner(System.in); // Scanner para fazer a leitura de entrada pelo teclado
+    <expr> = S_c___anner.nextLine();
+>>
 return(expr) ::= "return <expr>;"
 
-while(expr, stmt) ::= <<
-while(<expr>) {
-    <stmt>
+iterate(expr, cmd, loopAtual) ::= <<
+$! Cria uma variavel para poder fazer o laço do loop !$
+int I_nd3x__L00p__loopAtual = 0;
+for (int I_nd3x__L00p__loopAtual = 0; I_nd3x__L00p__loopAtual \< <expr>; I_nd3x__L00p__loopAtual++) {
+    <cmd>
 }
 >>
 
-if(expr, thn, els) ::= <<
+if(expr, cmd) ::= <<
 if(<expr>) {
-    <thn>
-} <if(els)>else {
-    <els>
+    <cmd>
+}
+>>
+
+if_else(expr, cmd, else) ::= <<
+if(<expr>) {
+    <cmd>
+} <if(else)>else {
+    <else>
 }
 <endif>
 >>
@@ -47,25 +73,26 @@ stmt_list(stmt1, stmt2) ::= <<
 <stmt2>
 >>
 
-attr(var, expr) ::= "<var> = <expr>;"
+attribution(var, expr) ::= "<var> = <expr>;"
 lvalue(name, array) ::= "<name><array>"
 array_access(expr) ::= "[<expr>]"
 
 boolean_expr(value) ::= "<value>"
 float_expr(value) ::= "<value>"
+char_expr(value) ::= "<value>"
 int_expr(value) ::= "<value>"
-
-new_array(var, type, expr) ::= "<var> = new <type>[<expr>];"
 
 call(name, args) ::= <<<name>(<args; separator=", ">)>>
 
-mul_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
+mult_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
 div_expr(left_expr, right_expr) ::= "(<left_expr> / <right_expr>)"
 mod_expr(left_expr, right_expr) ::= "(<left_expr> % <right_expr>)"
 add_expr(left_expr, right_expr) ::= "(<left_expr> + <right_expr>)"
 sub_expr(left_expr, right_expr) ::= "(<left_expr> - <right_expr>)"
 
 lt_expr(left_expr, right_expr) ::= "(<left_expr> \< <right_expr>)"
-equals_expr(left_expr, right_expr) ::= "(<left_expr> == <right_expr>)"
+equallity_expr(left_expr, right_expr) ::= "(<left_expr> == <right_expr>)"
+diff_expr(left_expr, right_expr) ::= "(<left_expr> != <right_expr>)"
 and_expr(left_expr, right_expr) ::= "(<left_expr> && <right_expr>)"
 not_expr(expr) ::= "!<expr>"
+minus_expr(expr) ::= "-<expr>"
