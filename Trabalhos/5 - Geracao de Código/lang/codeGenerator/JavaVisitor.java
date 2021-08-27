@@ -406,8 +406,19 @@ public class JavaVisitor extends Visitor {
         aux.add("expr", expr);
         loopAtual++;    // Incrementa o indice do loop atual
         aux.add("loopAtual", String.valueOf(loopAtual));
-        i.getCmd().accept(this);
-        aux.add("cmd", stmt);
+        if(i.getCmd() instanceof CommandsList){ // Se for uma lista de comandos no corpo do iterate
+            CommandsList cmdList = (CommandsList)i.getCmd();
+            for(int j = 0; j < cmdList.getCommands().size(); j++){
+                cmdList.getCommands().get(j).accept(this);
+                aux.add("cmd", stmt);
+            }
+        }
+        else{
+            i.getCmd().accept(this);
+            aux.add("cmd", stmt);
+        }
+        System.out.println(getLineNumber() + " -- " + i.getCmd() + " ---- " + i.getCmd().getClass().getSimpleName());
+        // aux.add("cmd", stmt);
         loopAtual--;    // Decrementa o indice do loop atual
         stmt = aux;
     }
@@ -456,10 +467,10 @@ public class JavaVisitor extends Visitor {
         lvalue.accept(this);
 
         if (lvalue instanceof Identifier) {
-            System.out.println(getLineNumber() + " --- " + variavel.render());
+            // System.out.println(getLineNumber() + " --- " + variavel.render());
             // lvalue.accept(this);
 
-            stmt.add("var", variavel);  //lvalue
+            stmt.add("var", expr);  //lvalue
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
             stmt.add("expr", expr);
@@ -505,6 +516,11 @@ public class JavaVisitor extends Visitor {
             else{   // Array 
                 // aceita a expressao e joga pro topo da pilha. vai verificar posteriormente
                 // dentro do ArrayAccess se casa
+                System.out.println(getLineNumber() + " --- " + expr.render());
+                stmt.add("var", expr);  //lvalue
+                // Empilha o tipo da expressao que sera atribuida
+                a.getExp().accept(this);
+                stmt.add("expr", expr);
 
                 /*lvalue.accept(this);        // Empilha o tipo do array
 
@@ -738,6 +754,7 @@ public class JavaVisitor extends Visitor {
     // Partem do aexp
     @Override
     public void visit(Addition a) {
+        System.out.println(getLineNumber() + " --- " + a + " --- " + a.getLeft());
         ST aux = groupTemplate.getInstanceOf("add_expr");
         a.getLeft().accept(this);
         aux.add("left_expr", expr);
@@ -1036,11 +1053,11 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(Identifier i) {
-        variavel = groupTemplate.getInstanceOf("lvalue");
+        expr = groupTemplate.getInstanceOf("lvalue");
         //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
         System.out.println(getLineNumber() + " --- " + i.getId());
-        variavel.add("name", i.getId());
-        System.out.println(getLineNumber() + " --- " + variavel.render());
+        expr.add("name", i.getId());
+        System.out.println(getLineNumber() + " --- " + expr.render());
 
         /*for (Expr exp : e.getIdx()) {
             exp.accept(this);               // Empilha o indice de posicao do array
@@ -1059,6 +1076,11 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(DataAccess d) {
+        variavel = groupTemplate.getInstanceOf("lvalue");
+        //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
+        System.out.println(getLineNumber() + " --- " + d.getId());
+        variavel.add("name", d.getId());
+        System.out.println(getLineNumber() + " --- " + variavel.render());
 
         // Certifica a existencia do tipo data passado no escopo atual
         /*if (temp.get(d.getDataId()) instanceof STyData) {
@@ -1168,6 +1190,13 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
+        System.out.println(getLineNumber() + " -- " + a);
+        expr = groupTemplate.getInstanceOf("lvalue");
+        //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
+        System.out.println(getLineNumber() + " --- " + a.getId());
+        expr.add("name", a.toString());
+        System.out.println(getLineNumber() + " --- " + expr.render());
+
         /*if(a.getLValue() instanceof Identifier){    // Já for a variavel entao é um array
             if(temp.get(a.getLValue().getId()) != null){
                 SType tipoAux = temp.get(a.getLValue().getId());
