@@ -32,5 +32,11 @@ main(){
 	print i;
 	ponto = new Ponto;
 	reta = new Reta;
+	pontos = new Ponto[5];
+	indice = 0;
+	iterate(5){
+		pontos[indice] = new Ponto;
+		indice = indice + 1;
+	}
 	--ponto = new Ponto;
 }
