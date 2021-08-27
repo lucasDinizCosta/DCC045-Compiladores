@@ -9,7 +9,8 @@ public class <name> {
     <funcs; separator="\n\n">
 
     public static void main(String args[]) {
-        main();
+        <name> m = new <name>();
+        m.main();
     }
 }
 >>
@@ -21,7 +22,7 @@ public class <name> {
 >>
 
 func(type, name, params, decl, stmt) ::= <<
-static <type> <name>(<params; separator=", ">) {
+<type> <name>(<params; separator=", ">) {
     <if(decl)><decl; separator=";\n">;<endif>
     <stmt; separator="\n">
 }
@@ -36,7 +37,6 @@ boolean_type() ::= "bool"
 char_type() ::= "char"
 data_type(data) ::= "<data>"
 null_type() ::= "null"
-typeInstanciate(type) ::= "new <type>;"
 
 print(expr) ::= "System.out.println(<expr>);"
 read(expr) ::=<<
@@ -74,7 +74,12 @@ stmt_list(stmt1, stmt2) ::= <<
 >>
 
 attribution(var, expr) ::= "<var> = <expr>;"
-lvalue(name, array) ::= "<name><array>"
+typeInstanciate(type, expr) ::= <<
+new <type><if(expr)>[<expr>]<else>()<endif>
+>>
+lvalue(name, array) ::= <<
+<name><if(array)><array><endif>
+>>
 array_access(expr) ::= "[<expr>]"
 
 boolean_expr(value) ::= "<value>"

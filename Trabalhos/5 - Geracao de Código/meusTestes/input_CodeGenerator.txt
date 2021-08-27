@@ -30,5 +30,7 @@ main(){
 	i = 2 + 2;
 	j = 0;
 	print i;
+	ponto = new Ponto;
+	reta = new Reta;
 	--ponto = new Ponto;
 }
