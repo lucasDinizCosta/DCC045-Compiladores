@@ -22,8 +22,8 @@ soma(n1 :: Int, n2 :: Int) : Int{
 }
 -}
 
-soma(n1 :: Int, n2 :: Float[], p1 :: Ponto[][]) : Int {
-	return 50;
+soma(n1 :: Int, n2 :: Float[], p1 :: Ponto[][]) : Int, Float {
+	return 50, 2.5;
 }
 
 main(){

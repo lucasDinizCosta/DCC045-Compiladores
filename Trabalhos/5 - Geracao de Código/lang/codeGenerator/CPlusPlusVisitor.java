@@ -32,7 +32,11 @@ public class CPlusPlusVisitor extends Visitor {
     private ArrayList<Function> functionsAST;
 
     // Tipos de dados novos
-    private HashMap<String, Data> datasAST;        
+    private HashMap<String, Data> datasAST;    
+    
+    // idRetorno é o indice de qual elemento será retornado quando a função apresenta 2 retornos
+    // para ser tratado no comando return
+    private int idRetorno = 0;
 
     public CPlusPlusVisitor(String fileName, TyEnv<LocalAmbiente<SType>> env, HashMap<String, DataAttributes> datasAttrib) {
         groupTemplate = new STGroupFile("./lang/codeGenerator/templates/c++.stg");
@@ -149,18 +153,61 @@ public class CPlusPlusVisitor extends Visitor {
             }
         }
 
-        if(f.getReturnTypes().size() == 0){ // void => 0 retornos
-            if(f.getId().equals("main")){   // Função 'main' pra c++ tem retornar valor inteiro
-                fun.add("type", "int");
+        if(f.getReturnTypes().size() < 2){
+            if(f.getReturnTypes().size() == 0){ // void => 0 retornos
+                if(f.getId().equals("main")){   // Função 'main' pra C++ tem retornar valor inteiro
+                    fun.add("type", "int");
+                }
+                else{
+                    fun.add("type", "void");
+                }
             }
-            else{
-                fun.add("type", "void");
+            else if(f.getReturnTypes().size() == 1){    // 1 retorno somente
+                f.getReturnTypes().get(0).accept(this); // Empilha o único tipo de retorno que será o tipo da função
+                fun.add("type", type);
             }
-        }
-        else if(f.getReturnTypes().size() == 1){    // 1 retorno somente
-            // System.out.println(getLineNumber() + " --- " + f.getReturnTypes());
-            f.getReturnTypes().get(0).accept(this); // Empilha o único tipo de retorno que será o tipo da função
-            fun.add("type", type);
+
+            // Instancia a lista que vai armazenar os comandos da função
+            params = new ArrayList<ST>();
+
+            if (f.getParameters() != null) {
+                Parameters paramsList = f.getParameters();
+
+                // Adiciona as variaveis do parametro no escopo local
+                for (int i = 0; i < paramsList.size(); i++) {
+                    SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
+                    ST p = groupTemplate.getInstanceOf("param");
+                    p.add("name", paramsList.getSingleId(i));
+                    if(t instanceof STyArr){
+                        adjustSTyArr((STyArr)t);
+                    }
+                    else{
+                        processSType(t);       
+                    }
+                    p.add("type", type);
+                    params.add(p);
+                }
+            }
+            fun.add("params", params);
+
+            // Instancia a lista que vai armazenar os comandos da função
+            commands = new ArrayList<ST>();
+
+            for(int i = 0; i < f.getCommands().size(); i++){
+                Command command = f.getCommands().get(i);
+                command.accept(this);
+                commands.add(stmt);
+            }
+            fun.add("stmt", commands);
+
+            // Adiciona o 'return 0;' na função main do código em C++
+            if(f.getId().equals("main")){
+                ST ret = groupTemplate.getInstanceOf("return");
+                ret.add("expr", 0 );  // 'return 0;'
+                fun.add("stmt", ret);
+            }
+
+            funcs.add(fun);
         }
         else{   // 2 retornos
             /**
@@ -171,47 +218,54 @@ public class CPlusPlusVisitor extends Visitor {
              *  -- Em C++
              *  float soma_retorno_01(int n, int n1) ||| int soma_retorno_02(int n, int n1)
              */
-        }
+            idRetorno = 1;
+            // Para cada tipo de retorno, será criada uma função diferente
+            for(int j = 0; j < f.getReturnTypes().size(); j++){
+                fun = groupTemplate.getInstanceOf("func");
+                String nomeFuncao = f.getId() + "_retorno_0" + idRetorno;
+                fun.add("name", nomeFuncao);
 
-        params = new ArrayList<ST>();
-        if (f.getParameters() != null) {
-            Parameters paramsList = f.getParameters();
+                // Empilha o tipo de retorno da função
+                f.getReturnTypes().get(idRetorno - 1).accept(this); 
+                fun.add("type", type);
 
-            // Adiciona as variaveis do parametro no escopo local
-            for (int i = 0; i < paramsList.size(); i++) {
-                SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
-                ST p = groupTemplate.getInstanceOf("param");
-                p.add("name", paramsList.getSingleId(i));
-                if(t instanceof STyArr){
-                    adjustSTyArr((STyArr)t);
+                // Instancia a lista que vai armazenar os comandos da função
+                params = new ArrayList<ST>();
+
+                if (f.getParameters() != null) {
+                    Parameters paramsList = f.getParameters();
+
+                    // Adiciona as variaveis do parametro no escopo local
+                    for (int i = 0; i < paramsList.size(); i++) {
+                        SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
+                        ST p = groupTemplate.getInstanceOf("param");
+                        p.add("name", paramsList.getSingleId(i));
+                        if(t instanceof STyArr){
+                            adjustSTyArr((STyArr)t);
+                        }
+                        else{
+                            processSType(t);       
+                        }
+                        p.add("type", type);
+                        params.add(p);
+                    }
                 }
-                else{
-                    processSType(t);       
+                fun.add("params", params);
+
+                // Instancia a lista que vai armazenar os comandos da função
+                commands = new ArrayList<ST>();
+
+                for(int i = 0; i < f.getCommands().size(); i++){
+                    Command command = f.getCommands().get(i);
+                    command.accept(this);
+                    commands.add(stmt);
                 }
-                p.add("type", type);
-                params.add(p);
+                fun.add("stmt", commands);
+
+                funcs.add(fun);
+                idRetorno++;
             }
         }
-        fun.add("params", params);
-
-        // Instancia a lista que vai armazenar os comandos da função
-        commands = new ArrayList<ST>();
-
-        for(int i = 0; i < f.getCommands().size(); i++){
-            Command command = f.getCommands().get(i);
-            command.accept(this);
-            commands.add(stmt);
-        }
-        fun.add("stmt", commands);
-
-        // Adiciona o 'return 0;' na função main do código em C++
-        if(f.getId().equals("main")){
-            ST ret = groupTemplate.getInstanceOf("return");
-            ret.add("expr", 0 );  // 'return 0;'
-            fun.add("stmt", ret);
-        }
-
-        funcs.add(fun);
     }
 
     // Partem do params
@@ -347,7 +401,12 @@ public class CPlusPlusVisitor extends Visitor {
             stmt.add("expr", expr);
         }
         else{   // Quando a função tem 2 retornos
-
+            stmt = groupTemplate.getInstanceOf("return");
+            System.out.println(getLineNumber() + " --- " + r.getExps());
+            // Processa a expressões de retorno da função
+            r.getExps().get(idRetorno - 1).accept(this);
+            System.out.println(getLineNumber() + " --- " + r.getExps());
+            stmt.add("expr", expr);
         }
         
         /*if (temp.getFuncType() instanceof STyFun) {
