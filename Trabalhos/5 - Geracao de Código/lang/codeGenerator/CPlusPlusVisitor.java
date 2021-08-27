@@ -158,6 +158,7 @@ public class CPlusPlusVisitor extends Visitor {
             }
         }
         else if(f.getReturnTypes().size() == 1){    // 1 retorno somente
+            // System.out.println(getLineNumber() + " --- " + f.getReturnTypes());
             f.getReturnTypes().get(0).accept(this); // Empilha o único tipo de retorno que será o tipo da função
             fun.add("type", type);
         }
@@ -181,10 +182,8 @@ public class CPlusPlusVisitor extends Visitor {
                 SType t = ((STyFun) local.getFuncType()).getTypes()[i]; // Pega o tipo do parametro
                 ST p = groupTemplate.getInstanceOf("param");
                 p.add("name", paramsList.getSingleId(i));
-                //processSType(t);       
                 if(t instanceof STyArr){
                     adjustSTyArr((STyArr)t);
-                    System.out.println(getLineNumber() + " --- ");
                 }
                 else{
                     processSType(t);       
@@ -194,6 +193,9 @@ public class CPlusPlusVisitor extends Visitor {
             }
         }
         fun.add("params", params);
+
+        // Instancia a lista que vai armazenar os comandos da função
+        commands = new ArrayList<ST>();
 
         for(int i = 0; i < f.getCommands().size(); i++){
             Command command = f.getCommands().get(i);
@@ -278,17 +280,8 @@ public class CPlusPlusVisitor extends Visitor {
     @Override
     public void visit(CommandsList c) {
         for (Command command : c.getCommands()) { // Executa os comandos
-            // ST aux = groupTemplate.getInstanceOf("stmt_list");
             command.accept(this);
             commands.add(stmt);
-            /*aux.add("stmt1", cmd);
-            Node s = e.getCmd2();
-            if (s != null) {
-                s.accept(this);
-                aux.add("stmt2", stmt);
-            }
-            stmt = aux;*/
-            
         }
     }
 
@@ -345,12 +338,19 @@ public class CPlusPlusVisitor extends Visitor {
 
     @Override
     public void visit(Return r) {
-        /*int qtdExpRetorno = 0;
-        for (Expression exp : r.getExps()) {    // Processa a expressões de retorno da função
-            exp.accept(this);   // Aceita a expressão e empilha no stk
-            qtdExpRetorno++;
+        if(r.getExps().size() == 1){
+            stmt = groupTemplate.getInstanceOf("return");
+            System.out.println(getLineNumber() + " --- " + r.getExps());
+            // Processa a expressões de retorno da função
+            r.getExps().get(0).accept(this);
+            System.out.println(getLineNumber() + " --- " + r.getExps());
+            stmt.add("expr", expr);
         }
-        if (temp.getFuncType() instanceof STyFun) {
+        else{   // Quando a função tem 2 retornos
+
+        }
+        
+        /*if (temp.getFuncType() instanceof STyFun) {
             // Padrao da documentação da função
             SType[] tiposRetornoPadrao = ((STyFun) temp.getFuncType()).getReturnTypes();
             SType[] tiposRetornados = new SType[qtdExpRetorno];
