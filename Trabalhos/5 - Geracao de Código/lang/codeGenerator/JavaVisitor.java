@@ -88,16 +88,13 @@ public class JavaVisitor extends Visitor {
         ST data = groupTemplate.getInstanceOf("data");
         data.add("name", d.getId());  // o nome do tipo data
         declarations = new ArrayList<ST>();
-        System.out.println(getLineNumber() + " --- " + d + " --- " +  d.getId());
         DataAttributes dataElement = datasAttrib.get(d.getId());
         List<Declaration> listaDeclaracoes = d.getDeclarations();
-        System.out.println(getLineNumber() + " --- " + dataElement + " --- " + d.getDeclarations());
         int indiceTipo = 0;
         declarations.clear();
         for(Declaration declaration : listaDeclaracoes){
             ST decl = groupTemplate.getInstanceOf("declaration");
             SType tipo = dataElement.getTipos().get(indiceTipo);
-            System.out.println(getLineNumber() + " --- " + tipo + " --- " + tipo.getClass().getSimpleName());
             decl.add("name", declaration.getId());
             if(tipo instanceof STyArr){
                 adjustSTyArr((STyArr)tipo);
@@ -397,10 +394,8 @@ public class JavaVisitor extends Visitor {
         aux.add("expr", expr);
         i.getCmd().accept(this);
         aux.add("cmd", stmt);
-        if (i.getElseCmd() != null) {
-            i.getElseCmd().accept(this); // Executa a verificação de tipos nos comandos do else
-            aux.add("else", stmt);
-        }
+        i.getElseCmd().accept(this); // Executa a verificação de tipos nos comandos do else
+        aux.add("els", stmt);
         stmt = aux;
     }
 
@@ -435,18 +430,14 @@ public class JavaVisitor extends Visitor {
     public void visit(Return r) {
         if(r.getExps().size() == 1){
             stmt = groupTemplate.getInstanceOf("return");
-            System.out.println(getLineNumber() + " --- " + r.getExps());
             // Processa a expressões de retorno da função
             r.getExps().get(0).accept(this);
-            System.out.println(getLineNumber() + " --- " + r.getExps());
             stmt.add("expr", expr);
         }
         else{   // Quando a função tem 2 retornos
             stmt = groupTemplate.getInstanceOf("return");
-            System.out.println(getLineNumber() + " --- " + r.getExps());
             // Processa a expressões de retorno da função
             r.getExps().get(idRetorno - 1).accept(this);
-            System.out.println(getLineNumber() + " --- " + r.getExps());
             stmt.add("expr", expr);
         }
     }

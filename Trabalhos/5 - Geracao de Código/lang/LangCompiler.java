@@ -161,9 +161,11 @@ public class LangCompiler {
                     System.exit(1);
                 }
                 TyEnv<LocalAmbiente<SType>> env = v.getEnv();
-                System.out.println("Executando a geracao de codigo de lang para Java:\n");
-                System.out.println(args[1] + " --- " + args[1].substring(0, args[1].length() - 4));
+                System.out.println("Executando a geracao de codigo de lang para Java:");
+                System.out.println("Arquivo passado: \"" + args[1] +"\"\n");
+                System.out.println("------------------ Codigo em Java ------------\n\n");
                 ((Node)result).accept(new JavaVisitor(getFileName(args[1]), env, v.getDatas()));
+                System.out.println("\n----------------------------------------------\n");
             }
             else if (args[0].equals("-pp")) {
                 // iv = new PPrint();

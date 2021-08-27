@@ -59,11 +59,11 @@ if(<expr>) {
 }
 >>
 
-if_else(expr, cmd, else) ::= <<
+if_else(expr, cmd, els) ::= <<
 if(<expr>) {
     <cmd>
-} <if(else)>else {
-    <else>
+} <if(els)>else {
+    <els>
 }
 <endif>
 >>
