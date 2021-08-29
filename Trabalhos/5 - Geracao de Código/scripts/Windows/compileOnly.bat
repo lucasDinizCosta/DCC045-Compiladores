@@ -1,5 +1,7 @@
 @ECHO OFF
 cls
+cd ..
+cd ..
 echo "----  COMPILACAO ------------"
 echo "----  Compila as classes do AST"
 javac -cp lib/ANTLR.jar;lib/ST-4.3.1.jar;. -d . lang/ast/*.java

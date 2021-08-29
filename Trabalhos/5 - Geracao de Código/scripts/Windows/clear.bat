@@ -1,5 +1,7 @@
 @ECHO OFF
 cls
+cd ..
+cd ..
 echo "----  LIMPA, CONSTROI E COMPILA TODO O PROJETO(PROCESSO COMPLETO)----"
 cd lang
 cd parser
