@@ -95,7 +95,7 @@ mod_expr(left_expr, right_expr) ::= "(<left_expr> % <right_expr>)"
 add_expr(left_expr, right_expr) ::= "(<left_expr> + <right_expr>)"
 sub_expr(left_expr, right_expr) ::= "(<left_expr> - <right_expr>)"
 
-lt_expr(left_expr, right_expr) ::= "(<left_expr> \< <right_expr>)"
+lessThan_expr(left_expr, right_expr) ::= "(<left_expr> \< <right_expr>)"
 equallity_expr(left_expr, right_expr) ::= "(<left_expr> == <right_expr>)"
 diff_expr(left_expr, right_expr) ::= "(<left_expr> != <right_expr>)"
 and_expr(left_expr, right_expr) ::= "(<left_expr> && <right_expr>)"

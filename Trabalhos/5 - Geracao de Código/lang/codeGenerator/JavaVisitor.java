@@ -380,6 +380,7 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(If i) {
+        System.out.println(getLineNumber() + " --- " + i);
         ST aux = groupTemplate.getInstanceOf("if");
         i.getExp().accept(this); // Empilha a expressao de verificacao do If
         aux.add("expr", expr);
@@ -418,8 +419,7 @@ public class JavaVisitor extends Visitor {
             i.getCmd().accept(this);
             aux.add("cmd", stmt);
         }
-        System.out.println(getLineNumber() + " -- " + i.getCmd() + " ---- " + i.getCmd().getClass().getSimpleName());
-        // aux.add("cmd", stmt);
+
         loopAtual--;    // Decrementa o indice do loop atual
         stmt = aux;
     }
@@ -427,7 +427,7 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(Read r) {
         stmt = groupTemplate.getInstanceOf("read");
-        
+
         // Declaração das variaveis que são usadas no corpo da função
         Set<String> keys = funcaoAtualObservada.getKeys();
 
@@ -507,7 +507,6 @@ public class JavaVisitor extends Visitor {
             else{   // Array 
                 // aceita a expressao e joga pro topo da pilha. vai verificar posteriormente
                 // dentro do ArrayAccess se casa
-                System.out.println(getLineNumber() + " --- " + expr.render());
                 stmt.add("var", expr);  //lvalue
                 // Empilha o tipo da expressao que sera atribuida
                 a.getExp().accept(this);
@@ -555,10 +554,8 @@ public class JavaVisitor extends Visitor {
             else if(f.getLValues().size() == 2){
                 f.getLValues().get(0).accept(this);
                 aux.add("var1", expr);
-                System.out.println(getLineNumber() + " -- " + expr.render());
                 f.getLValues().get(1).accept(this);
                 aux.add("var2", expr);
-                System.out.println(getLineNumber() + " -- " + expr.render());
             }
         }
         else{   // Função sem retornos
@@ -572,27 +569,6 @@ public class JavaVisitor extends Visitor {
 			aux.add("args", expr);
 		}
 		stmt = aux;
-        System.out.println(getLineNumber() + " -- " + expr.render());
-
-        /*stmt = groupTemplate.getInstanceOf("attribution");
-
-        // Variavel que vai ter os dados atribuidos nela
-        LValue lvalue = a.getLValue();
-
-        System.out.println(getLineNumber() + " --- " + lvalue + " --- " + a.getExp());
-
-        lvalue.accept(this);
-
-        if (lvalue instanceof Identifier) {
-            // System.out.println(getLineNumber() + " --- " + variavel.render());
-            // lvalue.accept(this);
-
-            stmt.add("var", expr);  //lvalue
-            // Empilha o tipo da expressao que sera atribuida
-            a.getExp().accept(this);
-            stmt.add("expr", expr);
-
-        }*/
     }
 
     // Partem do exp
@@ -609,8 +585,10 @@ public class JavaVisitor extends Visitor {
     // Partem do rexp
     @Override
     public void visit(LessThan l) {
+        System.out.println(getLineNumber() + " -- " + l + " -- " + l.getRight() + " -- " + l.getRight().getClass().getSimpleName());
         ST aux = groupTemplate.getInstanceOf("lessThan_expr");
         l.getLeft().accept(this);
+        System.out.println(getLineNumber() + " --- " + expr.render() );
         aux.add("left_expr", expr);
         l.getRight().accept(this);
         aux.add("right_expr", expr);
@@ -640,7 +618,6 @@ public class JavaVisitor extends Visitor {
     // Partem do aexp
     @Override
     public void visit(Addition a) {
-        System.out.println(getLineNumber() + " --- " + a + " --- " + a.getLeft());
         ST aux = groupTemplate.getInstanceOf("add_expr");
         a.getLeft().accept(this);
         aux.add("left_expr", expr);
@@ -723,6 +700,7 @@ public class JavaVisitor extends Visitor {
     public void visit(IntegerNumber i) {
         expr = groupTemplate.getInstanceOf("int_expr");
         expr.add("value", i.getValue());
+        System.out.println(getLineNumber() + " -- " + i.getValue());
     }
 
     @Override
@@ -844,6 +822,7 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(Identifier i) {
+        System.out.println(getLineNumber() + " -- " + i);
         expr = groupTemplate.getInstanceOf("lvalue");
         expr.add("name", i.getId());
     }
