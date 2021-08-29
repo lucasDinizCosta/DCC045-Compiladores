@@ -470,13 +470,13 @@ public class JavaVisitor extends Visitor {
         }
         // Converte a string digitada para o tipo da variavel
         if(t instanceof STyInt){
-            stmt.add("converteTipo", "Integer.parseInt(S_c___anner.nextLine())");
+            stmt.add("converteTipo", "Integer.parseInt(__Scanner.nextLine())");
         }
         else if(t instanceof STyFloat){
-            stmt.add("converteTipo", "Float.parseFloat(S_c___anner.nextLine())");
+            stmt.add("converteTipo", "Float.parseFloat(__Scanner.nextLine())");
         }
         else if(t instanceof STyCharacter){
-            stmt.add("converteTipo", "S_c___anner.nextLine().charAt(0)");
+            stmt.add("converteTipo", "__Scanner.nextLine().charAt(0)");
         }
 
         r.getLValue().accept(this);

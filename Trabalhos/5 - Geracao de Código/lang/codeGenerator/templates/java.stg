@@ -4,7 +4,7 @@ program(name, funcs, datas) ::= <<
 import java.util.Scanner;
 
 public class <name> {
-    public Scanner S_c___anner = new Scanner(System.in); // Scanner para fazer a leitura de entrada pelo teclado
+    public Scanner __Scanner = new Scanner(System.in); // Scanner para fazer a leitura de entrada pelo teclado
 
     <datas; separator="\n\n">
 
@@ -42,12 +42,12 @@ null_type() ::= "null"
 
 print(expr) ::= "System.out.print(<expr>);"
 read(expr, converteTipo) ::=<<
-<expr> = <if(converteTipo)><converteTipo><else>S_c___anner.nextLine()<endif>;
+<expr> = <if(converteTipo)><converteTipo><else>__Scanner.nextLine()<endif>;
 >>
 return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<
-for (int I_nd3x__L00p__<loopAtual> = 0, I_nd3x__L00p__<loopAtual>_EndLoop = <expr>; I_nd3x__L00p__<loopAtual> \< I_nd3x__L00p__<loopAtual>_EndLoop; I_nd3x__L00p__<loopAtual>++) {
+for (int _Indice_Loop_<loopAtual> = 0, _Indice_Loop_<loopAtual>_EndLoop = <expr>; _Indice_Loop_<loopAtual> \< _Indice_Loop_<loopAtual>_EndLoop; _Indice_Loop_<loopAtual>++) {
     <cmd; separator="\n">
 }
 >>
