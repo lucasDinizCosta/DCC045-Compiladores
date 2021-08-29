@@ -47,7 +47,7 @@ read(expr, converteTipo) ::=<<
 return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<
-for (int I_nd3x__L00p__<loopAtual> = 0; I_nd3x__L00p__<loopAtual> \< <expr>; I_nd3x__L00p__<loopAtual>++) {
+for (int I_nd3x__L00p__<loopAtual> = 0, I_nd3x__L00p__<loopAtual>_EndLoop = <expr>; I_nd3x__L00p__<loopAtual> \< I_nd3x__L00p__<loopAtual>_EndLoop; I_nd3x__L00p__<loopAtual>++) {
     <cmd; separator="\n">
 }
 >>
