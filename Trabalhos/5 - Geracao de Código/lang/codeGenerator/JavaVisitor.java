@@ -1,3 +1,9 @@
+/********************************************************
+* Trabalho de Teoria dos Compiladores(DCC045)(2021/1)   *
+*            Linguagem Lang                             *
+* Nome: Lucas Diniz da Costa -- Matricula: 201465524C   *
+* Nome: Luiz Henrique      -- Matricula:                *
+*********************************************************/
 package lang.codeGenerator;
 
 import lang.ast.*;
@@ -17,6 +23,7 @@ public class JavaVisitor extends Visitor {
 
     private STGroup groupTemplate;
     private ST type, stmt, expr, variavel;
+    private ST template;    // Armazena todo o código do programa
     private List<ST> funcs, params, datas, declarations;
     private String fileName;
 
@@ -54,7 +61,7 @@ public class JavaVisitor extends Visitor {
     // Partem do prog
     @Override
     public void visit(Program p) {
-        ST template = groupTemplate.getInstanceOf("program");
+        template = groupTemplate.getInstanceOf("program");
         template.add("name", fileName);
         datas = new ArrayList<ST>();
         // Aceita os tipos data para fazer a verificação de tipo
@@ -71,8 +78,11 @@ public class JavaVisitor extends Visitor {
             f.accept(this);
         }
         template.add("funcs", funcs);
+        // System.out.println(template.render()); // Imprime na tela o código em alto nivel gerado
+    }
 
-        System.out.println(template.render()); // Imprime na tela o código em alto nivel gerado
+    public String getTemplate(){
+        return template.render();
     }
 
     // Retorna o ambiente de geração de código
@@ -759,7 +769,7 @@ public class JavaVisitor extends Visitor {
                     // Troca o modo de criação da matriz
                     // Na Lang: ... new Char[][5]
                     // Outras linguagens: ... new Char[5][]
-                    
+
                     TypeArray tArray = (TypeArray)t.getType();
                     ST lvalue = groupTemplate.getInstanceOf("lvalue");
                     tArray.getType().accept(this);  // Converte o tipo do array pro padrao java: Ex: Char -> char

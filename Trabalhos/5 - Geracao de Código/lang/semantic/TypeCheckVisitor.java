@@ -495,14 +495,6 @@ public class TypeCheckVisitor extends Visitor {
     @Override
     public void visit(Read r) {
         r.getLValue().accept(this);
-        /*
-         * if(){
-         * 
-         * } else{ logError.add(r.getLine() + ", " + r.getColumn() +
-         * ": O comando read so grava informacoes em variaveis do tipo Int, Float ou Char"
-         * ); stk.push(tyErr); }
-         */
-
     }
 
     @Override
