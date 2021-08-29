@@ -380,7 +380,6 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(If i) {
-        System.out.println(getLineNumber() + " --- " + i + " -- " + i.getCmd());
         ST aux = groupTemplate.getInstanceOf("if");
         i.getExp().accept(this); // Empilha a expressao de verificacao do If
         aux.add("expr", expr);
@@ -485,11 +484,9 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(Print i) {
-        //ST aux = groupTemplate.getInstanceOf("iterate");
         stmt = groupTemplate.getInstanceOf("print");
         i.getExpression().accept(this);
         stmt.add("expr", expr);
-        System.out.println(getLineNumber() + " -- " + stmt.render());
     }
 
     @Override
@@ -520,9 +517,6 @@ public class JavaVisitor extends Visitor {
         lvalue.accept(this);
 
         if (lvalue instanceof Identifier) {
-            // System.out.println(getLineNumber() + " --- " + variavel.render());
-            // lvalue.accept(this);
-
             stmt.add("var", expr);  //lvalue
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
@@ -729,7 +723,6 @@ public class JavaVisitor extends Visitor {
     public void visit(IntegerNumber i) {
         expr = groupTemplate.getInstanceOf("int_expr");
         expr.add("value", i.getValue());
-        System.out.println(getLineNumber() + " -- " + i.getValue());
     }
 
     @Override
@@ -766,9 +759,7 @@ public class JavaVisitor extends Visitor {
                     // Troca o modo de criação da matriz
                     // Na Lang: ... new Char[][5]
                     // Outras linguagens: ... new Char[5][]
-
-                    // System.out.println(getLineNumber() + " --- " + t + " -- " 
-                    // + t.getType() + " --- " + t.getExp());
+                    
                     TypeArray tArray = (TypeArray)t.getType();
                     ST lvalue = groupTemplate.getInstanceOf("lvalue");
                     tArray.getType().accept(this);  // Converte o tipo do array pro padrao java: Ex: Char -> char
@@ -790,8 +781,6 @@ public class JavaVisitor extends Visitor {
                     // aux.add("type", type);
                 }
                 else{       // Array
-                    // System.out.println(getLineNumber() + " --- " + t + " -- " 
-                    // + t.getType() + " --- " + t.getExp());
 
                     // Empilha o tipo do array
                     t.getType().accept(this);
@@ -851,7 +840,6 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(Identifier i) {
-        System.out.println(getLineNumber() + " -- " + i);
         expr = groupTemplate.getInstanceOf("lvalue");
         expr.add("name", i.getId());
     }
@@ -864,7 +852,6 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
-        System.out.println(getLineNumber() + " --- " + a + " -- ");
         expr = groupTemplate.getInstanceOf("lvalue");
         expr.add("name", a.toString()); 
     }
