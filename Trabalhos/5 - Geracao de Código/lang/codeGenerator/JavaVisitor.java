@@ -529,35 +529,6 @@ public class JavaVisitor extends Visitor {
                 // Empilha o tipo da expressao que sera atribuida
                 a.getExp().accept(this);
                 stmt.add("expr", expr);
-
-                /*lvalue.accept(this);        // Empilha o tipo do array
-
-                // ver a parte de indices - por enquanto so ve se n foi declarada ainda
-                // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
-                if ((temp.get(lvalue.getId()) == null)) {
-
-                    a.getExp().accept(this);       
-
-                    SType st = stk.pop();
-                    STyArr arr = new STyArr(st);
-
-                    // adiciona o array no contexto, com o tipo dado pela expressão
-                    temp.set(lvalue.getId(), arr);
-                }
-                // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
-                else {
-                    a.getExp().accept(this);        // Empilha o tipo da expressao que será atribuida
-
-                    SType tipoExpAtribuicao = stk.pop();
-                    SType tipoArray = stk.pop();
-
-                    if (!tipoArray.match(tipoExpAtribuicao)) {   
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                            + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
-                            + tipoArray);
-                        stk.push(tyErr);
-                    }
-                }*/
             }
         } else if (lvalue instanceof DataAccess) {
             // aceita a expresso e joga pro topo da pilha. vai verificar posteriormente
@@ -567,23 +538,14 @@ public class JavaVisitor extends Visitor {
             // Empilha o tipo da expressao que sera atribuida
             a.getExp().accept(this);
             stmt.add("expr", expr);
+        }
 
-            /*if(((DataAccess)lvalue).getLValue() != null && ((DataAccess)lvalue).getLValue() instanceof ArrayAccess){    // Matriz de data
 
-                a.getExp().accept(this);    // Empilha o tipo da expressao que será atribuida
-
-                lvalue.accept(this);    // Empilha o tipo da matriz;
-            }
-            else{
-                a.getExp().accept(this);    // Empilha o tipo da expressao que será atribuida
-
-                lvalue.accept(this);    // Empilha o Tipo do atributo do data ou o tipo data mesmo
-            }
-            
-            SType tipoVariavel = stk.pop();
-            SType tipoExpressao = stk.pop();
-            DataAccess d = (DataAccess)lvalue;*/
-
+        // VERIFICA se é TypeInstanciate e sua expr chegou null
+        if(expr == null && a.getExp() instanceof TypeInstanciate){
+            // new Int, new Float, new Char;
+            // Não faz nada pois a declaração da variavel de tipos primitivos já foi feita
+            stmt = null;    
         }
     }
 
@@ -790,7 +752,7 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(CharLitteral c) {
         expr = groupTemplate.getInstanceOf("char_expr");
-        expr.add("value", c.getOriginalString());//c.getValue());
+        expr.add("value", c.getOriginalString());
     }
 
     // Partem do pexp
@@ -851,8 +813,14 @@ public class JavaVisitor extends Visitor {
                     aux.add("expr", expr);
                 }  
             } else { // new Int; -- new Float; -- new Char; -- new data;
-                t.getType().accept(this);
-                aux.add("type", type);
+                if(t.getType() instanceof NameType){    // Se for do tipo Data Adiciona
+                    t.getType().accept(this);
+                    aux.add("type", type);
+                }
+                else{   //new Int; -- new Float; -- new Char
+                    // Nao faz nada pois a variavel já é instanciada quando as funções são validadas em program
+                    aux = null;
+                }
             }
         }
 
