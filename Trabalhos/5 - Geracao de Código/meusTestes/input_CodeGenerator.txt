@@ -16,11 +16,15 @@ data Quadrado {
    description :: Char[][];
    retas :: Reta[][];
 }
-{-
+
 soma(n1 :: Int, n2 :: Int) : Int{
 	return n1 + n2;
 }
--}
+
+somaEMultiplica(n1 :: Int, n2 :: Int) : Int, Int{
+	return n1 + n2, n1 * n2;
+}
+
 
 soma(n1 :: Int, n2 :: Float[], p1 :: Ponto[][]) : Int, Float {
 	return 50, 2.5;
@@ -47,5 +51,5 @@ main(){
 		indice = indice + 1;
 	}
 	print pontos[3].x + pontos[3].y;
-	--ponto = new Ponto;
+	print somaEMultiplica(i, i)[1];
 }

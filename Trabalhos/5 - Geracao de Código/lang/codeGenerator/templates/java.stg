@@ -80,7 +80,9 @@ boolean_expr(value) ::= "<value>"
 float_expr(value) ::= "<value>"
 char_expr(value) ::= "<value>"
 int_expr(value) ::= "<value>"
-
+functionReturn(name, args, expr) ::= <<
+<name><if(expr)>_retorno_0<expr><else><endif>(<args; separator=", ">)
+>>
 call(name, args) ::= <<<name>(<args; separator=", ">)>>
 
 mult_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"

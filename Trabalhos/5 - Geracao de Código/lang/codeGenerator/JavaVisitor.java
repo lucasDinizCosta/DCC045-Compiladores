@@ -161,6 +161,10 @@ public class JavaVisitor extends Visitor {
                 }
             }
             else if(f.getReturnTypes().size() == 1){    // 1 retorno somente
+                // A função mesmo com somente 1 retorno terá seu nome alterado
+                fun = groupTemplate.getInstanceOf("func");
+                String nomeFuncao = f.getId() + "_retorno_00";
+                fun.add("name", nomeFuncao);
                 f.getReturnTypes().get(0).accept(this); // Empilha o único tipo de retorno que será o tipo da função
                 fun.add("type", type);
             }
@@ -237,7 +241,7 @@ public class JavaVisitor extends Visitor {
              *  -- Em C++
              *  float soma_retorno_01(int n, int n1) ||| int soma_retorno_02(int n, int n1)
              */
-            idRetorno = 1;
+            idRetorno = 0;
             // Para cada tipo de retorno, será criada uma função diferente
             for(int j = 0; j < f.getReturnTypes().size(); j++){
                 fun = groupTemplate.getInstanceOf("func");
@@ -245,7 +249,7 @@ public class JavaVisitor extends Visitor {
                 fun.add("name", nomeFuncao);
 
                 // Empilha o tipo de retorno da função
-                f.getReturnTypes().get(idRetorno - 1).accept(this); 
+                f.getReturnTypes().get(idRetorno).accept(this); 
                 fun.add("type", type);
 
                 // Declaração das variaveis que são usadas no corpo da função
@@ -448,7 +452,7 @@ public class JavaVisitor extends Visitor {
         else{   // Quando a função tem 2 retornos
             stmt = groupTemplate.getInstanceOf("return");
             // Processa a expressões de retorno da função
-            r.getExps().get(idRetorno - 1).accept(this);
+            r.getExps().get(idRetorno).accept(this);
             stmt.add("expr", expr);
         }
     }
@@ -929,10 +933,30 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(FunctionReturn f) {
-        /********************************************************************************
-         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0] *
-         * AGORA SEM RETORNO PODE SER SÓ: fat(num−1)                                    *
-         ********************************************************************************/
+        /************************************************************************************************
+         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0]                 *
+         * Regra                                                                                        *
+         * pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn     *
+         * // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0] *
+         ***********************************************************************************************/
+        ST aux = groupTemplate.getInstanceOf("functionReturn");
+		aux.add("name", f.getId());
+        f.getExpIndex().accept(this);   // Coloca o indice do retorno na expressao
+        aux.add("expr", expr);
+
+        String nomeFuncao = f.getId();
+        Integer qtdParamPassados = 0;           // A funcao nao foi passado parametros
+        if(f.getFCallParams() != null){
+            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
+        }
+
+        // Adiciona os parametros passados na chamada da função
+		for (Expression exp : f.getFCallParams().getExps()) {
+			exp.accept(this);
+			aux.add("args", expr);
+		}
+		expr = aux;
+
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]

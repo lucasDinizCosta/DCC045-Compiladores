@@ -1146,10 +1146,12 @@ public class TypeCheckVisitor extends Visitor {
 
     @Override
     public void visit(FunctionReturn f) {
-        /********************************************************************************
-         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0] *
-         * AGORA SEM RETORNO PODE SER SÓ: fat(num−1)                                    *
-         ********************************************************************************/
+        /************************************************************************************************
+         * MESMO QUE TENHA SOMENTE 1 RETORNO, ELA DEVE SER CHAMADA ASSIM: fat(num−1)[0]                 *
+         * Regra                                                                                        *
+         * pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET  # FunctionReturn     *
+         * // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0] *
+         ***********************************************************************************************/
         // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
         // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
         // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
