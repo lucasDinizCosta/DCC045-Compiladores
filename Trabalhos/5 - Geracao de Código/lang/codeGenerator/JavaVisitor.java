@@ -884,8 +884,8 @@ public class JavaVisitor extends Visitor {
                     // Na Lang: ... new Char[][5]
                     // Outras linguagens: ... new Char[5][]
 
-                    System.out.println(getLineNumber() + " --- " + t + " -- " 
-                    + t.getType() + " --- " + t.getExp());
+                    // System.out.println(getLineNumber() + " --- " + t + " -- " 
+                    // + t.getType() + " --- " + t.getExp());
                     TypeArray tArray = (TypeArray)t.getType();
                     ST lvalue = groupTemplate.getInstanceOf("lvalue");
                     tArray.getType().accept(this);  // Converte o tipo do array pro padrao java: Ex: Char -> char
@@ -907,8 +907,8 @@ public class JavaVisitor extends Visitor {
                     // aux.add("type", type);
                 }
                 else{       // Array
-                    System.out.println(getLineNumber() + " --- " + t + " -- " 
-                    + t.getType() + " --- " + t.getExp());
+                    // System.out.println(getLineNumber() + " --- " + t + " -- " 
+                    // + t.getType() + " --- " + t.getExp());
 
                     // Empilha o tipo do array
                     t.getType().accept(this);
@@ -1095,202 +1095,19 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(Identifier i) {
         expr = groupTemplate.getInstanceOf("lvalue");
-        //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
-        System.out.println(getLineNumber() + " --- " + i.getId());
         expr.add("name", i.getId());
-        System.out.println(getLineNumber() + " --- " + expr.render());
-
-        /*for (Expr exp : e.getIdx()) {
-            exp.accept(this);               // Empilha o indice de posicao do array
-            arrayAccess.add("expr", expr);  // Adiciona o indice em um arrayaccess: [<expr>]
-            expr = arrayAccess;             // Atualiza que a posição do array vira a expressão
-            lvalue.add("array", expr);
-        }*/
-        // expr = lvalue;
-        /*if (temp.get(i.getId()) == null) {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: "+i.getLine() + ", coluna: " + i.getColumn() + "): A variavel \'" + i.getId() + "\' nao existe!!!");
-            stk.push(tyErr);
-        } else {
-            stk.push(temp.get(i.getId()));
-        }*/
     }
 
     @Override
     public void visit(DataAccess d) {
         expr = groupTemplate.getInstanceOf("lvalue");
-        //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
-        System.out.println(getLineNumber() + " --- " + d.getId());
         expr.add("name", d.toString());
-        System.out.println(getLineNumber() + " --- " + expr.render());
-
-        // Certifica a existencia do tipo data passado no escopo atual
-        /*if (temp.get(d.getDataId()) instanceof STyData) {
-
-            STyData dataType = (STyData) temp.get(d.getDataId());
-
-            if (datas.get(dataType.getName()) == null) {
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: "+d.getLine() + ", coluna: " + d.getColumn() 
-                + "): Acesso a um tipo de data inexistente: " + dataType.getName());
-                stk.push(tyErr);
-            }
-            else{
-                DataAttributes data = datas.get(dataType.getName());
-                boolean atribEncontrado = false;
-                for(int i = 0; i < data.getVariaveis().size(); i++){
-                    if(data.getVariaveis().get(i).equals(d.getId())){
-                        stk.push(data.getTipos().get(i));
-                        atribEncontrado = true;
-                        break;
-                    }
-                }
-                if(!atribEncontrado){   // Atributo nao encontrado
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): Atributo \'" + d.getId() + "\' eh inexistente em \'"+ dataType.getName()+"\' !!");
-                    stk.push(tyErr);
-                }
-            }
-
-        } // verificando existencia do Data na base de dados
-        else if (datas.get(d.getDataId()) != null) {    // Tipo data normal
-
-            // verificando se o campo acessado existe
-            ArrayList<String> variaveis = datas.get(d.getDataId()).getVariaveis();
-            ArrayList<SType> dataTypes = datas.get(d.getDataId()).getTipos();
-
-            boolean varEncontrada = false; // marca se encontrou
-
-            // Verifica se a variavel empilha está presente no Data e ainda verifica o tipo
-            // dela
-            for (int i = 0; i < variaveis.size(); i++) {
-
-                // Compara o nome do atributo com as variaveis(atributo) que estão dentro do
-                // data
-                if (variaveis.get(i).equals(d.getId())) {
-
-                    // O tipo da expressao está no topo da pilha
-                    // Agora compara-se o tipo do atributo(variavel)
-                    if (!stk.pop().match(dataTypes.get(i))) {
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn()
-                            + "): Erro de tipo no acesso a um data. Verifique o tipo do atributo \'" + d.getId()
-                            + "\' do data \'" + d.getDataId() + "\' !!");
-                        stk.push(tyErr);
-                    }
-                    varEncontrada = true;
-                    break;
-                }
-            }
-
-            // Variavel inexistente no objeto, logo é um erro
-            if (!varEncontrada) {
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): \'" + d.getId()
-                    + "\' => Atributo inexistente no objeto \'" + d.getDataId() + "\'");
-                stk.push(tyErr);
-            }
-
-        }
-        else if (temp.get(d.getLValue().getId()) instanceof STyArr) {    // Verifica se é array de data
-
-            // Empilha o tipo do array/matriz
-            d.getLValue().accept(this);
-
-            STyData dataType = (STyData) stk.pop();
-            // STyArr arrayType = (STyArr) temp.get(d.getLValue().getId());
-            // STyData dataType = (STyData) arrayType.getArg();
-
-            // verificando se o campo acessado existe
-            ArrayList<String> variaveis = datas.get(dataType.getName()).getVariaveis();
-            ArrayList<SType> dataTypes = datas.get(dataType.getName()).getTipos();
-
-            boolean varEncontrada = false; // marca se encontrou
-
-            // Verifica se a variavel empilha está presente no Data e ainda verifica o tipo
-            // dela
-            for (int i = 0; i < variaveis.size(); i++) {
-
-                // Compara o nome do atributo com as variaveis(atributo) que estão dentro do
-                // data
-                if (variaveis.get(i).equals(d.getId())) {
-                    stk.push(dataTypes.get(i)); // Empilha o tipo do atributo
-                    varEncontrada = true;
-                    break;
-                }
-            }
-
-            // Variavel inexistente no objeto, logo é um erro
-            if (!varEncontrada) {
-                logError.add("(" + getLineNumber() + ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): \'" + d.getId()
-                    + "\' => Atributo inexistente no objeto \'" + d.getDataId() + "\'");
-                stk.push(tyErr);
-            }
-
-        }
-        else {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + d.getLine() + ", coluna: " + d.getColumn() + "): A variavel \'" + d.getDataId() + "\' nao existe e portanto nao pode ter atributos !!!");
-            stk.push(tyErr);
-        }*/
     }
 
     @Override
     public void visit(ArrayAccess a) {
-        System.out.println(getLineNumber() + " -- " + a);
         expr = groupTemplate.getInstanceOf("lvalue");
-        //ST arrayAccess = groupTemplate.getInstanceOf("array_access");
-        System.out.println(getLineNumber() + " --- " + a.getId());
-        expr.add("name", a.toString());
-        System.out.println(getLineNumber() + " --- " + expr.render());
-
-        /*if(a.getLValue() instanceof Identifier){    // Já for a variavel entao é um array
-            if(temp.get(a.getLValue().getId()) != null){
-                SType tipoAux = temp.get(a.getLValue().getId());
-                if(tipoAux instanceof STyArr){
-                    SType argumento = ((STyArr)tipoAux).getArg();
-                    stk.push(argumento);           // Empilha o tipo do array
-                }
-            }
-            else{
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): a variavel  \'" + a.getLValue().getId() + "\' nao existe !!");
-                stk.push(tyErr);
-            }
-        }
-        else if(a.getLValue() instanceof ArrayAccess){   // é matriz
-            if(temp.get(a.getLValue().getId()) != null){
-                SType tipoAux = temp.get(a.getLValue().getId());
-                if(tipoAux instanceof STyArr){
-                    SType argumento = ((STyArr)tipoAux).getArg();
-                    if(argumento instanceof STyArr ){
-                        SType tipoMatriz = ((STyArr)argumento).getArg();
-                        if(tipoMatriz instanceof STyArr){
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Nao eh possivel uma matriz no formato "+ tipoAux + "!!");
-                            stk.push(tyErr);
-                        }
-                        else{
-                            // Verifica o indice da linha da matriz
-                            ((ArrayAccess)a.getLValue()).getExp().accept(this);
-                            SType tipoLinha = stk.pop();
-                            if (!tipoLinha.match(tyInt)) { // Verifica se o tipo da posicao da linha na matriz é um valor inteiro
-                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Arrays so podem ter sua posicao acessada se o indice for um numero inteiro e nao \'" + tipoLinha + "\' !!");
-                                stk.push(tyErr);
-                            }
-
-                            stk.push(tipoMatriz);       // Empilha o tipo da matriz
-                        }
-                    }
-                    else{
-                        stk.push(argumento);           // Empilha o tipo do array
-                    }
-                }
-            }
-            else{
-                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): a variavel  \'" + a.getLValue().getId() + "\' nao existe !!");
-                stk.push(tyErr);
-            }
-        }
-            
-        a.getExp().accept(this); // Verifica se a posicao foi passada
-        SType tipo = stk.pop();
-        if (!tipo.match(tyInt)) { // Verifica se o tipo da posicao do array é um valor inteiro
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn() + "): Arrays so podem ter sua posicao acessada se o indice for um numero inteiro e nao \'" + tipo + "\' !!");
-            stk.push(tyErr);
-        }*/
+        expr.add("name", a.toString()); 
     }
 
     // Partem do exps
