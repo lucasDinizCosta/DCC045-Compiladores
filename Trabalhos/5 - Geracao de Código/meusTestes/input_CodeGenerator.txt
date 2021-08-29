@@ -51,5 +51,20 @@ main(){
 		indice = indice + 1;
 	}
 	print pontos[3].x + pontos[3].y;
+	print '\n';
 	print somaEMultiplica(i, i)[1];
+	print '\n';
+	somaEMultiplica(i, i)<ind1, ind2>;
+	print ind1;
+	print '\n';
+	print ind2;
+	print '\n';
+	somaEMultiplica(i+1, i+1)<i, ind2>;
+	print ind1;
+	print '\n';
+	print ind2;
+	print '\n';
+	c = new Char;
+	c = 'a';
+	print c;
 }

@@ -40,10 +40,8 @@ char_type() ::= "char"
 data_type(data) ::= "<data>"
 null_type() ::= "null"
 
-print(expr) ::= "System.out.println(<expr>);"
-read(expr) ::=<<
-    <expr> = S_c___anner.nextLine();
->>
+print(expr) ::= "System.out.print(<expr>);"
+read(expr) ::=<<<expr> = S_c___anner.nextLine();>>
 return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<
@@ -77,13 +75,17 @@ lvalue(name, array) ::= <<
 array_access(expr) ::= "[<expr>]"
 
 boolean_expr(value) ::= "<value>"
-float_expr(value) ::= "<value>"
+float_expr(value) ::= "<value>f"
 char_expr(value) ::= "<value>"
 int_expr(value) ::= "<value>"
 functionReturn(name, args, expr) ::= <<
 <name><if(expr)>_retorno_0<expr><else><endif>(<args; separator=", ">)
 >>
-call(name, args) ::= <<<name>(<args; separator=", ">)>>
+functionCall(name, args, var1, var2) ::= <<
+<var1> = <name>_retorno_00(<args; separator=", ">);
+<if(var2)><var2> = <name>_retorno_01(<args; separator=", ">);<else><endif>
+>>
+call(name, args) ::= <<<name>(<args; separator=", ">);>>
 
 mult_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
 div_expr(left_expr, right_expr) ::= "(<left_expr> / <right_expr>)"

@@ -60,6 +60,14 @@ public class CharLitteral extends LValue{
         this.value = value;
     }
 
+    public String getOriginalString(){
+        return originalValue;
+    }
+
+    public void setOriginalString(String origin){
+        this.originalValue = origin;
+    }
+
     public char getValue(){
         return value;
     }

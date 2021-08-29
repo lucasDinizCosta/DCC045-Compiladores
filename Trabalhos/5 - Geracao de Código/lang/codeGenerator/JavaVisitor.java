@@ -599,126 +599,54 @@ public class JavaVisitor extends Visitor {
          * pode ser tbm
          * divmod(5,2); SEM RETORNO
          */
-        // Informacoes da funcao que sera retomada no functionReturn
-        /*Integer qtdParamPassados = 0;           // A funcao nao foi passado parametros
-        if(f.getFCallParams() != null){
-            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
-        }
+        ST aux = groupTemplate.getInstanceOf("functionCall");
         String nomeFuncao = f.getId();
-        
-
-        // Pega o ambiente da função
-        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(nomeFuncao);
-
-        // Pega a função correspondente
-        LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
-        if(funcFinded.size() > 1){  // Tem sobrecarga 
-            ArrayList<Function> funcoesAST = getFunctionAST(nomeFuncao);
-            for(int i = 0; i < funcFinded.size(); i++){
-                LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
-
-                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
-
-                // Se a funcao tem o mesmo numero de parametros
-                if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
-                    int contTiposIguais = 0;
-                    int indiceExp = 0;
-                    // Empilha os tipos das expressões passadas como parametro na chamada da FunctionReturn
-                    // Compara com os tipos da função Find e verifica se coincide
-                    for (Expression exp : f.getFCallParams().getExps()) {
-                        // Empilha a expressao do parametro
-                        exp.accept(this);
-                        SType tipoParametro = funcaoBaseTipo.getTypes()[indiceExp];    // Tipo do parametro do campo da função
-                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
-                        // Compara pelo nome pois se comparar só com o equals, são regioes de 
-                        // memoria diferente, então nao funciona
-                        if(tipoParametro.toString().equals(parametroPassado.toString())){
-                            contTiposIguais++;
-                        }
-                        else{
-                            break;
-                        }
-                        indiceExp++;
-                    }
-                    if(contTiposIguais == funcaoBaseTipo.getTypes().length){
-                        function = (LocalAmbiente<SType>)funcFinded.get(i);
-                        break;
-                    }
-                }
+		aux.add("name", nomeFuncao);
+        if(f.getLValues().size() > 0){  // Tem variaveis para atribuição
+            if(f.getLValues().size() == 1){
+                f.getLValues().get(0).accept(this);
+                aux.add("var1", expr);
+            }
+            else if(f.getLValues().size() == 2){
+                f.getLValues().get(0).accept(this);
+                aux.add("var1", expr);
+                System.out.println(getLineNumber() + " -- " + expr.render());
+                f.getLValues().get(1).accept(this);
+                aux.add("var2", expr);
+                System.out.println(getLineNumber() + " -- " + expr.render());
             }
         }
+        else{   // Função sem retornos
+            aux = groupTemplate.getInstanceOf("call");
+            aux.add("name", nomeFuncao);
+        }
 
-        // Garante a existencia da função
-        if (function != null) {
+        // Adiciona os parametros passados na chamada da função
+		for (Expression exp : f.getFCallParams().getExps()) {
+			exp.accept(this);
+			aux.add("args", expr);
+		}
+		stmt = aux;
+        System.out.println(getLineNumber() + " -- " + expr.render());
 
-            // Passa do operand para o params
-            // monta o parametro da função
-            if (f.getFCallParams() != null) {
+        /*stmt = groupTemplate.getInstanceOf("attribution");
 
-                STyFun tipoFuncao = (STyFun) function.getFuncType();
+        // Variavel que vai ter os dados atribuidos nela
+        LValue lvalue = a.getLValue();
 
-                int indiceParamPassado = 0;
+        System.out.println(getLineNumber() + " --- " + lvalue + " --- " + a.getExp());
 
-                // Verifica os tipos dos parametros passado
-                for (Expression exp : f.getFCallParams().getExps()) {
-                    // Empilha a expressao do parametro
-                    exp.accept(this);
-                    // Verifica se o tamanho dos parametros é o mesmo informado pelo usuario
-                    if(indiceParamPassado < tipoFuncao.getTypes().length){ 
-                        SType tipoParametro = tipoFuncao.getTypes()[indiceParamPassado];    // Tipo do parametro do campo da função
-                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
+        lvalue.accept(this);
 
-                        // Se o parametro passado não casar com o da função, emite um erro
-                        if (!tipoParametro.match(parametroPassado)) {
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                                + "): Argumentos com tipos incompativeis com o da funcao \'" + f.getId()+"\' => " + parametroPassado + " diferente de " + tipoParametro);
-                            stk.push(tyErr);
-                        } 
-                        
-                    }
-                    indiceParamPassado++;
-                }
-                Integer qtdParametrosInformados = ((List)f.getFCallParams().getExps()).size();
-                if( qtdParametrosInformados > tipoFuncao.getTypes().length || qtdParametrosInformados < tipoFuncao.getTypes().length){
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                    + "): Na chamada da funcao \'" + f.getId()+"\' foram passados " + qtdParametrosInformados + " parametros enquanto que a funcao deveria receber " + tipoFuncao.getTypes().length + " parametro !");
-                    stk.push(tyErr);
-                }
-            }
+        if (lvalue instanceof Identifier) {
+            // System.out.println(getLineNumber() + " --- " + variavel.render());
+            // lvalue.accept(this);
 
-            // Retorno da função para as duas variaveis determinadas
-            if (f.getLValues() != null) {
-                // Garante que a função tem retorno e seja a mesma quantidade solicitada pelo usuario
-                if(((STyFun)function.getFuncType()).getReturnTypes() != null &&
-                f.getLValues().size() == ((STyFun)function.getFuncType()).getReturnTypes().length){
-                    List<LValue> ret = f.getLValues();
-                    int it = ret.size() - 1;
+            stmt.add("var", expr);  //lvalue
+            // Empilha o tipo da expressao que sera atribuida
+            a.getExp().accept(this);
+            stmt.add("expr", expr);
 
-                    // Inverte a ordem quando empilha os operadores, logo, deve ser
-                    // Desempilhado do direita pra esquerda
-                    for (LValue l : ret) {
-                        if(temp.get(ret.get(it).getId()) != null){  // Variavel existe, entao tem um tipo
-                            if(temp.get(ret.get(it).getId()).match(((STyFun)function.getFuncType()).getReturnTypes()[it])){     // Verifica se o tipo bate com o retorno da função
-                                temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
-                            }
-                            else{
-                                logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + "): A variavel \'" + ret.get(it).getId() + "\' ja existe e seu tipo eh \'" + temp.get(ret.get(it).getId()) + "\' e portanto, nao pode receber o valor do tipo \'" + ((STyFun)function.getFuncType()).getReturnTypes()[it] + "\' retornado pela funcao \'" + f.getId() + "\'");
-                                stk.push(tyErr);
-                            }
-                        }
-                        else{
-                            temp.set(ret.get(it).getId(), ((STyFun)function.getFuncType()).getReturnTypes()[it]);
-                        }
-                        it--;
-                    }
-
-                    }
-                else{   // A função não tem retorno ou é menor que o numero de retornos solicitados pelo usuario
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                    + "): Na chamada da funcao foram solicitados \'" + f.getLValues().size()+"\' retorno(s) mas a funcao original apresenta " + ((STyFun)function.getFuncType()).getReturnTypes().length + " retorno(s) !");
-                    stk.push(tyErr);
-                }
-            }
         }*/
     }
 
@@ -856,13 +784,13 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(FloatNumber p) {
         expr = groupTemplate.getInstanceOf("float_expr");
-        expr.add("value", p.getValue() + "f");
+        expr.add("value", p.getValue());
     }
 
     @Override
     public void visit(CharLitteral c) {
         expr = groupTemplate.getInstanceOf("char_expr");
-        expr.add("value", c.getValue());
+        expr.add("value", c.getOriginalString());//c.getValue());
     }
 
     // Partem do pexp
@@ -940,15 +868,10 @@ public class JavaVisitor extends Visitor {
          * // Como retorna 2 valores, logo precisa do funcao(parametros)[indice] Exemplo: fat(num−1)[0] *
          ***********************************************************************************************/
         ST aux = groupTemplate.getInstanceOf("functionReturn");
-		aux.add("name", f.getId());
+        String nomeFuncao = f.getId();
+		aux.add("name", nomeFuncao);
         f.getExpIndex().accept(this);   // Coloca o indice do retorno na expressao
         aux.add("expr", expr);
-
-        String nomeFuncao = f.getId();
-        Integer qtdParamPassados = 0;           // A funcao nao foi passado parametros
-        if(f.getFCallParams() != null){
-            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
-        }
 
         // Adiciona os parametros passados na chamada da função
 		for (Expression exp : f.getFCallParams().getExps()) {
@@ -956,153 +879,6 @@ public class JavaVisitor extends Visitor {
 			aux.add("args", expr);
 		}
 		expr = aux;
-
-        // pexp: ID OPEN_PARENT exps? CLOSE_PARENT OPEN_BRACKET exp CLOSE_BRACKET #
-        // 'FunctionReturn' // Como retorna 2 valores, logo precisa do
-        // funcao(parametros)[indice] Exemplo: fat(num−1)[0]
-        // TEM RETORNO A FUNCAO ===> Obrigatorio
-
-        // Informacoes da funcao que sera retomada no functionReturn
-        /*Integer qtdParamPassados = 0;           // A funcao nao foi passado parametros
-        if(f.getFCallParams() != null){
-            qtdParamPassados = f.getFCallParams().getExps().size(); // A funcao foi passada parametros
-        }
-        String nomeFuncao = f.getId();
-        
-
-        // Pega o ambiente da função
-        ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(nomeFuncao);
-
-        // Pega a função correspondente
-        LocalAmbiente<SType> function = (LocalAmbiente<SType>)funcFinded.get(0);   // Só uma funcao
-        if(funcFinded.size() > 1){  // Tem sobrecarga 
-            ArrayList<Function> funcoesAST = getFunctionAST(nomeFuncao);
-            for(int i = 0; i < funcFinded.size(); i++){
-                LocalAmbiente<SType> funcaoBase = funcFinded.get(i);
-
-                STyFun funcaoBaseTipo = (STyFun)funcaoBase.getFuncType();
-
-                // Se a funcao tem o mesmo numero de parametros
-                if(funcaoBaseTipo.getTypes().length == qtdParamPassados){
-                    int contTiposIguais = 0;
-                    int indiceExp = 0;
-                    // Empilha os tipos das expressões passadas como parametro na chamada da FunctionReturn
-                    // Compara com os tipos da função Find e verifica se coincide
-                    for (Expression exp : f.getFCallParams().getExps()) {
-                        // Empilha a expressao do parametro
-                        exp.accept(this);
-                        SType tipoParametro = funcaoBaseTipo.getTypes()[indiceExp];    // Tipo do parametro do campo da função
-                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
-                        // Compara pelo nome pois se comparar só com o equals, são regioes de 
-                        // memoria diferente, então nao funciona
-                        if(tipoParametro.toString().equals(parametroPassado.toString())){
-                            contTiposIguais++;
-                        }
-                        else{
-                            break;
-                        }
-                        indiceExp++;
-                    }
-                    if(contTiposIguais == funcaoBaseTipo.getTypes().length){
-                        function = (LocalAmbiente<SType>)funcFinded.get(i);
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        // Garante a existencia da função
-        if (function != null) {
-
-            if (f.getFCallParams() != null) {
-
-                STyFun tipoFuncao = (STyFun) function.getFuncType();
-
-                int tempID = 0;
-
-                // Verifica se a quantidade de parametros informados é o mesmo da função
-                if(f.getFCallParams().getExps().size() == tipoFuncao.getTypes().length){
-                    // Verifica os tipos dos parametros passado
-                    for (Expression exp : f.getFCallParams().getExps()) {
-                        // Empilha o tipo da expressao passada como parametro na chamada da funcao FunctionReturn
-                        exp.accept(this);
-                        SType tipoParametro = tipoFuncao.getTypes()[tempID];    // Tipo do parametro do campo da função
-                        SType parametroPassado = stk.pop(); // parametro passado na chamada da funcao
-
-                        // Se o parametro passado não casar com o da função, emite um erro
-                        if (!tipoParametro.match(parametroPassado)) {
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                                + "): Argumentos com tipos incompativeis com os parametros da funcao \'" + f.getId()+"\'"
-                                + " => O parametro \'" + tipoFuncao.getTypesName()[tempID] + "\' deve apresentar o tipo \'"
-                                + tipoParametro + "\' e nao \'" + parametroPassado + "\' !!!"
-                            );
-                            stk.push(tyErr);
-                        }
-
-                        tempID++;
-                    }
-                    // // Empilha o ultimo tipo da função
-                    // stk.push(tipoFuncao.getTypes()[tipoFuncao.getTypes().length - 1]);
-                }
-                else{
-                    if(f.getFCallParams().getExps().size() > tipoFuncao.getTypes().length){
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                        + "): Foi passado mais argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
-                        + " apresenta, sendo: " + f.getFCallParams().getExps().size() + " argumento(s) no parametro na chamada da funcao e " + tipoFuncao.getTypes().length + " argumento(s) no parametro na declaracao da funcao  !!!");
-                        stk.push(tyErr);
-                    }
-                    else{
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn()
-                        + "): Foi passado menos argumentos que a quantidade de parametros que a funcao \'" + f.getId()+"\'"
-                        + " apresenta, sendo: " + f.getFCallParams().getExps().size() + " argumento(s) no parametro na chamada da funcao e " + tipoFuncao.getTypes().length + " argumento(s) no parametro na declaracao da funcao  !!!");
-                        stk.push(tyErr);
-                    }
-                }
-            }
-            else{
-                STyFun tipoFuncao = (STyFun) function.getFuncType();
-
-                if(tipoFuncao.getTypes().length > 0){   // Tem parametros na declaracao da funcao mas nao tem na chamada dela
-                    logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna: " + f.getColumn() + 
-                        "): Foi passado 0 argumentos como parametro na chamada da funcao \'" + f.getId()+"\'"
-                        + " sendo que na declaracao da funcao ela precisa de " + tipoFuncao.getTypes().length + " parametro(s) !!"
-                    );
-                    stk.push(tyErr);
-                }
-            }
-        }
-
-        // verifica se o valor passado de posicao do array é inteiro
-        f.getExpIndex().accept(this);
-
-        SType tipoPosicaoRetorno = stk.pop();
-        if (!tipoPosicaoRetorno.match(tyInt)) {
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + f.getLine() + ", coluna:" + f.getColumn()
-                + "): O retorno da funcao so pode ser acessado com uma posicao em valor Int e nao \'" 
-                + tipoPosicaoRetorno + "\' !");
-            stk.push(tyErr);
-        }
-
-        // Certifica que o valor da posicao de retorno existe e é um inteiro
-        // Se uma variavel for passada como posicao, simplesmente essa checagem de retorno não é feita
-        if(!(f.getExpIndex() instanceof Identifier)){   // Se nao for variavel
-            if(positionReturnFunction != null && positionReturnFunction instanceof IntegerNumber){
-                STyFun tipoFuncao = (STyFun) function.getFuncType();
-                IntegerNumber posicao = (IntegerNumber)positionReturnFunction;
-                stk.push(tipoFuncao.getReturnTypes()[posicao.getValue()]);
-            }
-        }
-        else{   // Empilha os dois retornos ====> Problema pode ser corrigido no interpretador
-            // Como nao temos acesso ao valor numerico e olhamos só o tipo
-            // Ficaria complicado afirmar se o retorno está com o tipo certo caso fosse uma variavel
-            // Sendo que empilhamos somente o tipo e não o valor inteiro
-            STyFun tipoFuncao = (STyFun) function.getFuncType();
-            IntegerNumber posicao = (IntegerNumber)positionReturnFunction;
-            for(int i = 0; i < tipoFuncao.getReturnTypes().length; i++){
-                stk.push(tipoFuncao.getReturnTypes()[i]);
-            }
-        }*/
     }
 
     // Partem do lvalue
