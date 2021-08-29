@@ -65,7 +65,19 @@ main(){
 	print ind2;
 	print '\n';
 	c = new Char;
+	{- 
+	-- Tentativa de teste de null
+	k = new Char;
 	k = null;
+	k = 'k';
+	print k;
+	print '\n';
+	i = null;
+	print i + 1;
+	-}
 	c = 'a';
 	print c;
+	carac = new Char;
+	read carac;
+	print carac;
 }

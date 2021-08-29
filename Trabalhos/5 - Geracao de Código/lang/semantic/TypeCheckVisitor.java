@@ -613,13 +613,21 @@ public class TypeCheckVisitor extends Visitor {
                 } else { // se ja foi declarada, verifica se o tipo casa com o tipo dela
                     SType tipoVariavel = temp.get(lvalue.getId());
 
-                    if (!tipoExpressao.match(tipoVariavel)) {
-                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                        + "): Reatribuicao de variavel => Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpressao + " <-> "
-                        + tipoVariavel);
-                        stk.push(tyErr);
-                    }
+                    if(!(tipoExpressao instanceof STyNull)){    // Se nao for Null, pode comparar os tipos
+                        if (!tipoExpressao.match(tipoVariavel)) {
+                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                            + "): Reatribuicao de variavel => Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpressao + " <-> "
+                            + tipoVariavel);
+                            stk.push(tyErr);
+                        }
 
+                        // tipoVariavel.nullValue = false;
+                    }
+                    else{
+                        // o valor da variavel vai ser null
+                        // tipoVariavel.nullValue = true;
+                    }
+                    
                 }
             }
 
@@ -884,7 +892,21 @@ public class TypeCheckVisitor extends Visitor {
     private void typeArithmeticBinOp(Node n, String opName) {
         SType tyr = stk.pop();
         SType tyl = stk.pop();
-        if ((tyr.match(tyInt))) {
+        /*if(tyr.nullValue){
+            System.out.println(tyr + " --- " + tyl);
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica pois o operando direito apresenta valor \'null\' => "
+                    + tyl.toString() + " (operando esquerdo)<=>(operando direito) " + tyr.toString());
+            stk.push(tyErr);
+        }
+        if(tyl.nullValue){
+            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + n.getLine() + ", coluna: " + n.getColumn() + "): Operador \'" + opName + "\' nao se aplica pois o operando esquerdo apresenta valor \'null\' => "
+                    + tyl.toString() + " (operando esquerdo)<=>(operando direito) " + tyr.toString());
+            stk.push(tyErr);
+        }
+        if(tyr.nullValue || tyl.nullValue)
+            return;
+        */
+        if (tyr.match(tyInt)) {
             if (tyl.match(tyInt)){//|| tyl.match(tyFloat)) {
                 stk.push(tyl);
             } else {

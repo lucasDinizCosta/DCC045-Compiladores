@@ -33,15 +33,17 @@ param(type, name) ::= "<type> <name>"
 declaration(type, name) ::= "<type> <name>;"    
 
 array_type(type) ::= "<type>[]"
-int_type() ::= "int"
-float_type() ::= "float"
-boolean_type() ::= "bool"
-char_type() ::= "char"
+int_type() ::= "Integer"
+float_type() ::= "Float"
+boolean_type() ::= "Boolean"
+char_type() ::= "Character"
 data_type(data) ::= "<data>"
 null_type() ::= "null"
 
 print(expr) ::= "System.out.print(<expr>);"
-read(expr) ::=<<<expr> = S_c___anner.nextLine();>>
+read(expr, converteTipo) ::=<<
+<expr> = <if(converteTipo)><converteTipo><else>S_c___anner.nextLine()<endif>;
+>>
 return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<

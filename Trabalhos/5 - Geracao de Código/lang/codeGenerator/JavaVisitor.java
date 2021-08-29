@@ -34,6 +34,9 @@ public class JavaVisitor extends Visitor {
 
     // Tipos de dados novos
     private HashMap<String, Data> datasAST;    
+
+    // Função atual => função que está sendo observada
+    private LocalAmbiente<SType> funcaoAtualObservada;
     
     // idRetorno é o indice de qual elemento será retornado quando a função apresenta 2 retornos
     // para ser tratado no comando return
@@ -123,7 +126,8 @@ public class JavaVisitor extends Visitor {
         fun.add("name", f.getId());
         // Pega todas as funções que tem o mesmo nome
         ArrayList<LocalAmbiente> funcFinded = (ArrayList)env.getFuncoes(f.getId());
-         // Só uma funcao
+        
+        // Só uma funcao
         LocalAmbiente<SType> local = (LocalAmbiente<SType>)funcFinded.get(0);  
         if(funcFinded.size() > 1){  // Tem sobrecarga 
             for(int i = 0; i < funcFinded.size(); i++){
@@ -150,6 +154,9 @@ public class JavaVisitor extends Visitor {
                 }
             }
         }
+
+        // Variavel que armazena qual função está sendo observada para poder verificar tipos e valores
+        funcaoAtualObservada = local;
 
         if(f.getReturnTypes().size() < 2){
             if(f.getReturnTypes().size() == 0){ // void => 0 retornos
@@ -354,18 +361,8 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(NameType i) { // TypeData
-        // Nao faz nada pois já foi tratado em outra funcao
         type = groupTemplate.getInstanceOf("data_type");
         type.add("data", i.getID());
-        /*if(datas.get(i.getID()) != null){   // Se o tipo data existe
-            STyData tipoData = new STyData(i.getID());
-            stk.push(tipoData);
-        }
-        else{
-            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + i.getLine() + ", coluna: " + i.getColumn()
-                + "): Tipo data passado como parametro na funcao nao existe =>\'" + i.getID() + "\' ");
-            stk.push(tyErr);
-        }*/
     }
 
     // Partem do cmd
@@ -430,6 +427,29 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(Read r) {
         stmt = groupTemplate.getInstanceOf("read");
+        
+        // Declaração das variaveis que são usadas no corpo da função
+        Set<String> keys = funcaoAtualObservada.getKeys();
+
+        SType t = null;
+        // Instancia as variaveis antes de usar nas operações presente no corpo da função
+        for (String key : keys) {
+            if(key.equals(r.getLValue().toString())){
+                t = funcaoAtualObservada.get(key);
+                break;
+            }
+        }
+        // Converte a string digitada para o tipo da variavel
+        if(t instanceof STyInt){
+            stmt.add("converteTipo", "Integer.parseInt(S_c___anner.nextLine())");
+        }
+        else if(t instanceof STyFloat){
+            stmt.add("converteTipo", "Float.parseFloat(S_c___anner.nextLine())");
+        }
+        else if(t instanceof STyCharacter){
+            stmt.add("converteTipo", "S_c___anner.nextLine().charAt(0)");
+        }
+
         r.getLValue().accept(this);
         stmt.add("expr", expr);
     }
@@ -466,8 +486,6 @@ public class JavaVisitor extends Visitor {
         // Variavel que vai ter os dados atribuidos nela
         LValue lvalue = a.getLValue();
 
-        System.out.println(getLineNumber() + " --- " + lvalue + " --- " + a.getExp());
-
         lvalue.accept(this);
 
         if (lvalue instanceof Identifier) {
@@ -485,41 +503,6 @@ public class JavaVisitor extends Visitor {
                 // Empilha o tipo da expressao que sera atribuida
                 a.getExp().accept(this);
                 stmt.add("expr", expr);
-                /*ArrayAccess matriz = (ArrayAccess)((ArrayAccess)lvalue).getLValue();
-                
-                lvalue.accept(this);    // Empilha o tipo da matriz e verifica os indices
-
-                // ver a parte de indices - por enquanto so ve se n foi declarada ainda
-                // se a var n foi declarada, atribui o novo tipo, equivalente à expressao
-                if ((temp.get(matriz.getId()) == null)) {
-
-                    a.getExp().accept(this);       
-
-                    SType st = stk.pop();
-                    STyArr arr = new STyArr(st);
-
-                    // adiciona o array no contexto, com o tipo dado pela expressão
-                    temp.set(matriz.getId(), arr);
-                }
-                // caso ja exista o array, verifica se o tipo casa com o esperado da atribuiçao
-                else {
-                    a.getExp().accept(this);    // Empilha o objeto da expressao => new int, new Ponto ou somente uma variavel
-
-                    // se nao for variavel, confere o valor
-                    if (!(a.getExp() instanceof Identifier)) {
-                        SType tipoExpAtribuicao = stk.pop();
-                        SType tipoMatriz = stk.pop();
-
-                        // Compara o tipo o objeto a ser adiciona com o tipo do array
-                        if (!tipoMatriz.match(tipoExpAtribuicao)) {   
-                            logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
-                                + "): Problema na atribuicao de variavel. Os tipos nao casam: " + tipoExpAtribuicao + " <-> "
-                                + tipoMatriz);
-                            stk.push(tyErr);
-                        }
-                    }
-
-                }*/
             }
             else{   // Array 
                 // aceita a expressao e joga pro topo da pilha. vai verificar posteriormente
@@ -734,7 +717,6 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(Null n) {
         expr = groupTemplate.getInstanceOf("null_type");
-        expr.add("value", n);
     }
 
     @Override
