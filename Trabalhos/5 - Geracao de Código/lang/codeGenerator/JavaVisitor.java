@@ -346,7 +346,7 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(TypeBool t) {
-        type = groupTemplate.getInstanceOf("bool_type");
+        type = groupTemplate.getInstanceOf("boolean_type");
     }
 
     @Override
