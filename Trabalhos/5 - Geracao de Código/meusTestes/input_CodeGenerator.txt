@@ -65,6 +65,7 @@ main(){
 	print ind2;
 	print '\n';
 	c = new Char;
+	k = null;
 	c = 'a';
 	print c;
 }

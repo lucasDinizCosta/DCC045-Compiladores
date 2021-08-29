@@ -734,7 +734,7 @@ public class JavaVisitor extends Visitor {
     @Override
     public void visit(Null n) {
         expr = groupTemplate.getInstanceOf("null_type");
-        expr.add("value", n.getValue());
+        expr.add("value", n);
     }
 
     @Override

@@ -28,8 +28,8 @@ public class Null extends Expression {
 
     @Override
     public String toString(){
-        //return "null";
-        return value.toString();
+        return "null";
+        // return value.toString();
     }
 
     @Override

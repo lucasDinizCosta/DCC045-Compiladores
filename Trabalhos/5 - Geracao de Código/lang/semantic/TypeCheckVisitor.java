@@ -601,7 +601,15 @@ public class TypeCheckVisitor extends Visitor {
                 // ver a parte de indices - por enquanto so ve se n foi declarada ainda
                 // se a var n foi declarada, atribui o novo tipo pra ela
                 if ((temp.get(lvalue.getId()) == null)) {
-                    temp.set(lvalue.getId(), tipoExpressao);
+                    // Se a variavel nao existe e tenta atribuir null pra ela é um erro
+                    if(tipoExpressao instanceof STyNull){   
+                        logError.add("(" + getLineNumber()+ ") Erro em (linha: " + a.getLine() + ", coluna: " + a.getColumn()
+                        + "): A variavel \'"+ lvalue.getId() + "\' nao existe, logo nao eh possivel atribuir o tipo \'null\' para ela !!!");
+                        stk.push(tyErr);
+                    }
+                    else{
+                        temp.set(lvalue.getId(), tipoExpressao);
+                    }
                 } else { // se ja foi declarada, verifica se o tipo casa com o tipo dela
                     SType tipoVariavel = temp.get(lvalue.getId());
 
