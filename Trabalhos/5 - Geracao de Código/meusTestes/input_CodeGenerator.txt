@@ -35,6 +35,8 @@ main(){
 	j = 0;
 	print i;
 	ponto = new Ponto;
+	ponto.x = 3;
+	ponto.y = 9;
 	reta = new Reta;
 	pontos = new Ponto[5];
 	caracteres = new Char[][5];	-- Cria as linhas da matriz
@@ -80,4 +82,12 @@ main(){
 	carac = new Char;
 	read carac;
 	print carac;
+	if(i < 4){
+		print 2 + 3;
+		print ponto.x;
+	}
+	else{
+		print 37 + 19;
+		print ponto.y;
+	}
 }

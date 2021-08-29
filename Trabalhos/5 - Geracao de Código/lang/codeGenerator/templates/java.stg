@@ -60,9 +60,9 @@ if(<expr>) {
 
 if_else(expr, cmd, els) ::= <<
 if(<expr>) {
-    <cmd>
+    <cmd; separator="\n">
 } <if(els)>else {
-    <els>
+    <els; separator="\n">
 }
 <endif>
 >>

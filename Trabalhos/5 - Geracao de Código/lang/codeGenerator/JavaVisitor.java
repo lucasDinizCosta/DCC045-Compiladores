@@ -403,10 +403,30 @@ public class JavaVisitor extends Visitor {
         ST aux = groupTemplate.getInstanceOf("if_else");
         i.getExp().accept(this);// Empilha a expressao de verificacao do If e Else
         aux.add("expr", expr);
-        i.getCmd().accept(this);
-        aux.add("cmd", stmt);
-        i.getElseCmd().accept(this); // Executa a verificação de tipos nos comandos do else
-        aux.add("els", stmt);
+        if(i.getCmd() instanceof CommandsList){ // Lista de comandos
+            CommandsList list = (CommandsList)i.getCmd();
+            for (Command command : list.getCommands()) { // Executa os comandos
+                command.accept(this);
+                aux.add("cmd", stmt);
+            }
+        }
+        else{   // Processa o unico comando que tem no 'if'
+            i.getCmd().accept(this);
+            aux.add("cmd", stmt);
+        }
+
+        if(i.getElseCmd() instanceof CommandsList){ // Lista de comandos do else
+            CommandsList list = (CommandsList)i.getElseCmd();
+            for (Command command : list.getCommands()) { // Executa os comandos
+                command.accept(this);
+                aux.add("els", stmt);
+            }
+        }
+        else{   // Processa o unico comando que tem no 'else'
+            i.getElseCmd().accept(this); // Executa a verificação de tipos nos comandos do else
+            aux.add("els", stmt);
+        }
+        
         stmt = aux;
     }
 
