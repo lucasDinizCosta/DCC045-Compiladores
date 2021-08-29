@@ -380,12 +380,21 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(If i) {
-        System.out.println(getLineNumber() + " --- " + i);
+        System.out.println(getLineNumber() + " --- " + i + " -- " + i.getCmd());
         ST aux = groupTemplate.getInstanceOf("if");
         i.getExp().accept(this); // Empilha a expressao de verificacao do If
         aux.add("expr", expr);
-        i.getCmd().accept(this);
-        aux.add("cmd", stmt);
+        if(i.getCmd() instanceof CommandsList){ // Lista de comandos
+            CommandsList list = (CommandsList)i.getCmd();
+            for (Command command : list.getCommands()) { // Executa os comandos
+                command.accept(this);
+                aux.add("cmd", stmt);
+            }
+        }
+        else{   // Processa o unico comando que tem no 'if'
+            i.getCmd().accept(this);
+            aux.add("cmd", stmt);
+        }
         stmt = aux;
     }
 
@@ -456,9 +465,11 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(Print i) {
+        //ST aux = groupTemplate.getInstanceOf("iterate");
         stmt = groupTemplate.getInstanceOf("print");
         i.getExpression().accept(this);
         stmt.add("expr", expr);
+        System.out.println(getLineNumber() + " -- " + stmt.render());
     }
 
     @Override
@@ -585,10 +596,8 @@ public class JavaVisitor extends Visitor {
     // Partem do rexp
     @Override
     public void visit(LessThan l) {
-        System.out.println(getLineNumber() + " -- " + l + " -- " + l.getRight() + " -- " + l.getRight().getClass().getSimpleName());
         ST aux = groupTemplate.getInstanceOf("lessThan_expr");
         l.getLeft().accept(this);
-        System.out.println(getLineNumber() + " --- " + expr.render() );
         aux.add("left_expr", expr);
         l.getRight().accept(this);
         aux.add("right_expr", expr);
@@ -835,6 +844,7 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visit(ArrayAccess a) {
+        System.out.println(getLineNumber() + " --- " + a + " -- ");
         expr = groupTemplate.getInstanceOf("lvalue");
         expr.add("name", a.toString()); 
     }

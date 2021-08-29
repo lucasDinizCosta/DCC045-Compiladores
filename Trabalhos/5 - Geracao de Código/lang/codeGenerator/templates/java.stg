@@ -54,7 +54,7 @@ for (int I_nd3x__L00p__<loopAtual> = 0; I_nd3x__L00p__<loopAtual> \< <expr>; I_n
 
 if(expr, cmd) ::= <<
 if(<expr>) {
-    <cmd>
+    <cmd; separator="\n">
 }
 >>
 
