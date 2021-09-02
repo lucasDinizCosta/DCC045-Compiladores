@@ -29,9 +29,9 @@ soma(n1 :: Ponto, n2 :: Ponto) : Float{
 	return 2.5;
 }
 
-soma(n1 :: Ponto, n2 :: Float) : Float{
-	return n1.x + n2;
-	--return 2.5;
+soma(n1 :: Ponto, n2 :: Float) : Float, Int{
+	--return n1.x + n2;
+	return 2.5, 0;
 }
 
 soma(n1 :: Ponto[], size :: Int) : Float{
