@@ -40,6 +40,7 @@ main(){
 	reta = new Reta;
 	pontos = new Ponto[5];
 	caracteres = new Char[][5];	-- Cria as linhas da matriz
+	{-
 	indice = 0;
 	iterate(5){
 		pontos[indice] = new Ponto;
@@ -67,16 +68,6 @@ main(){
 	print ind2;
 	print '\n';
 	c = new Char;
-	{- 
-	-- Tentativa de teste de null
-	k = new Char;
-	k = null;
-	k = 'k';
-	print k;
-	print '\n';
-	i = null;
-	print i + 1;
-	-}
 	c = 'a';
 	print c;
 	carac = new Char;
@@ -90,4 +81,5 @@ main(){
 		print 37 + 19;
 		print ponto.y;
 	}
+	-}
 }

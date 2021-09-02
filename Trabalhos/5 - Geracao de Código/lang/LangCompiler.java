@@ -40,8 +40,7 @@ public class LangCompiler {
             System.out.println("Use java -cp . Lang ação <Caminho para código Fonte> ");
             System.out.println("Ação (uma das seguintes possibilidades): ");
             System.out.println(" -C++ : Executa a geraçao de codigo da lang para C++ em relacao ao codigo fonte passado.");
-            // System.out.println(" -Java : Executa a geraçao de codigo da minilang para Java");
-            // System.out.println(" -Python : Executa a geraçao de codigo da minilang para Python");
+            System.out.println(" -Java : Executa a geraçao de codigo da lang para Java em relacao ao codigo fonte passado.");
             System.out.println("-------------------------------------------------------------------");
         }
         try {
@@ -144,16 +143,60 @@ public class LangCompiler {
                 ((Node)result).accept(v);
 
                 if(v.getNumErrors() != 0) {
-                    System.out.println(" Erros ocorreram durante a analise semântica.\nAbortando");
+                    System.out.println(" Erros ocorreram durante a Analise Semantica.\nAbortando");
                     v.printErrors();
                     System.exit(1);
                 }
                 TyEnv<LocalAmbiente<SType>> env = v.getEnv();
+                String nomeArquivo = getFileName(args[1]);
+                CPlusPlusVisitor cPlusPlus;
                 System.out.println("Executando a geracao de codigo de Lang para C++:");
                 System.out.println("Arquivo passado: \"" + args[1] +"\"\n");
-                System.out.println("----------------- Codigo gerado em C++ ---------\n\n");
-                ((Node)result).accept(new CPlusPlusVisitor(getFileName(args[1]), env, v.getDatas()));
-                System.out.println("\n----------------------------------------------\n");
+                if(args.length > 2){
+                    if(args.length == 3){       // Gera o arquivo com o mesmo nome do arquivo de entrada
+                        if(args[2].equals("-genFile")){
+                            cPlusPlus = new CPlusPlusVisitor(nomeArquivo, env, v.getDatas());
+                            ((Node)result).accept(cPlusPlus);
+                            String caminhoEArquivo = getPathFile(args[1]) + nomeArquivo + ".cpp";
+                            System.out.println("Arquivo de codigo em C++ gerado: \"" + caminhoEArquivo +"\"\n");
+                            writeFile(caminhoEArquivo, cPlusPlus.getTemplate());
+                        }
+                        else{
+                            System.out.println("Parametro \'" + args[2] 
+                            + "\' eh incorreto, o certo eh \'-genFile\' !!!\n");
+                            System.exit(1);
+                        }
+                    }
+                    else if(args.length == 4){ // Gera o arquivo com nome informado e caminho passado
+                        if(args[2].equals("-genFile")){
+                            if(getPathFile(args[3]) != ""){ // Foi passado um nome de arquivo além do path
+                                nomeArquivo = getFileName(args[3]);
+                            }
+                            cPlusPlus = new CPlusPlusVisitor(nomeArquivo, env, v.getDatas());
+                            ((Node)result).accept(cPlusPlus);
+                            String caminhoEArquivo = getPathFile(args[3]) + nomeArquivo + ".cpp";
+                            System.out.println("Arquivo de codigo em C++ gerado: \"" + caminhoEArquivo +"\"\n");
+                            writeFile(caminhoEArquivo, cPlusPlus.getTemplate());
+                        }
+                        else{
+                            System.out.println("Parametro \'"+args[2]+"\' eh incorreto, o certo eh \'-genFile\' !!!\n");
+                            System.exit(1);
+                        }
+                    }
+                    else{
+                        System.out.println("Foram passados parametros a mais !!!\n");
+                        System.exit(1);
+                    }
+
+                    System.out.println("=> Geracao de codigo em java concluida com sucesso !!!");
+                }
+                else{
+                    cPlusPlus = new CPlusPlusVisitor(nomeArquivo, env, v.getDatas());
+                    ((Node)result).accept(cPlusPlus);
+                    System.out.println("----------------- Codigo gerado em C++ ------------\n\n");
+                    System.out.println(cPlusPlus.getTemplate());
+                    System.out.println("\n--------------------------------------------------\n");
+                }
             }
             else if(args[0].equals("-Java")){    // Geração de código para Java
                 TypeCheckVisitor v = new TypeCheckVisitor();

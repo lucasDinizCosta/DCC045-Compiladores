@@ -27,23 +27,23 @@ param(type, name) ::= "<type> <name>"
 declaration(type, name) ::= "<type> <name>;"    
 
 array_type(type) ::= "<type>*"
+typeInstanciate(type, expr, isMatrix) ::= <<
+new <type><if(isMatrix)><else><if(expr)>[<expr>]<else>()<endif><endif>
+>>
 int_type() ::= "int"
 float_type() ::= "float"
 boolean_type() ::= "bool"
 char_type() ::= "char"
 data_type(data) ::= "<data>"
 null_type() ::= "null"
-typeInstanciate(type) ::= "new <type>;"
 
 print(expr) ::= "std::cout \<\< <expr> \<\< std::endl;"
 read(expr) ::= "std::cin \>\> <expr>;"
 return(expr) ::= "return <expr>;"
 
 iterate(expr, cmd, loopAtual) ::= <<
-$! Cria uma variavel para poder fazer o laço do loop !$
-int I_nd3x__L00p__loopAtual = 0;
-for (int I_nd3x__L00p__loopAtual = 0; I_nd3x__L00p__loopAtual \< <expr>; I_nd3x__L00p__loopAtual++) {
-    <cmd>
+for (int _Indice_Loop_<loopAtual> = 0, _Indice_Loop_<loopAtual>_EndLoop = <expr>; _Indice_Loop_<loopAtual> \< _Indice_Loop_<loopAtual>_EndLoop; _Indice_Loop_<loopAtual>++) {
+    <cmd; separator="\n">
 }
 >>
 
@@ -55,28 +55,30 @@ if(<expr>) {
 
 if_else(expr, cmd, els) ::= <<
 if(<expr>) {
-    <cmd>
+    <cmd; separator="\n">
 } <if(els)>else {
-    <els>
+    <els; separator="\n">
 }
 <endif>
->>
-
-stmt_list(stmt1, stmt2) ::= <<
-<stmt1>
-<stmt2>
 >>
 
 attribution(var, expr) ::= "<var> = <expr>;"
 lvalue(name, array) ::= "<name><array>"
 array_access(expr) ::= "[<expr>]"
+data_access(variavel, atributo) ::= "<variavel>-><atributo>"
 
 boolean_expr(value) ::= "<value>"
-float_expr(value) ::= "<value>"
+float_expr(value) ::= "<value>f"
 char_expr(value) ::= "<value>"
 int_expr(value) ::= "<value>"
-
-call(name, args) ::= <<<name>(<args; separator=", ">)>>
+functionReturn(name, args, expr) ::= <<
+<name><if(expr)>_retorno_0<expr><else><endif>(<args; separator=", ">)
+>>
+functionCall(name, args, var1, var2) ::= <<
+<var1> = <name>_retorno_00(<args; separator=", ">);
+<if(var2)><var2> = <name>_retorno_01(<args; separator=", ">);<else><endif>
+>>
+call(name, args) ::= <<<name>(<args; separator=", ">);>>
 
 mult_expr(left_expr, right_expr) ::= "(<left_expr> * <right_expr>)"
 div_expr(left_expr, right_expr) ::= "(<left_expr> / <right_expr>)"
