@@ -338,7 +338,7 @@ public class CPlusPlusVisitor extends Visitor {
     // Partem do Type
     @Override
     public void visit(TypeArray t) {
-        System.out.println(getLineNumber() + " -- " + t);
+        // System.out.println(getLineNumber() + " -- " + t);
         ST aux = groupTemplate.getInstanceOf("array_type");
         t.getType().accept(this);
         aux.add("type", type);
@@ -738,7 +738,7 @@ public class CPlusPlusVisitor extends Visitor {
     public void visit(TypeInstanciate t) {
         // a = new Int, a = new Ponto, a = new Ponto[8];
         ST aux = groupTemplate.getInstanceOf("typeInstanciate");
-        System.out.println(getLineNumber() + " --- " + t);
+        // System.out.println(getLineNumber() + " --- " + t);
 
         if (t.getType() != null) {
             if (t.getExp() != null) { // Array comum e Array de data
@@ -773,11 +773,11 @@ public class CPlusPlusVisitor extends Visitor {
                     t.getType().accept(this);
                     aux.add("type", type);
                     
-                    System.out.println(getLineNumber() + " -- " + t.getExp() + " -- " + t.getExp().getClass().getSimpleName());
+                    // System.out.println(getLineNumber() + " -- " + t.getExp() + " -- " + t.getExp().getClass().getSimpleName());
                     
                     // Empilha o tamanho do array
                     t.getExp().accept(this);
-                    System.out.println(getLineNumber() + " -- " + expr.render());
+                    // System.out.println(getLineNumber() + " -- " + expr.render());
                     aux.add("expr", expr);
                 }  
             } else { // new Int; -- new Float; -- new Char; -- new data;
